@@ -1,0 +1,1433 @@
+{
+  "metadata": {
+    "repository": "celonis/kafka-ems-connector",
+    "repository_url": "https://github.com/celonis/kafka-ems-connector",
+    "description": "A Kafka Connect sink connector allowing data stored in Apache Kafka to be uploaded to Celonis Execution Management System (EMS) for process mining and execution automation",
+    "language": "Scala",
+    "scala_version": "2.13",
+    "build_system": "sbt",
+    "analysis_date": "2025-11-08",
+    "latest_version": "1.8.8",
+    "latest_release_date": "2024-07-05",
+    "stars": 42,
+    "forks": 2,
+    "status": "Active"
+  },
+  "license": {
+    "type": "Apache License 2.0",
+    "commercial_use": "Allowed",
+    "modification": "Allowed",
+    "distribution": "Allowed",
+    "patent_grant": "Yes",
+    "trademark_use": "No",
+    "liability": "None",
+    "warranty": "None",
+    "reuse_assessment": "APPROVED - Can be freely reused, modified, and integrated into proprietary systems. Apache 2.0 is permissive and business-friendly.",
+    "conditions": [
+      "License and copyright notice must be included",
+      "State changes if modifications are made",
+      "Include NOTICE file if provided"
+    ]
+  },
+  "requirements": {
+    "minimum_kafka_version": "2.3",
+    "kafka_connect_cluster": "Required",
+    "java_runtime": "JVM-compatible",
+    "celonis_platform": "Celonis EMS with Continuous Batch Processing API access",
+    "infrastructure": [
+      "Kafka Connect cluster (standalone or distributed mode)",
+      "Temporary storage for Parquet files",
+      "Network access to Celonis Cloud endpoints",
+      "Authorization credentials for Celonis EMS"
+    ]
+  },
+  "architecture": {
+    "connector_type": "Sink Connector",
+    "framework": "Apache Kafka Connect",
+    "data_flow": [
+      "Kafka Topics → Kafka Connect → Record Transformation → Parquet Buffer → Celonis EMS (CBP API)"
+    ],
+    "core_components": {
+      "EmsSinkConnector": {
+        "type": "Main Connector Class",
+        "class": "com.celonis.kafka.connect.ems.sink.EmsSinkConnector",
+        "responsibility": "Entry point for the Kafka Connect framework, manages connector lifecycle and configuration"
+      },
+      "EmsSinkTask": {
+        "type": "Task Processor",
+        "responsibility": "Processes records from Kafka topics with timeout support (v1.8.1+)",
+        "features": [
+          "Batch processing of Kafka records",
+          "Timeout handling for put operations",
+          "Partition-aware processing"
+        ]
+      },
+      "RecordTransformer": {
+        "type": "Data Transformation",
+        "class": "ems.transform.RecordTransformer",
+        "input": "Kafka Connect SinkRecord",
+        "output": "AVRO GenericRecord",
+        "responsibility": "Transforms incoming Kafka records into AVRO format for Parquet file creation",
+        "features": [
+          "Schema inference for JSON formatted topics (null schema handling)",
+          "Default flattening strategy for nested structures",
+          "Enum-to-string transformation during flattening",
+          "Error handling with optional continuation (v1.8.6+)"
+        ]
+      },
+      "WriterManager": {
+        "type": "Storage Manager",
+        "class": "ems.storage.WriterManager",
+        "responsibility": "Entry point for file-based record buffering logic",
+        "features": [
+          "Dispatches write operations to appropriate Writer instances",
+          "One Writer instance per partition (partition-aware)",
+          "Coordinates Parquet file creation and lifecycle"
+        ]
+      },
+      "Writer": {
+        "type": "File Writer",
+        "responsibility": "Handles actual writing of records to Parquet files",
+        "features": [
+          "Partition-specific file management",
+          "Buffering based on configurable thresholds",
+          "Parquet file format handling"
+        ]
+      },
+      "SchemaInferringJsonConverter": {
+        "type": "Custom Converter",
+        "class": "cloud.celonis.kafka.connect.json.SchemaInferringJsonConverter",
+        "responsibility": "Dynamically infers schema from JSON structure and converts to canonical internal representation",
+        "use_case": "Topics with JSON data but no explicit schema"
+      }
+    },
+    "data_processing_pipeline": {
+      "stages": [
+        {
+          "stage": "1. Ingestion",
+          "description": "Kafka Connect framework pulls records from configured topics",
+          "components": ["EmsSinkTask"]
+        },
+        {
+          "stage": "2. Transformation",
+          "description": "Records are transformed to AVRO GenericRecord format",
+          "components": ["RecordTransformer", "SchemaInferringJsonConverter"],
+          "operations": [
+            "Schema inference (if needed)",
+            "Flattening nested structures",
+            "Type conversions (e.g., enum to string)",
+            "Error handling with optional DLQ routing"
+          ]
+        },
+        {
+          "stage": "3. Buffering",
+          "description": "AVRO records are written to temporary Parquet files per partition",
+          "components": ["WriterManager", "Writer"],
+          "operations": [
+            "Partition-based file organization",
+            "Threshold-based file rotation (size, records, time)",
+            "Parquet file creation with configurable row groups"
+          ]
+        },
+        {
+          "stage": "4. Upload",
+          "description": "Completed Parquet files are uploaded to Celonis EMS via CBP API",
+          "target_api": "Celonis Continuous Batch Processing (CBP) API",
+          "operations": [
+            "HTTP POST to CBP endpoint",
+            "Authorization header inclusion",
+            "Retry logic on failure"
+          ]
+        },
+        {
+          "stage": "5. Cleanup",
+          "description": "Local Parquet files are cleaned or renamed based on configuration",
+          "configurable": true,
+          "debug_option": "connect.ems.debug.keep.parquet.files"
+        }
+      ]
+    },
+    "parallelization_model": {
+      "task_level": "Configurable via tasks.max parameter",
+      "partition_level": "One Writer per topic-partition",
+      "concurrency": "Tasks can run in parallel across Kafka Connect workers",
+      "scalability_considerations": [
+        "Number of tasks should not exceed number of partitions",
+        "Each task maintains separate Writers for its assigned partitions",
+        "Distributed mode allows horizontal scaling across workers"
+      ]
+    }
+  },
+  "kafka_integration_patterns": {
+    "connector_pattern": "Sink Connector",
+    "framework": "Apache Kafka Connect API",
+    "consumer_pattern": {
+      "type": "Kafka Connect Framework-Managed",
+      "description": "Connector leverages Kafka Connect's built-in consumer group management",
+      "features": [
+        "Automatic offset management",
+        "Consumer group coordination",
+        "Rebalancing support",
+        "Fault tolerance through offset commits"
+      ]
+    },
+    "data_formats_supported": [
+      {
+        "format": "JSON",
+        "converter": "org.apache.kafka.connect.json.JsonConverter",
+        "schema_support": "With or without schema",
+        "special_handling": "Schema inference via SchemaInferringJsonConverter"
+      },
+      {
+        "format": "AVRO",
+        "converter": "io.confluent.connect.avro.AvroConverter",
+        "schema_support": "Schema Registry required",
+        "special_handling": "Native support with enum-to-string transformation"
+      },
+      {
+        "format": "String",
+        "converter": "org.apache.kafka.connect.storage.StringConverter",
+        "schema_support": "No schema",
+        "use_case": "Simple key values"
+      }
+    ],
+    "offset_management": {
+      "strategy": "Kafka Connect Framework",
+      "commit_triggers": [
+        "After successful upload to Celonis",
+        "Based on connector's internal batching logic"
+      ],
+      "exactly_once_semantics": "Best-effort at-least-once delivery"
+    },
+    "topic_consumption": {
+      "mode": "Multi-topic support",
+      "configuration": "Via 'topics' parameter (comma-separated)",
+      "partition_assignment": "Kafka Connect handles partition assignment to tasks"
+    }
+  },
+  "real_time_event_streaming": {
+    "streaming_model": "Continuous micro-batching",
+    "latency_characteristics": {
+      "factors": [
+        "Commit interval (connect.ems.commit.interval.ms)",
+        "Commit size threshold (connect.ems.commit.size.bytes)",
+        "Commit records threshold (connect.ems.commit.records)",
+        "Network latency to Celonis cloud",
+        "Parquet file creation overhead"
+      ],
+      "typical_latency": "Seconds to minutes (configurable)",
+      "real_time_definition": "Near real-time streaming with configurable micro-batches"
+    },
+    "batching_strategy": {
+      "type": "Threshold-based batching",
+      "thresholds": [
+        {
+          "name": "Size-based",
+          "parameter": "connect.ems.commit.size.bytes",
+          "example_value": "10000000 (10MB)",
+          "constraint": "Minimum 100KB (as of v1.8.0)"
+        },
+        {
+          "name": "Count-based",
+          "parameter": "connect.ems.commit.records",
+          "example_value": "100000 records"
+        },
+        {
+          "name": "Time-based",
+          "parameter": "connect.ems.commit.interval.ms",
+          "example_value": "30000 ms (30 seconds)"
+        }
+      ],
+      "trigger_logic": "Whichever threshold is reached first triggers upload"
+    },
+    "throughput_optimization": {
+      "parquet_configuration": {
+        "row_group_size": {
+          "parameter": "connect.ems.parquet.row.group.size.bytes",
+          "default_value": "10KB (as of v1.8.0)",
+          "previous_name": "connect.ems.parquet.write.flush.records",
+          "constraint": "Must be <= MIN(row.group.size.bytes, commit.size.bytes)",
+          "impact": "Smaller values = more row groups, larger values = more memory usage"
+        }
+      },
+      "network_optimization": {
+        "strategy": "Local file accumulation reduces network calls",
+        "benefit": "Batch uploads instead of per-record network calls"
+      }
+    },
+    "use_cases": {
+      "transactional_systems": [
+        "Oracle",
+        "SAP",
+        "Salesforce",
+        "Workday"
+      ],
+      "custom_sources": [
+        "IoT devices",
+        "Weather data feeds",
+        "Traffic data",
+        "Market data"
+      ],
+      "event_driven_applications": [
+        "Microservices event streams",
+        "Kafka-based architectures",
+        "Real-time analytics pipelines"
+      ],
+      "process_mining": [
+        "Real-time process execution monitoring",
+        "Event log collection",
+        "Business transformation analytics"
+      ]
+    }
+  },
+  "data_transformation_and_mapping": {
+    "transformation_pipeline": {
+      "input_formats": [
+        "Kafka Connect SinkRecord with schema",
+        "Kafka Connect SinkRecord without schema (JSON)"
+      ],
+      "intermediate_format": "AVRO GenericRecord",
+      "output_format": "Apache Parquet",
+      "rationale": "AVRO facilitates interaction with Java Parquet libraries"
+    },
+    "schema_handling": {
+      "schema_inference": {
+        "enabled": true,
+        "trigger": "When incoming SinkRecord has null schema",
+        "implementation": "SchemaInferringJsonConverter",
+        "description": "Dynamically infers schema from JSON structure"
+      },
+      "schema_evolution": {
+        "supported": true,
+        "features": [
+          "Incremental schema evolution",
+          "Optional field preservation during evolution (v1.8.6+ fix)",
+          "Backward compatibility handling"
+        ],
+        "limitations": [
+          "Data misalignment between file and target table schema can cause failures",
+          "Limited error reporting for schema mismatches"
+        ]
+      },
+      "schema_registry": {
+        "required_for": "AVRO topics",
+        "optional_for": "JSON topics",
+        "configuration": "Standard Kafka Connect schema registry settings"
+      }
+    },
+    "flattening_strategy": {
+      "description": "Default flattening strategy applies simple rules for nested structures",
+      "operations": [
+        {
+          "operation": "Nested field flattening",
+          "example": "address.street → address_street",
+          "description": "Nested objects are flattened with underscore separators"
+        },
+        {
+          "operation": "Array field handling",
+          "description": "Arrays are processed according to simple flattening rules",
+          "limitations": "Complex array structures may require custom SMTs"
+        },
+        {
+          "operation": "Enum transformation",
+          "description": "AVRO enum values are converted to plain strings (v1.8.6+)",
+          "benefit": "Enables efficient Parquet upload for record-name-strategy AVRO topics with incompatible enum types"
+        }
+      ],
+      "customization": "Can be extended through Kafka Connect Single Message Transforms (SMTs)"
+    },
+    "data_type_mapping": {
+      "kafka_to_avro": "Handled by RecordTransformer",
+      "avro_to_parquet": "Native mapping via Parquet Java library",
+      "special_cases": [
+        "Enum → String transformation",
+        "Nested structures → Flattened representation",
+        "Null handling for optional fields"
+      ]
+    },
+    "configuration_mapping": {
+      "property_definition": "EmsSinkConfigDef.config",
+      "property_exposure": "EmsSinkConfig case class",
+      "property_mapping": "EmsSinkConfig.from method",
+      "features": [
+        "Incompatible property handling",
+        "Property overrides",
+        "Validation and constraints"
+      ]
+    }
+  },
+  "scalability_patterns": {
+    "horizontal_scaling": {
+      "method": "Kafka Connect distributed mode",
+      "scaling_units": [
+        "Number of Kafka Connect workers",
+        "Number of tasks per connector (tasks.max)",
+        "Number of partitions in source topics"
+      ],
+      "best_practices": [
+        "tasks.max should not exceed number of topic partitions",
+        "Distribute workers across multiple nodes",
+        "Monitor worker CPU and memory usage"
+      ]
+    },
+    "partition_parallelism": {
+      "pattern": "Partition-per-Writer",
+      "description": "WriterManager creates one Writer instance per partition",
+      "benefit": "Parallel processing of different partitions",
+      "scalability": "Linear scaling with partition count (up to task limit)"
+    },
+    "resource_management": {
+      "memory": {
+        "primary_usage": [
+          "Parquet file buffering",
+          "AVRO record transformation",
+          "Row group accumulation"
+        ],
+        "configuration_impact": [
+          "row.group.size.bytes affects memory per Writer",
+          "commit.size.bytes affects total buffered data",
+          "Number of partitions multiplies per-partition memory"
+        ]
+      },
+      "disk": {
+        "usage": "Temporary Parquet files",
+        "configuration": "connect.ems.tmp.dir",
+        "cleanup": "Automatic after upload (configurable)"
+      },
+      "network": {
+        "pattern": "Batch uploads to minimize network calls",
+        "optimization": "Local accumulation before upload"
+      }
+    },
+    "known_limitations": {
+      "scalability_issue": {
+        "issue_number": 9,
+        "description": "Scaling to 3 instances with 3-partition topics resulted in data count mismatch in Celonis",
+        "status": "Reported, resolution unclear",
+        "impact": "Potential data loss or duplication during scaling",
+        "recommendation": "Thoroughly test scaling scenarios with data validation"
+      }
+    },
+    "performance_tuning": {
+      "commit_size_reduction": {
+        "version": "1.8.0",
+        "change": "Minimum commit.size.bytes reduced from 1MB to 100KB",
+        "benefit": "Enables smaller batch sizes for lower latency use cases"
+      },
+      "row_group_optimization": {
+        "version": "1.8.0",
+        "change": "Default row.group.size.bytes reduced to 10KB",
+        "benefit": "Better balance between memory usage and file efficiency"
+      },
+      "configuration_validation": {
+        "version": "1.8.0",
+        "logic": "row.size.bytes constrained to MIN(row.group.size.bytes, commit.size.bytes)",
+        "benefit": "Prevents inconsistent configurations"
+      }
+    }
+  },
+  "error_handling_and_resilience": {
+    "retry_mechanism": {
+      "configuration": {
+        "policy": {
+          "parameter": "connect.ems.error.policy",
+          "values": ["RETRY", "FAIL"],
+          "default": "Likely RETRY"
+        },
+        "max_retries": {
+          "parameter": "connect.ems.max.retries",
+          "example_value": 20,
+          "description": "Maximum number of retry attempts"
+        },
+        "retry_interval": {
+          "parameter": "connect.ems.retry.interval",
+          "example_value": "60000 ms (1 minute)",
+          "description": "Delay between retry attempts"
+        }
+      },
+      "retry_scope": [
+        "Upload failures to CBP API",
+        "Network connectivity issues",
+        "Transient Celonis platform errors"
+      ]
+    },
+    "error_policies": {
+      "continue_on_invalid_input": {
+        "parameter": "connect.ems.error.policy.continue.on.invalid.input",
+        "introduced": "v1.8.6",
+        "type": "boolean",
+        "default": false,
+        "behavior_when_true": [
+          "Connector continues processing when single record transformation fails",
+          "Failed records are sent to DLQ if configured",
+          "Prevents connector failure due to individual bad records"
+        ],
+        "use_case": "Production environments where uptime is critical"
+      },
+      "dead_letter_queue": {
+        "support": "Standard Kafka Connect DLQ",
+        "configuration": "Standard errors.deadletterqueue.topic.name",
+        "scope": "Sink connector (supported)",
+        "records_sent": [
+          "Records that fail transformation",
+          "Records that fail schema validation",
+          "Records that trigger exceptions"
+        ]
+      }
+    },
+    "timeout_handling": {
+      "put_timeout": {
+        "introduced": "v1.8.1",
+        "component": "EmsSinkTask#put",
+        "description": "Timeout for put operations with e2e tests",
+        "benefit": "Prevents indefinite blocking on slow operations"
+      }
+    },
+    "fault_tolerance": {
+      "offset_management": {
+        "strategy": "Kafka Connect framework handles offsets",
+        "commit_timing": "After successful upload to Celonis",
+        "recovery": "On restart, resumes from last committed offset",
+        "guarantee": "At-least-once delivery"
+      },
+      "partial_failure_handling": {
+        "batch_level": "If batch upload fails, entire batch is retried",
+        "record_level": "Individual record failures can be isolated with continue.on.invalid.input"
+      },
+      "connector_restart": {
+        "behavior": "Resumes from last committed offset",
+        "temporary_files": "May need cleanup depending on when failure occurred",
+        "state_recovery": "Kafka Connect framework manages connector state"
+      }
+    },
+    "monitoring_and_observability": {
+      "logging": {
+        "framework": "Standard Kafka Connect logging",
+        "custom_components": [
+          "RecordTransformer logging",
+          "WriterManager logging",
+          "Upload operation logging"
+        ]
+      },
+      "metrics": {
+        "source": "Kafka Connect JMX metrics",
+        "custom_metrics": "Implementation-specific (not detailed in available docs)"
+      },
+      "debugging": {
+        "parquet_file_retention": {
+          "parameter": "connect.ems.debug.keep.parquet.files",
+          "type": "boolean",
+          "purpose": "Retain local Parquet files for inspection",
+          "use_case": "Troubleshooting data transformation issues"
+        }
+      }
+    },
+    "data_quality_issues": {
+      "schema_mismatch": {
+        "symptom": "Celonis platform job fails during ingestion",
+        "cause": "Incoming file data and schema not aligned with target table schema",
+        "limitation": "No error reporting from connector for this scenario",
+        "mitigation": [
+          "Validate schema compatibility before deployment",
+          "Use schema evolution features carefully",
+          "Monitor Celonis platform job logs"
+        ]
+      },
+      "flattening_bugs": {
+        "fixed_in": "v1.8.2",
+        "issue": "Bug when schema has nested schema",
+        "impact": "Incorrect data transformation",
+        "resolution": "Fixed in release"
+      }
+    }
+  },
+  "dependencies": {
+    "runtime_dependencies": {
+      "apache_kafka": {
+        "minimum_version": "2.3",
+        "components": [
+          "Kafka Connect API",
+          "Kafka Consumer",
+          "Kafka Connect Framework"
+        ]
+      },
+      "scala": {
+        "version": "2.13",
+        "usage": "Primary implementation language"
+      },
+      "parquet": {
+        "library": "Apache Parquet Java library",
+        "usage": "Parquet file creation and manipulation"
+      },
+      "avro": {
+        "library": "Apache Avro",
+        "usage": "Intermediate data format for transformation"
+      },
+      "schema_registry": {
+        "provider": "Confluent (optional)",
+        "usage": "AVRO schema management",
+        "required_for": "AVRO topics with schema"
+      }
+    },
+    "build_dependencies": {
+      "sbt": {
+        "version": "Latest compatible with Scala 2.13",
+        "usage": "Build system"
+      },
+      "sbt_assembly": {
+        "usage": "Creates fat JAR for deployment",
+        "output": "connector/target/scala-2.13/kafka-ems-sink-assembly-{version}.jar"
+      }
+    },
+    "external_service_dependencies": {
+      "celonis_ems": {
+        "component": "Celonis Execution Management System",
+        "api": "Continuous Batch Processing (CBP) API",
+        "endpoint_format": "https://{tenant}.celonis.cloud/continuous-batch-processing/api/v1/{connection}/items",
+        "authentication": "API Key (AppKey)",
+        "requirements": [
+          "Valid Celonis tenant",
+          "Connection ID",
+          "Target table pre-configured",
+          "API authorization key"
+        ]
+      }
+    },
+    "development_dependencies": {
+      "testing_frameworks": "Implied but not detailed in available documentation",
+      "e2e_tests": "Mentioned for timeout handling (v1.8.1)"
+    },
+    "license_compatibility": {
+      "apache_kafka": "Apache License 2.0 - Compatible",
+      "apache_parquet": "Apache License 2.0 - Compatible",
+      "apache_avro": "Apache License 2.0 - Compatible",
+      "scala": "Apache License 2.0 - Compatible",
+      "overall_assessment": "All major dependencies are Apache 2.0 licensed, ensuring full compatibility"
+    }
+  },
+  "design_patterns": {
+    "architectural_patterns": {
+      "plugin_architecture": {
+        "pattern": "Kafka Connect Plugin",
+        "description": "Implements Kafka Connect SinkConnector and SinkTask interfaces",
+        "benefits": [
+          "Leverage Kafka Connect framework features",
+          "Standard deployment model",
+          "Built-in offset management and fault tolerance"
+        ]
+      },
+      "pipeline_pattern": {
+        "pattern": "ETL Pipeline",
+        "stages": ["Extract (Kafka)", "Transform (AVRO)", "Load (Parquet → Celonis)"],
+        "description": "Clear separation of concerns across pipeline stages"
+      },
+      "adapter_pattern": {
+        "usage": "RecordTransformer adapts Kafka SinkRecord to AVRO GenericRecord",
+        "benefit": "Decouples Kafka-specific formats from Parquet handling"
+      }
+    },
+    "data_ingestion_patterns": {
+      "micro_batching": {
+        "description": "Accumulate records into micro-batches before upload",
+        "threshold_types": ["Size", "Count", "Time"],
+        "benefits": [
+          "Reduced network overhead",
+          "Improved throughput",
+          "Configurable latency vs. efficiency trade-off"
+        ]
+      },
+      "partition_affinity": {
+        "description": "Each partition processed by dedicated Writer instance",
+        "benefits": [
+          "Parallel processing",
+          "Maintains partition ordering",
+          "Scalable with partition count"
+        ]
+      },
+      "buffered_writer": {
+        "description": "Local file buffering before remote upload",
+        "implementation": "WriterManager + Writer classes",
+        "benefits": [
+          "Resilience to transient network issues",
+          "Efficient batch uploads",
+          "Atomic file operations"
+        ]
+      },
+      "schema_on_read": {
+        "description": "Schema inference for schemaless JSON data",
+        "implementation": "SchemaInferringJsonConverter",
+        "use_case": "Flexible ingestion from sources without rigid schemas"
+      }
+    },
+    "streaming_patterns": {
+      "continuous_processing": {
+        "description": "Continuously consume and process from Kafka topics",
+        "framework": "Kafka Connect provides continuous polling"
+      },
+      "checkpoint_pattern": {
+        "description": "Offset commits act as checkpoints",
+        "benefit": "Resume from last checkpoint on failure"
+      },
+      "eventual_consistency": {
+        "description": "At-least-once delivery guarantees eventual consistency",
+        "trade_off": "Simplicity over strict exactly-once semantics"
+      }
+    },
+    "resilience_patterns": {
+      "retry_with_backoff": {
+        "implementation": "Configurable retry count and interval",
+        "parameters": ["max.retries", "retry.interval"]
+      },
+      "circuit_breaker_like": {
+        "description": "Error policies control connector behavior on failures",
+        "options": ["RETRY", "FAIL"]
+      },
+      "dead_letter_queue": {
+        "description": "Route problematic records to separate topic",
+        "benefit": "Prevents connector failure from bad data"
+      },
+      "graceful_degradation": {
+        "feature": "continue.on.invalid.input",
+        "description": "Continue processing valid records despite individual failures"
+      }
+    },
+    "transformation_patterns": {
+      "canonical_data_model": {
+        "model": "AVRO GenericRecord",
+        "description": "Standardize all inputs to common format before output",
+        "benefit": "Single transformation logic regardless of input format"
+      },
+      "flattening_transformation": {
+        "description": "Transform nested structures to flat representation",
+        "rationale": "Simplify downstream processing and storage"
+      },
+      "format_conversion": {
+        "conversions": ["JSON → AVRO", "Kafka Record → AVRO", "AVRO → Parquet"],
+        "benefit": "Leverage best format for each stage"
+      }
+    }
+  },
+  "configuration_reference": {
+    "connector_configuration": {
+      "connector.class": {
+        "value": "com.celonis.kafka.connect.ems.sink.EmsSinkConnector",
+        "required": true,
+        "description": "Connector class name"
+      },
+      "tasks.max": {
+        "type": "integer",
+        "example": 1,
+        "required": true,
+        "description": "Maximum number of tasks for parallelism"
+      },
+      "topics": {
+        "type": "string (comma-separated)",
+        "example": "payments,orders,shipments",
+        "required": true,
+        "description": "Kafka topics to consume from"
+      }
+    },
+    "celonis_configuration": {
+      "connect.ems.endpoint": {
+        "type": "URL",
+        "example": "https://tenant.celonis.cloud/continuous-batch-processing/api/v1/connection-id/items",
+        "required": true,
+        "description": "Celonis CBP API endpoint"
+      },
+      "connect.ems.target.table": {
+        "type": "string",
+        "example": "payments",
+        "required": true,
+        "description": "Target table name in Celonis"
+      },
+      "connect.ems.connection.id": {
+        "type": "string",
+        "required": true,
+        "description": "Celonis connection identifier"
+      },
+      "connect.ems.authorization.key": {
+        "type": "string",
+        "example": "AppKey ***",
+        "required": true,
+        "description": "Authorization key for Celonis API",
+        "security": "Sensitive - should be secured in production"
+      }
+    },
+    "batching_configuration": {
+      "connect.ems.commit.size.bytes": {
+        "type": "integer",
+        "example": 10000000,
+        "minimum": 100000,
+        "default": "Not specified",
+        "description": "File size threshold for upload (bytes)",
+        "notes": "Minimum reduced from 1MB to 100KB in v1.8.0"
+      },
+      "connect.ems.commit.records": {
+        "type": "integer",
+        "example": 100000,
+        "description": "Record count threshold for upload"
+      },
+      "connect.ems.commit.interval.ms": {
+        "type": "integer",
+        "example": 30000,
+        "description": "Time interval threshold for upload (milliseconds)"
+      }
+    },
+    "parquet_configuration": {
+      "connect.ems.parquet.row.group.size.bytes": {
+        "type": "integer",
+        "default": 10240,
+        "description": "Parquet row group size in bytes",
+        "notes": "Previously named connect.ems.parquet.write.flush.records; default changed to 10KB in v1.8.0",
+        "constraint": "Must be <= MIN(row.group.size.bytes, commit.size.bytes)"
+      }
+    },
+    "storage_configuration": {
+      "connect.ems.tmp.dir": {
+        "type": "path",
+        "example": "/tmp/ems",
+        "required": true,
+        "description": "Temporary directory for Parquet file accumulation"
+      },
+      "connect.ems.debug.keep.parquet.files": {
+        "type": "boolean",
+        "default": false,
+        "description": "Whether to keep Parquet files after upload for debugging"
+      }
+    },
+    "error_handling_configuration": {
+      "connect.ems.error.policy": {
+        "type": "enum",
+        "values": ["RETRY", "FAIL"],
+        "example": "RETRY",
+        "description": "Error handling policy"
+      },
+      "connect.ems.max.retries": {
+        "type": "integer",
+        "example": 20,
+        "description": "Maximum number of retry attempts"
+      },
+      "connect.ems.retry.interval": {
+        "type": "integer",
+        "example": 60000,
+        "description": "Retry interval in milliseconds"
+      },
+      "connect.ems.error.policy.continue.on.invalid.input": {
+        "type": "boolean",
+        "default": false,
+        "introduced": "v1.8.6",
+        "description": "Continue processing when transformation of single records fails; failed records sent to DLQ if configured"
+      }
+    },
+    "converter_configuration": {
+      "key.converter": {
+        "example": "org.apache.kafka.connect.storage.StringConverter",
+        "description": "Converter for record keys"
+      },
+      "value.converter": {
+        "examples": [
+          "org.apache.kafka.connect.json.JsonConverter",
+          "io.confluent.connect.avro.AvroConverter",
+          "cloud.celonis.kafka.connect.json.SchemaInferringJsonConverter"
+        ],
+        "description": "Converter for record values"
+      }
+    }
+  },
+  "version_history": {
+    "v1.8.8": {
+      "release_date": "2024-07-05",
+      "changes": [
+        "Fixed proxy configuration issues"
+      ]
+    },
+    "v1.8.6": {
+      "changes": [
+        "Fixed bug preventing optional fields preservation during schema evolution",
+        "Transformed enum AVRO values into plain strings during flattening",
+        "Introduced connect.ems.error.policy.continue.on.invalid.input parameter"
+      ]
+    },
+    "v1.8.2": {
+      "changes": [
+        "Fixed bug in flattener when schema has nested schema"
+      ]
+    },
+    "v1.8.1": {
+      "changes": [
+        "Introduced timeout for EmsSinkTask#put",
+        "Added e2e tests for timeout handling"
+      ]
+    },
+    "v1.8.0": {
+      "release_date": "2024-07-12",
+      "changes": [
+        "Reduced minimum commit.size.bytes from 1MB to 100KB",
+        "Reduced default row.group.size.bytes to 10KB",
+        "Added configuration validation logic for row.size.bytes constraint"
+      ]
+    }
+  },
+  "extracted_requirements": {
+    "functional_requirements": [
+      {
+        "id": "FR-1",
+        "requirement": "System shall consume messages from Kafka topics in real-time",
+        "category": "Data Ingestion",
+        "source": "Core connector functionality"
+      },
+      {
+        "id": "FR-2",
+        "requirement": "System shall transform Kafka records to AVRO format",
+        "category": "Data Transformation",
+        "source": "RecordTransformer component"
+      },
+      {
+        "id": "FR-3",
+        "requirement": "System shall buffer transformed records in Parquet files",
+        "category": "Data Storage",
+        "source": "WriterManager/Writer components"
+      },
+      {
+        "id": "FR-4",
+        "requirement": "System shall upload Parquet files to Celonis EMS via CBP API",
+        "category": "Data Integration",
+        "source": "Upload mechanism"
+      },
+      {
+        "id": "FR-5",
+        "requirement": "System shall infer schemas from JSON messages without explicit schema",
+        "category": "Schema Management",
+        "source": "SchemaInferringJsonConverter"
+      },
+      {
+        "id": "FR-6",
+        "requirement": "System shall flatten nested data structures",
+        "category": "Data Transformation",
+        "source": "Default flattening strategy"
+      },
+      {
+        "id": "FR-7",
+        "requirement": "System shall support schema evolution",
+        "category": "Schema Management",
+        "source": "Schema evolution features"
+      },
+      {
+        "id": "FR-8",
+        "requirement": "System shall route failed records to Dead Letter Queue when configured",
+        "category": "Error Handling",
+        "source": "DLQ support"
+      },
+      {
+        "id": "FR-9",
+        "requirement": "System shall retry failed upload operations based on configuration",
+        "category": "Resilience",
+        "source": "Retry mechanism"
+      },
+      {
+        "id": "FR-10",
+        "requirement": "System shall support multiple data formats (JSON, AVRO, String)",
+        "category": "Data Ingestion",
+        "source": "Converter support"
+      },
+      {
+        "id": "FR-11",
+        "requirement": "System shall maintain partition ordering from source topics",
+        "category": "Data Integrity",
+        "source": "Partition-per-Writer pattern"
+      },
+      {
+        "id": "FR-12",
+        "requirement": "System shall commit offsets only after successful upload",
+        "category": "Data Integrity",
+        "source": "Offset management"
+      }
+    ],
+    "non_functional_requirements": [
+      {
+        "id": "NFR-1",
+        "requirement": "System shall achieve near real-time latency (seconds to minutes)",
+        "category": "Performance",
+        "source": "Streaming characteristics"
+      },
+      {
+        "id": "NFR-2",
+        "requirement": "System shall scale horizontally via Kafka Connect distributed mode",
+        "category": "Scalability",
+        "source": "Scalability patterns"
+      },
+      {
+        "id": "NFR-3",
+        "requirement": "System shall provide at-least-once delivery guarantee",
+        "category": "Reliability",
+        "source": "Offset management"
+      },
+      {
+        "id": "NFR-4",
+        "requirement": "System shall handle connector restarts without data loss",
+        "category": "Reliability",
+        "source": "Fault tolerance"
+      },
+      {
+        "id": "NFR-5",
+        "requirement": "System shall be configurable for latency vs. throughput trade-offs",
+        "category": "Performance",
+        "source": "Batching configuration"
+      },
+      {
+        "id": "NFR-6",
+        "requirement": "System shall minimize network overhead through batch uploads",
+        "category": "Performance",
+        "source": "Micro-batching pattern"
+      },
+      {
+        "id": "NFR-7",
+        "requirement": "System shall be available as open-source under Apache 2.0 license",
+        "category": "Licensing",
+        "source": "License"
+      },
+      {
+        "id": "NFR-8",
+        "requirement": "System shall support deployment on JVM-compatible platforms",
+        "category": "Portability",
+        "source": "Scala/Java implementation"
+      },
+      {
+        "id": "NFR-9",
+        "requirement": "System shall provide configurable error handling policies",
+        "category": "Reliability",
+        "source": "Error policy configuration"
+      },
+      {
+        "id": "NFR-10",
+        "requirement": "System shall support debugging through Parquet file retention",
+        "category": "Maintainability",
+        "source": "Debug configuration"
+      }
+    ],
+    "integration_requirements": [
+      {
+        "id": "IR-1",
+        "requirement": "System shall integrate with Apache Kafka 2.3 or higher",
+        "category": "External System",
+        "source": "Requirements"
+      },
+      {
+        "id": "IR-2",
+        "requirement": "System shall integrate with Kafka Connect framework",
+        "category": "Framework",
+        "source": "Architecture"
+      },
+      {
+        "id": "IR-3",
+        "requirement": "System shall integrate with Celonis EMS Continuous Batch Processing API",
+        "category": "External System",
+        "source": "Target platform"
+      },
+      {
+        "id": "IR-4",
+        "requirement": "System shall optionally integrate with Confluent Schema Registry",
+        "category": "External System",
+        "source": "AVRO support"
+      }
+    ],
+    "security_requirements": [
+      {
+        "id": "SR-1",
+        "requirement": "System shall authenticate to Celonis API using API keys",
+        "category": "Authentication",
+        "source": "Authorization configuration"
+      },
+      {
+        "id": "SR-2",
+        "requirement": "System shall use HTTPS for API communication",
+        "category": "Transport Security",
+        "source": "Endpoint format"
+      },
+      {
+        "id": "SR-3",
+        "requirement": "System shall protect sensitive configuration parameters",
+        "category": "Data Protection",
+        "source": "Authorization key handling"
+      }
+    ]
+  },
+  "complexity_assessment": {
+    "overall_complexity": "Medium to High",
+    "complexity_factors": {
+      "architecture": {
+        "level": "Medium",
+        "factors": [
+          "Well-defined component separation",
+          "Standard Kafka Connect patterns",
+          "Clear data flow pipeline"
+        ],
+        "challenges": [
+          "Understanding Kafka Connect framework",
+          "Multi-stage transformation pipeline",
+          "Partition-based parallelism"
+        ]
+      },
+      "implementation": {
+        "level": "Medium-High",
+        "factors": [
+          "Scala implementation (requires Scala expertise)",
+          "Multiple data format conversions",
+          "Parquet file handling complexity",
+          "Schema evolution management"
+        ],
+        "challenges": [
+          "AVRO and Parquet library interactions",
+          "Schema inference logic",
+          "Error handling across multiple stages",
+          "Memory and resource management"
+        ]
+      },
+      "configuration": {
+        "level": "Medium",
+        "factors": [
+          "Extensive configuration options",
+          "Multiple tuning parameters for performance"
+        ],
+        "challenges": [
+          "Understanding parameter interactions",
+          "Optimal configuration for specific use cases",
+          "Balancing latency, throughput, and resource usage"
+        ]
+      },
+      "deployment": {
+        "level": "Medium",
+        "factors": [
+          "Standard Kafka Connect deployment model",
+          "Single JAR artifact"
+        ],
+        "challenges": [
+          "Kafka Connect cluster setup",
+          "Celonis integration prerequisites",
+          "Temporary storage provisioning"
+        ]
+      },
+      "integration": {
+        "level": "Medium-High",
+        "factors": [
+          "Multiple external system dependencies",
+          "API integration with Celonis"
+        ],
+        "challenges": [
+          "Celonis API access and credentials",
+          "Schema Registry setup (for AVRO)",
+          "Network connectivity and security",
+          "Target table schema alignment"
+        ]
+      },
+      "operational": {
+        "level": "Medium",
+        "factors": [
+          "Built-in Kafka Connect monitoring",
+          "Standard JMX metrics"
+        ],
+        "challenges": [
+          "Troubleshooting data misalignment issues",
+          "Limited error visibility for Celonis platform failures",
+          "Scaling validation (known issue #9)",
+          "Temporary file management"
+        ]
+      }
+    },
+    "lines_of_code_estimate": "5,000 - 10,000 LOC",
+    "learning_curve": "Medium - Requires knowledge of Kafka Connect, Scala, AVRO, Parquet, and Celonis platform",
+    "maintenance_burden": "Medium - Active project with regular releases, requires keeping up with Kafka and Celonis updates"
+  },
+  "recommendations": {
+    "reuse_opportunities": {
+      "high_value_components": [
+        {
+          "component": "RecordTransformer",
+          "value": "Generic Kafka record to AVRO transformation logic",
+          "applicability": "Any system needing Kafka-to-AVRO conversion",
+          "considerations": "May need adaptation for non-Celonis targets"
+        },
+        {
+          "component": "SchemaInferringJsonConverter",
+          "value": "Dynamic schema inference from JSON",
+          "applicability": "Systems ingesting schemaless JSON from Kafka",
+          "considerations": "Valuable for flexible data ingestion pipelines"
+        },
+        {
+          "component": "WriterManager pattern",
+          "value": "Partition-aware buffering and file management",
+          "applicability": "Any file-based sink connector",
+          "considerations": "Good pattern for batch-oriented sinks"
+        },
+        {
+          "component": "Batching logic",
+          "value": "Threshold-based (size/count/time) batching",
+          "applicability": "Any system needing configurable batching",
+          "considerations": "Excellent pattern for latency/throughput tuning"
+        },
+        {
+          "component": "Error handling patterns",
+          "value": "Configurable retry, DLQ integration, continue-on-error",
+          "applicability": "Any data pipeline requiring resilience",
+          "considerations": "Production-ready error handling approach"
+        }
+      ],
+      "architectural_patterns": [
+        {
+          "pattern": "Kafka Connect plugin architecture",
+          "value": "Standard framework integration",
+          "applicability": "Building any Kafka source/sink connector"
+        },
+        {
+          "pattern": "Micro-batching for streaming",
+          "value": "Balance real-time needs with efficiency",
+          "applicability": "Real-time data pipelines"
+        },
+        {
+          "pattern": "Partition-per-worker parallelism",
+          "value": "Scalable parallel processing",
+          "applicability": "Kafka-based processing systems"
+        },
+        {
+          "pattern": "Canonical data model (AVRO)",
+          "value": "Standardize transformations",
+          "applicability": "Multi-format data integration"
+        }
+      ]
+    },
+    "integration_recommendations": [
+      {
+        "scenario": "Building a similar connector",
+        "recommendation": "Reuse the overall architecture and component structure",
+        "effort": "High",
+        "benefits": [
+          "Proven design patterns",
+          "Apache 2.0 allows code reuse",
+          "Well-structured codebase"
+        ]
+      },
+      {
+        "scenario": "Integrating with Celonis",
+        "recommendation": "Use this connector as-is",
+        "effort": "Low",
+        "benefits": [
+          "Official Celonis connector",
+          "Actively maintained",
+          "Production-ready"
+        ]
+      },
+      {
+        "scenario": "Building different Kafka sink",
+        "recommendation": "Adapt the buffering and batching logic",
+        "effort": "Medium",
+        "benefits": [
+          "Proven scalability patterns",
+          "Configurable performance tuning",
+          "Error handling included"
+        ]
+      },
+      {
+        "scenario": "Schema inference needs",
+        "recommendation": "Extract and adapt SchemaInferringJsonConverter",
+        "effort": "Low-Medium",
+        "benefits": [
+          "Handles schemaless JSON",
+          "Dynamic schema creation",
+          "Reduces ingestion friction"
+        ]
+      }
+    ],
+    "implementation_recommendations": [
+      {
+        "area": "Performance",
+        "recommendations": [
+          "Start with default v1.8.0+ batching parameters (10KB row groups, 100KB+ commits)",
+          "Monitor memory usage relative to partition count and batch sizes",
+          "Tune commit thresholds based on latency requirements",
+          "Test thoroughly before scaling beyond 1-2 tasks due to issue #9"
+        ]
+      },
+      {
+        "area": "Reliability",
+        "recommendations": [
+          "Enable connect.ems.error.policy.continue.on.invalid.input in production",
+          "Configure Dead Letter Queue for failed records",
+          "Set appropriate retry counts and intervals for your network",
+          "Ensure target table schema is aligned before deployment"
+        ]
+      },
+      {
+        "area": "Monitoring",
+        "recommendations": [
+          "Monitor Kafka Connect JMX metrics",
+          "Track Celonis platform job success/failure",
+          "Enable debug.keep.parquet.files initially for troubleshooting",
+          "Set up alerts for connector failures and restarts"
+        ]
+      },
+      {
+        "area": "Security",
+        "recommendations": [
+          "Secure API keys using Kafka Connect secrets management",
+          "Ensure HTTPS for all Celonis API calls",
+          "Restrict access to temporary file directory",
+          "Regular rotation of API credentials"
+        ]
+      },
+      {
+        "area": "Testing",
+        "recommendations": [
+          "Validate schema compatibility with target tables",
+          "Test scaling scenarios with data validation (issue #9)",
+          "Test schema evolution scenarios",
+          "Verify error handling with intentionally bad data"
+        ]
+      }
+    ],
+    "lessons_learned": [
+      {
+        "lesson": "Canonical intermediate format simplifies multi-format support",
+        "application": "Use AVRO or similar as intermediate format in data pipelines"
+      },
+      {
+        "lesson": "Threshold-based batching provides flexible tuning",
+        "application": "Offer size, count, and time thresholds for batch triggers"
+      },
+      {
+        "lesson": "Partition-aware processing enables scalability",
+        "application": "Design for partition-level parallelism in Kafka consumers"
+      },
+      {
+        "lesson": "Schema inference reduces integration friction",
+        "application": "Support schemaless data sources where appropriate"
+      },
+      {
+        "lesson": "Continue-on-error improves production resilience",
+        "application": "Allow connectors to skip bad records rather than failing"
+      },
+      {
+        "lesson": "Local buffering before remote upload improves reliability",
+        "application": "Buffer data locally when uploading to external systems"
+      }
+    ]
+  },
+  "use_case_applicability": {
+    "ideal_for": [
+      "Real-time process mining with Celonis",
+      "Streaming event data from microservices to Celonis",
+      "Migrating batch-based Celonis ingestion to real-time",
+      "IoT event streaming to Celonis",
+      "Transactional system change data capture to Celonis"
+    ],
+    "not_ideal_for": [
+      "Extremely low latency requirements (sub-second)",
+      "Exactly-once semantics requirements",
+      "Non-Celonis target systems (without modification)",
+      "Scenarios requiring complex transformations beyond flattening"
+    ],
+    "adaptation_potential": [
+      {
+        "use_case": "Different target system",
+        "effort": "Medium-High",
+        "changes_needed": [
+          "Replace CBP API client with target system API",
+          "Adapt upload mechanism",
+          "May need different output format than Parquet",
+          "Adjust configuration schema"
+        ]
+      },
+      {
+        "use_case": "Complex transformations",
+        "effort": "Medium",
+        "changes_needed": [
+          "Extend RecordTransformer logic",
+          "Add custom transformation stages",
+          "Consider Kafka Connect SMTs as alternative"
+        ]
+      },
+      {
+        "use_case": "Source connector (reverse direction)",
+        "effort": "High",
+        "changes_needed": [
+          "Complete redesign as SourceConnector",
+          "Different API interaction model",
+          "Offset management for source",
+          "Polling vs push model"
+        ]
+      }
+    ]
+  },
+  "knowledge_gaps": {
+    "documentation_limitations": [
+      "Detailed dependency list with versions not publicly accessible",
+      "Internal implementation details of some components",
+      "Complete configuration reference not available without GitHub wiki access",
+      "Performance benchmarks not published",
+      "Scalability issue (#9) resolution status unclear"
+    ],
+    "areas_requiring_code_inspection": [
+      "Exact dependencies and their versions",
+      "Internal RecordTransformer implementation details",
+      "WriterManager state management logic",
+      "Parquet file creation specifics",
+      "Schema inference algorithm details",
+      "Custom metrics implementation",
+      "Testing framework and coverage"
+    ],
+    "operational_questions": [
+      "What are typical throughput numbers?",
+      "Memory footprint per partition?",
+      "Best practices for connector scaling?",
+      "Recommended worker configuration?",
+      "How to diagnose Celonis platform ingestion failures?",
+      "Impact of schema evolution on running connectors?"
+    ]
+  },
+  "related_technologies": {
+    "similar_connectors": [
+      {
+        "name": "Confluent S3 Sink Connector",
+        "similarity": "File-based sink with Parquet support",
+        "difference": "Generic S3 target vs Celonis-specific"
+      },
+      {
+        "name": "Snowflake Kafka Connector",
+        "similarity": "Data warehouse sink with batching",
+        "difference": "Different target system and data format"
+      },
+      {
+        "name": "Elasticsearch Sink Connector",
+        "similarity": "Real-time data sink from Kafka",
+        "difference": "Document-based vs file-based ingestion"
+      }
+    ],
+    "complementary_tools": [
+      "Confluent Schema Registry - Schema management for AVRO",
+      "Kafka Connect - Deployment framework",
+      "Celonis EMS - Target platform",
+      "Lenses.io - Kafka management (Celonis acquired Lenses.io)",
+      "Apache Parquet Tools - Debugging Parquet files"
+    ]
+  },
+  "summary": {
+    "key_strengths": [
+      "Apache 2.0 licensed - fully reusable",
+      "Production-ready with active maintenance",
+      "Well-architected with clear separation of concerns",
+      "Flexible configuration for various use cases",
+      "Robust error handling with DLQ support",
+      "Schema evolution and inference support",
+      "Partition-based scalability",
+      "Threshold-based batching for tunable performance"
+    ],
+    "key_weaknesses": [
+      "Reported scalability issue (#9) with multi-instance deployment",
+      "Limited error visibility for Celonis platform failures",
+      "Requires understanding of multiple technologies (Kafka, Scala, AVRO, Parquet)",
+      "At-least-once semantics only (no exactly-once)",
+      "Celonis-specific (requires adaptation for other targets)"
+    ],
+    "overall_assessment": "The Celonis Kafka EMS Connector is a well-designed, production-grade connector that demonstrates best practices for Kafka Connect sink implementations. Its Apache 2.0 license makes it an excellent candidate for code reuse and learning. The architecture, particularly the RecordTransformer, WriterManager, and batching logic, provides valuable patterns applicable to other data integration scenarios. The connector is actively maintained with regular releases addressing bugs and adding features. Primary concerns are the reported scalability issue and the Celonis-specific nature of the implementation. For building similar connectors or learning Kafka Connect patterns, this codebase offers significant value.",
+    "reuse_verdict": "HIGHLY RECOMMENDED for reuse, adaptation, and learning"
+  }
+}

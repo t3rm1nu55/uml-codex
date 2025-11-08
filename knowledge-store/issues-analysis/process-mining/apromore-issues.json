@@ -1,0 +1,898 @@
+{
+  "version": 1,
+  "repository": "https://github.com/apromore/ApromoreCore",
+  "analysis_date": "2025-11-08",
+  "last_updated": "2025-11-08",
+  "change_history": [
+    {
+      "version": 1,
+      "date": "2025-11-08",
+      "changes": "Initial analysis based on code review findings - no actual issues exist in archived repository"
+    }
+  ],
+  "total_issues": 0,
+  "issues_analyzed": 0,
+  "note": "Repository archived with no issues or pull requests. Analysis based on architectural review, identified gaps, and technical limitations.",
+  "date_range": {
+    "from": "N/A",
+    "to": "2025-08-29 (archive date)"
+  },
+  "categories": {
+    "bugs": [],
+    "features": [],
+    "enhancements": [],
+    "questions": [],
+    "documentation": []
+  },
+  "key_insights": [
+    {
+      "id": "INSIGHT-001",
+      "insight": "Plugin Architecture Scalability: OSGi-compatible plugin system with 25+ plugins demonstrates extensible design but requires careful lifecycle management and dependency resolution. Plugin development complexity increases with scale.",
+      "source_issues": ["Code review architectural analysis"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design plugin API with clear service interfaces and dependency injection",
+        "Implement plugin isolation to prevent conflicts",
+        "Create plugin templates and comprehensive development documentation",
+        "Separate portal (UI) plugins from logic (backend) plugins",
+        "Use Spring Boot for plugin lifecycle management",
+        "Provide hot-reload capabilities for development"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-002",
+      "insight": "Multi-User Collaboration Limitations: No explicit multi-tenancy support and limited model versioning constrain enterprise deployment. Group-based access control exists but lacks fine-grained permissions and data isolation.",
+      "source_issues": ["Code review multi-user analysis", "Identified gaps"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design multi-tenancy from the start with tenant isolation at database level",
+        "Implement comprehensive RBAC with fine-grained permissions",
+        "Add model versioning with full audit trail",
+        "Implement real-time collaboration features (WebSockets)",
+        "Add concurrent editing conflict resolution",
+        "Design for horizontal data sharding",
+        "Implement tenant-aware caching and session management"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-003",
+      "insight": "BPMN Editor Integration Complexity: JavaScript-based BPMN editor (Apromore-BPMN-Modeler-JS) integrated via portal plugin requires coordination between frontend build (Webpack) and backend deployment. Version synchronization and API contracts critical.",
+      "source_issues": ["Code review frontend architecture"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Separate frontend as standalone SPA with clear API boundaries",
+        "Use modern framework (React/Vue) instead of ZK Framework",
+        "Implement versioned REST APIs for editor-backend communication",
+        "Use WebSocket for real-time collaboration in editor",
+        "Implement client-side validation with BPMN 2.0 schema",
+        "Add comprehensive OpenAPI documentation",
+        "Design for offline editing with conflict resolution"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-004",
+      "insight": "Performance with Large Models: System has documented limits (5000 nodes, 15000 arcs) for process models. Graph visualization (Cytoscape) and animation become bottlenecks with complex models. Memory management and rendering optimization critical.",
+      "source_issues": ["Code review technical limitations", "Performance requirements"],
+      "relevance": "HIGH",
+      "confidence": "MEDIUM",
+      "actionable": true,
+      "action_items": [
+        "Implement virtual scrolling/viewport rendering for large graphs",
+        "Use WebGL-based rendering for complex visualizations (D3.js alternative)",
+        "Add progressive loading and lazy evaluation",
+        "Implement server-side graph simplification/aggregation",
+        "Use web workers for heavy computations",
+        "Implement efficient data structures (RoaringBitmap for sets)",
+        "Add performance monitoring and profiling tools",
+        "Design pagination for large model lists"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-005",
+      "insight": "Deployment and Installation Complexity: Manual MySQL configuration, complex Gradle multi-project setup, and dual storage model (DB + filesystem) increase deployment difficulty. No containerization out of the box limits cloud deployment.",
+      "source_issues": ["Code review setup analysis", "Usability limitations"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Provide Docker containers with docker-compose for local development",
+        "Support multiple database backends (PostgreSQL, MySQL, H2)",
+        "Implement database auto-initialization with Liquibase",
+        "Create Kubernetes Helm charts for cloud deployment",
+        "Add health checks and readiness probes",
+        "Implement configuration externalization (environment variables, ConfigMaps)",
+        "Provide Infrastructure as Code templates (Terraform, CloudFormation)",
+        "Add comprehensive deployment documentation"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-006",
+      "insight": "Database and Persistence Challenges: Dual storage model (MySQL for metadata, filesystem for event logs) requires coordinated backup and transaction management. Liquibase migrations enable schema evolution but add complexity. No built-in multi-database sharding.",
+      "source_issues": ["Code review storage architecture"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design unified storage abstraction with pluggable backends",
+        "Support object storage (S3, Azure Blob) for event logs",
+        "Implement distributed transactions or saga pattern",
+        "Add automatic backup and restore functionality",
+        "Design for database sharding with tenant-based partitioning",
+        "Use PostgreSQL JSONB for flexible metadata storage",
+        "Implement read replicas for query scalability",
+        "Add connection pooling optimization (HikariCP tuning)"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-007",
+      "insight": "Monolithic Architecture Scalability: Spring Boot monolith with embedded Tomcat limits horizontal scalability and independent component deployment. Tight coupling between portal, manager, and plugins constrains evolution.",
+      "source_issues": ["Code review architecture assessment", "Scalability limitations"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Decompose into microservices (API Gateway, Auth Service, Model Service, Mining Service, Storage Service)",
+        "Implement service mesh for inter-service communication (Istio, Linkerd)",
+        "Use message queue (Kafka, RabbitMQ) for asynchronous processing",
+        "Add API Gateway pattern for request routing",
+        "Implement CQRS for read/write separation",
+        "Use event-driven architecture for loose coupling",
+        "Add distributed tracing (Jaeger, Zipkin)",
+        "Implement circuit breakers and bulkheads"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-008",
+      "insight": "License Restrictions Impact Reusability: LGPL 3.0 on core platform and key dependencies (ZK Framework, OpenXES, Hibernate, JBPT) requires derivative works to be LGPL. Incompatible with proprietary licensing, necessitating clean-room reimplementation.",
+      "source_issues": ["Code review license analysis"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Use only permissive licenses (Apache 2.0, MIT, BSD) for all dependencies",
+        "Audit all dependencies for license compatibility",
+        "Implement license scanning in CI/CD pipeline",
+        "Document licensing decisions and rationale",
+        "Consider commercial support licenses where needed",
+        "Avoid LGPL and GPL dependencies entirely for proprietary products"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-009",
+      "insight": "ZK Framework Vendor Lock-in: Java-based UI framework (LGPL 3.0) with ZUL markup creates vendor lock-in and limits frontend flexibility. Developers require ZK expertise, reducing talent pool. Modern frontend practices (React, Vue) not applicable.",
+      "source_issues": ["Code review frontend technology"],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Use modern JavaScript framework (React with TypeScript)",
+        "Implement headless backend with REST/GraphQL APIs",
+        "Separate frontend completely from backend deployment",
+        "Use Material-UI or Ant Design for component library",
+        "Implement server-side rendering (Next.js) for SEO",
+        "Add progressive web app capabilities",
+        "Use widely-adopted technologies to expand talent pool"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-010",
+      "insight": "Process Mining Algorithm Integration: SplitMiner uses complex Petri net and graph algorithms (JBPT, UMA, PNAPI). Integration of ProM framework provides extensive capabilities but adds complexity. Algorithm pluggability via strategy pattern enables flexibility.",
+      "source_issues": ["Code review process mining capabilities"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design algorithm abstraction layer with pluggable implementations",
+        "Use strategy pattern for algorithm selection",
+        "Implement async processing for long-running algorithms",
+        "Add progress reporting and cancellation",
+        "Cache algorithm results with intelligent invalidation",
+        "Provide algorithm comparison and benchmarking tools",
+        "Document algorithm parameters and tuning guidance",
+        "Consider cloud-based compute for resource-intensive algorithms"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-011",
+      "insight": "Event Log Processing at Scale: XES format handling via OpenXES with filesystem storage enables large file support (up to 500MB). APMLogModule provides advanced filtering and transformation. Memory management and streaming critical for large logs.",
+      "source_issues": ["Code review event log support"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement streaming log processing to handle unlimited sizes",
+        "Use columnar storage (Parquet) for analytics optimization",
+        "Add incremental log import with resume capability",
+        "Implement log sampling and filtering at import time",
+        "Use time-series database for log storage (InfluxDB, TimescaleDB)",
+        "Add distributed processing (Apache Spark) for large-scale analytics",
+        "Implement log compression and archival",
+        "Add log quality validation and profiling"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-012",
+      "insight": "Visualization Performance Bottlenecks: Cytoscape-based graph rendering with SVG.js and Konva for animations creates performance challenges with complex models. Export to PDF (jsPDF) and image formats requires optimization.",
+      "source_issues": ["Code review visualization libraries"],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Use Canvas/WebGL for large graph rendering instead of SVG",
+        "Implement level-of-detail rendering (LOD)",
+        "Add viewport-based culling for off-screen elements",
+        "Use web workers for layout calculations",
+        "Implement server-side rendering for static exports",
+        "Add interactive zoom levels with detail adaptation",
+        "Optimize animation frame rates and reduce repaints",
+        "Provide vector and raster export options"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-013",
+      "insight": "Security Implementation Gaps: SHA-256 password hashing with legacy MD5 support, 45-minute session timeout, and optional Keycloak SSO. No explicit API rate limiting, audit logging, or multi-tenancy data isolation.",
+      "source_issues": ["Code review security analysis", "Recommendations"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement OAuth 2.0 / OIDC by default (no legacy auth)",
+        "Add comprehensive audit logging for all operations",
+        "Implement API rate limiting and throttling",
+        "Add RBAC with fine-grained permissions (resource-level)",
+        "Implement encryption at rest for sensitive data",
+        "Add security headers per OWASP recommendations",
+        "Implement SIEM integration for security monitoring",
+        "Add vulnerability scanning in CI/CD",
+        "Use secrets management (HashiCorp Vault)",
+        "Implement multi-tenancy with strict data isolation"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-014",
+      "insight": "Business Calendar Integration: Calendar management for working hours and holidays enables accurate duration calculations. Critical for process performance analysis but adds configuration complexity. Integration across components required.",
+      "source_issues": ["Code review calendar component"],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design flexible calendar abstraction (multiple calendars, time zones)",
+        "Support standard calendar formats (iCal)",
+        "Implement calendar inheritance and composition",
+        "Add holiday and working hours management UI",
+        "Support tenant-specific and user-specific calendars",
+        "Implement calendar-aware duration calculations",
+        "Add calendar validation and conflict detection",
+        "Document calendar configuration best practices"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-015",
+      "insight": "Model Repository and Versioning: Model storage in repository with sharing capabilities but no explicit version control. Database metadata with filesystem storage requires synchronization. Version history and change tracking missing.",
+      "source_issues": ["Code review multi-user collaboration", "Identified gaps"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement Git-like versioning for all models",
+        "Add branching and merging capabilities",
+        "Implement change history with diff visualization",
+        "Add rollback and restore functionality",
+        "Implement tagging and release management",
+        "Add change approval workflows",
+        "Implement model comparison and conflict resolution",
+        "Add comprehensive audit trail for all changes"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-016",
+      "insight": "API Design and Integration: REST APIs via Spring Jersey with SpringDoc OpenAPI documentation. No GraphQL support limits query flexibility. API versioning not prominently documented. Limited webhook and event notification capabilities.",
+      "source_issues": ["Code review integration analysis", "Migration considerations"],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design RESTful APIs with proper resource modeling",
+        "Add GraphQL for flexible client queries",
+        "Implement comprehensive API versioning (URL or header-based)",
+        "Add webhook support for event notifications",
+        "Implement async APIs for long-running operations",
+        "Add pagination, filtering, sorting on all list endpoints",
+        "Implement HATEOAS for API discoverability",
+        "Add comprehensive OpenAPI 3.0 documentation",
+        "Implement API rate limiting per client",
+        "Add API analytics and usage monitoring"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-017",
+      "insight": "Testing and Quality Assurance: Testing infrastructure in place (JUnit, EasyMock, PowerMock, Karma, Jasmine) but coverage unknown. Code quality tools configured (Checkstyle, SpotBugs, JaCoCo, SonarQube). Integration testing approach unclear.",
+      "source_issues": ["Code review testing infrastructure"],
+      "relevance": "MEDIUM",
+      "confidence": "MEDIUM",
+      "actionable": true,
+      "action_items": [
+        "Aim for 80%+ code coverage with meaningful tests",
+        "Implement comprehensive integration testing",
+        "Add end-to-end testing (Cypress, Playwright)",
+        "Implement contract testing for APIs (Pact)",
+        "Add performance testing (JMeter, Gatling)",
+        "Implement mutation testing for test quality",
+        "Add smoke tests for deployments",
+        "Implement chaos engineering for resilience testing",
+        "Add security testing (OWASP ZAP)",
+        "Integrate quality gates in CI/CD"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-018",
+      "insight": "Configuration Management Complexity: Spring Boot application.properties with feature flags and profiles. Configuration scattered across multiple files. No externalized configuration management for distributed deployments.",
+      "source_issues": ["Code review configuration analysis"],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement centralized configuration management (Spring Cloud Config, Consul)",
+        "Use feature flags service (LaunchDarkly, Unleash)",
+        "Externalize all configuration (12-factor app)",
+        "Support environment-specific configuration",
+        "Add configuration validation at startup",
+        "Implement hot reload for certain configurations",
+        "Add configuration versioning and rollback",
+        "Document all configuration parameters comprehensively",
+        "Implement secrets management separate from configuration"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-019",
+      "insight": "Observability and Monitoring Gaps: Limited observability infrastructure noted. No explicit metrics collection (Prometheus), distributed tracing (Jaeger), or centralized logging (ELK stack) mentioned in architecture.",
+      "source_issues": ["Code review recommendations", "Architecture improvements"],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement Prometheus metrics for all services",
+        "Add distributed tracing (Jaeger, Zipkin)",
+        "Implement centralized logging (ELK, Loki)",
+        "Add application performance monitoring (APM)",
+        "Implement health checks and readiness probes",
+        "Add business metrics and KPIs",
+        "Implement alerting (PagerDuty, Opsgenie)",
+        "Create comprehensive dashboards (Grafana)",
+        "Add user behavior analytics",
+        "Implement error tracking (Sentry)"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "INSIGHT-020",
+      "insight": "Data Export and Interoperability: CSV and Parquet export plugins. PDF export via jsPDF. BPMN XML import/export for standard compliance. Limited integration with external systems and data warehouses.",
+      "source_issues": ["Code review data export capabilities"],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Support multiple export formats (CSV, JSON, Parquet, Avro)",
+        "Add scheduled export and ETL pipeline integration",
+        "Implement incremental export for large datasets",
+        "Add export templates and customization",
+        "Support direct data warehouse integration (Snowflake, BigQuery)",
+        "Implement streaming export for real-time analytics",
+        "Add import validation and error reporting",
+        "Support batch import with progress tracking",
+        "Implement data lineage tracking",
+        "Add data quality profiling on import/export"
+      ],
+      "refined_count": 0
+    }
+  ],
+  "pain_points": [
+    {
+      "category": "Scalability",
+      "description": "Monolithic architecture limits horizontal scaling and independent component deployment",
+      "severity": "HIGH",
+      "affected_areas": ["Architecture", "Deployment", "Operations"]
+    },
+    {
+      "category": "Multi-tenancy",
+      "description": "No explicit multi-tenancy support constrains enterprise SaaS deployment",
+      "severity": "HIGH",
+      "affected_areas": ["Architecture", "Database", "Security"]
+    },
+    {
+      "category": "Model Versioning",
+      "description": "Limited model versioning prevents comprehensive change tracking and rollback",
+      "severity": "HIGH",
+      "affected_areas": ["Model Repository", "Collaboration", "Audit"]
+    },
+    {
+      "category": "Performance",
+      "description": "Graph visualization bottlenecks with large models (5000+ nodes)",
+      "severity": "HIGH",
+      "affected_areas": ["Frontend", "Visualization", "User Experience"]
+    },
+    {
+      "category": "Deployment Complexity",
+      "description": "Manual setup, no containerization, complex multi-project build",
+      "severity": "MEDIUM",
+      "affected_areas": ["DevOps", "Installation", "Cloud Deployment"]
+    },
+    {
+      "category": "Technology Lock-in",
+      "description": "ZK Framework vendor lock-in limits frontend flexibility and talent pool",
+      "severity": "MEDIUM",
+      "affected_areas": ["Frontend", "Development", "Hiring"]
+    },
+    {
+      "category": "License Restrictions",
+      "description": "LGPL 3.0 prevents code reuse in proprietary products",
+      "severity": "HIGH",
+      "affected_areas": ["Licensing", "Reusability", "Commercial Use"]
+    },
+    {
+      "category": "API Limitations",
+      "description": "Limited API for external integrations, no GraphQL, unclear versioning",
+      "severity": "MEDIUM",
+      "affected_areas": ["Integration", "API Design", "Extensibility"]
+    },
+    {
+      "category": "Real-time Collaboration",
+      "description": "No real-time collaboration features for concurrent editing",
+      "severity": "MEDIUM",
+      "affected_areas": ["User Experience", "Collaboration", "Frontend"]
+    },
+    {
+      "category": "Observability",
+      "description": "Limited metrics, tracing, and centralized logging infrastructure",
+      "severity": "HIGH",
+      "affected_areas": ["Operations", "Monitoring", "Debugging"]
+    },
+    {
+      "category": "Event Log Processing",
+      "description": "500MB upload limit and memory constraints for very large logs",
+      "severity": "MEDIUM",
+      "affected_areas": ["Performance", "Scalability", "Data Processing"]
+    },
+    {
+      "category": "Security",
+      "description": "No explicit API rate limiting, multi-tenancy isolation, or comprehensive audit logging",
+      "severity": "HIGH",
+      "affected_areas": ["Security", "Compliance", "Enterprise Features"]
+    }
+  ],
+  "feature_requests": [
+    {
+      "feature": "Microservices Architecture",
+      "description": "Decompose monolith into independently deployable microservices",
+      "priority": "HIGH",
+      "benefits": ["Scalability", "Independent deployment", "Technology flexibility"]
+    },
+    {
+      "feature": "Multi-tenancy Support",
+      "description": "Built-in multi-tenancy with data isolation and tenant management",
+      "priority": "HIGH",
+      "benefits": ["SaaS deployment", "Resource optimization", "Enterprise scalability"]
+    },
+    {
+      "feature": "Comprehensive Model Versioning",
+      "description": "Git-like versioning with branching, merging, and diff visualization",
+      "priority": "HIGH",
+      "benefits": ["Change tracking", "Rollback capability", "Collaboration"]
+    },
+    {
+      "feature": "Modern Frontend Framework",
+      "description": "React/Vue-based SPA replacing ZK Framework",
+      "priority": "HIGH",
+      "benefits": ["Better UX", "Developer experience", "Wider talent pool"]
+    },
+    {
+      "feature": "GraphQL API",
+      "description": "Add GraphQL alongside REST for flexible queries",
+      "priority": "MEDIUM",
+      "benefits": ["Query flexibility", "Reduced over-fetching", "Better mobile support"]
+    },
+    {
+      "feature": "Real-time Collaboration",
+      "description": "WebSocket-based real-time editing and presence awareness",
+      "priority": "MEDIUM",
+      "benefits": ["Team collaboration", "Concurrent editing", "Better UX"]
+    },
+    {
+      "feature": "Advanced Observability",
+      "description": "Prometheus metrics, distributed tracing, centralized logging",
+      "priority": "HIGH",
+      "benefits": ["Operational visibility", "Debugging", "Performance optimization"]
+    },
+    {
+      "feature": "Containerization and Kubernetes",
+      "description": "Docker containers and Helm charts for cloud-native deployment",
+      "priority": "HIGH",
+      "benefits": ["Easy deployment", "Scalability", "Cloud portability"]
+    },
+    {
+      "feature": "Enhanced Security",
+      "description": "OAuth 2.0, RBAC, API rate limiting, comprehensive audit logging",
+      "priority": "HIGH",
+      "benefits": ["Enterprise security", "Compliance", "Multi-tenancy isolation"]
+    },
+    {
+      "feature": "Distributed Event Processing",
+      "description": "Kafka/RabbitMQ integration for streaming log processing",
+      "priority": "MEDIUM",
+      "benefits": ["Unlimited log sizes", "Real-time processing", "Scalability"]
+    },
+    {
+      "feature": "Cloud-native Storage",
+      "description": "S3/Azure Blob support for event logs and models",
+      "priority": "MEDIUM",
+      "benefits": ["Cloud deployment", "Scalability", "Cost optimization"]
+    },
+    {
+      "feature": "Advanced API Features",
+      "description": "Webhooks, async operations, comprehensive versioning",
+      "priority": "MEDIUM",
+      "benefits": ["Integration flexibility", "Event-driven workflows", "API stability"]
+    }
+  ],
+  "architectural_decisions": [
+    {
+      "decision": "Plugin Architecture with OSGi Compatibility",
+      "rationale": "Enables extensibility and modular functionality with 25+ specialized plugins",
+      "trade_offs": {
+        "pros": ["Extensibility", "Modularity", "Independent plugin development"],
+        "cons": ["Complexity", "Lifecycle management overhead", "Plugin dependency resolution"]
+      },
+      "recommendation": "Adopt plugin pattern but simplify with Spring Boot plugin system instead of full OSGi"
+    },
+    {
+      "decision": "Layered Architecture (Presentation, Application, Domain, Infrastructure)",
+      "rationale": "Clear separation of concerns improves maintainability and testability",
+      "trade_offs": {
+        "pros": ["Separation of concerns", "Testability", "Clear boundaries"],
+        "cons": ["Potential performance overhead", "Inter-layer coordination complexity"]
+      },
+      "recommendation": "Keep layered architecture but consider domain-driven design for better business logic organization"
+    },
+    {
+      "decision": "Dual Storage Model (Database + Filesystem)",
+      "rationale": "Optimizes storage: database for metadata/queries, filesystem for large binary event logs",
+      "trade_offs": {
+        "pros": ["Performance", "Handles large files", "Database size management"],
+        "cons": ["Backup complexity", "Transaction coordination", "Deployment complexity"]
+      },
+      "recommendation": "Use object storage (S3, Azure Blob) instead of filesystem for cloud-native deployment"
+    },
+    {
+      "decision": "ZK Framework for UI",
+      "rationale": "Enables rapid Java-based UI development with MVVM pattern",
+      "trade_offs": {
+        "pros": ["Java-centric development", "Rapid prototyping", "Built-in MVVM"],
+        "cons": ["Vendor lock-in", "LGPL license", "Limited modern frontend practices", "Smaller talent pool"]
+      },
+      "recommendation": "Replace with modern JavaScript framework (React + TypeScript) for better flexibility and ecosystem"
+    },
+    {
+      "decision": "Spring Boot Monolithic Deployment",
+      "rationale": "Simplifies deployment with single application, embedded container",
+      "trade_offs": {
+        "pros": ["Simple deployment", "No distributed system complexity", "Easy development"],
+        "cons": ["Limited scalability", "All-or-nothing deployment", "Technology lock-in"]
+      },
+      "recommendation": "Migrate to microservices for enterprise scale while keeping monolith for simple deployments"
+    },
+    {
+      "decision": "Cytoscape.js for Graph Visualization",
+      "rationale": "Provides rich graph manipulation and layout capabilities",
+      "trade_offs": {
+        "pros": ["Feature-rich", "Good documentation", "Active community"],
+        "cons": ["Performance with large graphs", "SVG rendering limitations"]
+      },
+      "recommendation": "Consider Canvas/WebGL rendering (D3.js custom) for large graphs, keep Cytoscape for moderate sizes"
+    },
+    {
+      "decision": "Liquibase for Database Migrations",
+      "rationale": "Enables declarative schema evolution and versioning",
+      "trade_offs": {
+        "pros": ["Version control", "Rollback support", "Database independence"],
+        "cons": ["Migration script complexity", "Learning curve"]
+      },
+      "recommendation": "Keep Liquibase approach - industry best practice for database evolution"
+    },
+    {
+      "decision": "OpenXES Standard for Event Logs",
+      "rationale": "Standards compliance ensures interoperability with other process mining tools",
+      "trade_offs": {
+        "pros": ["Standards compliance", "Interoperability", "Rich metadata support"],
+        "cons": ["XML verbosity", "LGPL library", "Limited streaming support"]
+      },
+      "recommendation": "Support XES but also add modern formats (Parquet, JSON) and streaming protocols"
+    },
+    {
+      "decision": "Separate Portal and Logic Plugins",
+      "rationale": "Decouples UI from business logic for independent development",
+      "trade_offs": {
+        "pros": ["Separation of concerns", "Testability", "Reusability"],
+        "cons": ["API versioning complexity", "Coordination overhead"]
+      },
+      "recommendation": "Excellent pattern - maintain strict separation with well-defined APIs"
+    },
+    {
+      "decision": "ProM Framework Integration",
+      "rationale": "Leverages established process mining algorithms and research",
+      "trade_offs": {
+        "pros": ["Proven algorithms", "Research community support", "Rich capabilities"],
+        "cons": ["LGPL licensing", "Integration complexity", "Performance optimization needed"]
+      },
+      "recommendation": "Study ProM algorithms but implement clean-room versions with permissive licenses"
+    }
+  ],
+  "common_patterns": [
+    {
+      "pattern": "Strategy Pattern for Algorithms",
+      "usage": "Process discovery algorithms (SplitMiner, etc.) with pluggable implementations",
+      "benefit": "Algorithm flexibility and extensibility without modifying core code"
+    },
+    {
+      "pattern": "Facade Pattern for Subsystem Access",
+      "usage": "Manager component provides unified interface to database, storage, security, plugins",
+      "benefit": "Simplified API and reduced coupling between layers"
+    },
+    {
+      "pattern": "Repository Pattern for Data Access",
+      "usage": "Storage component abstracts database and filesystem operations",
+      "benefit": "Data access abstraction and backend flexibility"
+    },
+    {
+      "pattern": "Client-Server Pattern",
+      "usage": "Portal (client) communicates with Manager (server) via manager-client library",
+      "benefit": "Decoupling and clear API boundaries"
+    },
+    {
+      "pattern": "MVC via ZK Framework",
+      "usage": "ZUL markup (View), Java controllers, Domain models",
+      "benefit": "UI organization and presentation logic separation"
+    },
+    {
+      "pattern": "Layered Architecture",
+      "usage": "Presentation, Application, Domain, Infrastructure layers with explicit dependencies",
+      "benefit": "Separation of concerns and maintainability"
+    },
+    {
+      "pattern": "Plugin Architecture",
+      "usage": "Core plugin API with portal and logic plugin implementations",
+      "benefit": "Extensibility and modular functionality"
+    },
+    {
+      "pattern": "Dependency Injection via Spring",
+      "usage": "Spring Boot manages component lifecycle and dependencies",
+      "benefit": "Loose coupling and testability"
+    },
+    {
+      "pattern": "Feature Flags for Configuration",
+      "usage": "Application properties enable/disable features (calendar, bpmn_diff, etc.)",
+      "benefit": "Flexible deployment and gradual rollout"
+    },
+    {
+      "pattern": "Multi-project Gradle Build",
+      "usage": "40+ subprojects with explicit module dependencies",
+      "benefit": "Modular build and clear dependency management"
+    }
+  ],
+  "uml_codex_actionable_items": [
+    {
+      "category": "Architecture",
+      "priority": "HIGH",
+      "items": [
+        "Design microservices architecture from the start (API Gateway, Auth, Model, Mining, Storage services)",
+        "Implement plugin system with clear service interfaces and Spring Boot integration",
+        "Use layered architecture with domain-driven design principles",
+        "Design for multi-tenancy with tenant isolation at all layers",
+        "Implement event-driven architecture with message queues (Kafka/RabbitMQ)"
+      ]
+    },
+    {
+      "category": "Frontend",
+      "priority": "HIGH",
+      "items": [
+        "Use React with TypeScript for modern, flexible UI development",
+        "Implement headless backend with REST and GraphQL APIs",
+        "Use Canvas/WebGL for large graph visualizations instead of SVG",
+        "Add real-time collaboration with WebSockets and CRDT",
+        "Implement progressive web app with offline capabilities"
+      ]
+    },
+    {
+      "category": "Data Management",
+      "priority": "HIGH",
+      "items": [
+        "Design comprehensive model versioning (Git-like with branching/merging)",
+        "Use PostgreSQL for metadata with JSONB support",
+        "Implement object storage (S3, Azure Blob) for event logs and models",
+        "Design for horizontal sharding with tenant-based partitioning",
+        "Add streaming event log processing for unlimited sizes"
+      ]
+    },
+    {
+      "category": "Security",
+      "priority": "HIGH",
+      "items": [
+        "Implement OAuth 2.0 / OIDC authentication by default",
+        "Add fine-grained RBAC with resource-level permissions",
+        "Implement comprehensive audit logging for compliance",
+        "Add API rate limiting and throttling per tenant/user",
+        "Implement encryption at rest and in transit",
+        "Design multi-tenancy with strict data isolation"
+      ]
+    },
+    {
+      "category": "DevOps & Deployment",
+      "priority": "HIGH",
+      "items": [
+        "Provide Docker containers and docker-compose for local development",
+        "Create Kubernetes Helm charts for production deployment",
+        "Implement health checks, readiness probes, and liveness probes",
+        "Add Infrastructure as Code (Terraform, CloudFormation)",
+        "Implement centralized configuration management (Spring Cloud Config)",
+        "Design for blue-green and canary deployments"
+      ]
+    },
+    {
+      "category": "Observability",
+      "priority": "HIGH",
+      "items": [
+        "Implement Prometheus metrics for all services",
+        "Add distributed tracing (Jaeger, Zipkin)",
+        "Implement centralized logging (ELK, Loki)",
+        "Create Grafana dashboards for operations and business metrics",
+        "Add alerting integration (PagerDuty, Opsgenie)",
+        "Implement error tracking (Sentry)"
+      ]
+    },
+    {
+      "category": "API Design",
+      "priority": "MEDIUM",
+      "items": [
+        "Design RESTful APIs with proper resource modeling and versioning",
+        "Add GraphQL for flexible client queries",
+        "Implement webhooks for event notifications",
+        "Design async APIs for long-running operations",
+        "Add comprehensive OpenAPI 3.0 documentation",
+        "Implement pagination, filtering, sorting on all list endpoints"
+      ]
+    },
+    {
+      "category": "Performance",
+      "priority": "HIGH",
+      "items": [
+        "Implement virtual scrolling and lazy loading for large datasets",
+        "Use distributed caching (Redis) with intelligent invalidation",
+        "Add read replicas for query scalability",
+        "Implement background job processing for heavy computations",
+        "Use CDN for static assets and frontend",
+        "Add performance monitoring and profiling"
+      ]
+    },
+    {
+      "category": "Testing & Quality",
+      "priority": "MEDIUM",
+      "items": [
+        "Aim for 80%+ code coverage with meaningful tests",
+        "Implement comprehensive integration and E2E testing",
+        "Add contract testing for APIs (Pact)",
+        "Implement performance testing (Gatling, k6)",
+        "Add security testing in CI/CD (OWASP ZAP)",
+        "Implement chaos engineering for resilience testing"
+      ]
+    },
+    {
+      "category": "Licensing",
+      "priority": "HIGH",
+      "items": [
+        "Use only permissive licenses (Apache 2.0, MIT, BSD) for all dependencies",
+        "Implement license scanning in CI/CD pipeline",
+        "Avoid all LGPL and GPL dependencies",
+        "Document licensing decisions and compatibility",
+        "Audit third-party libraries regularly"
+      ]
+    },
+    {
+      "category": "Process Mining Specific",
+      "priority": "HIGH",
+      "items": [
+        "Design algorithm abstraction layer with pluggable implementations",
+        "Support streaming event log processing with backpressure",
+        "Implement process discovery with interactive filtering",
+        "Add BPMN 2.0 editor with real-time collaboration",
+        "Support multiple event log formats (XES, CSV, Parquet, JSON)",
+        "Implement log animation and visualization",
+        "Add business calendar support for accurate metrics",
+        "Design for conformance checking and predictive analytics"
+      ]
+    }
+  ],
+  "technology_recommendations": {
+    "backend": {
+      "framework": "Spring Boot with Spring Cloud for microservices",
+      "language": "Java 17+ or Kotlin",
+      "database": "PostgreSQL with JSONB support",
+      "cache": "Redis for distributed caching",
+      "message_queue": "Apache Kafka for event streaming",
+      "api": "REST with OpenAPI 3.0 + GraphQL",
+      "auth": "OAuth 2.0 / OIDC (Keycloak, Auth0)"
+    },
+    "frontend": {
+      "framework": "React with TypeScript",
+      "state_management": "Redux Toolkit or Zustand",
+      "ui_library": "Material-UI or Ant Design",
+      "visualization": "D3.js with Canvas/WebGL, Cytoscape.js for moderate graphs",
+      "build": "Vite or Next.js",
+      "testing": "Jest + React Testing Library + Playwright"
+    },
+    "infrastructure": {
+      "container": "Docker with Kubernetes",
+      "orchestration": "Kubernetes with Helm",
+      "service_mesh": "Istio or Linkerd",
+      "api_gateway": "Kong or Spring Cloud Gateway",
+      "config": "Spring Cloud Config or Consul",
+      "secrets": "HashiCorp Vault"
+    },
+    "observability": {
+      "metrics": "Prometheus + Grafana",
+      "tracing": "Jaeger or Zipkin",
+      "logging": "ELK Stack or Loki",
+      "apm": "New Relic or Datadog",
+      "error_tracking": "Sentry"
+    },
+    "storage": {
+      "database": "PostgreSQL (primary), MySQL (compatibility)",
+      "object_storage": "AWS S3, Azure Blob, or MinIO",
+      "time_series": "InfluxDB or TimescaleDB for logs",
+      "cache": "Redis with clustering",
+      "search": "Elasticsearch for full-text search"
+    },
+    "development": {
+      "version_control": "Git with GitFlow workflow",
+      "ci_cd": "GitHub Actions, GitLab CI, or Jenkins",
+      "code_quality": "SonarQube, ESLint, Prettier",
+      "testing": "JUnit 5, Testcontainers, Playwright",
+      "iac": "Terraform or Pulumi"
+    }
+  },
+  "references": [
+    {
+      "type": "Code Review",
+      "path": "/home/user/uml-codex/knowledge-store/code-reviews/process-mining/apromore-core.json",
+      "description": "Comprehensive architectural analysis of Apromore Core"
+    },
+    {
+      "type": "Repository",
+      "url": "https://github.com/apromore/ApromoreCore",
+      "status": "ARCHIVED (2025-08-29)",
+      "note": "No issues or pull requests available"
+    }
+  ]
+}

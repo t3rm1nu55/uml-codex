@@ -143,36 +143,40 @@ Analyzed 4 repositories with full code reviews:
 
 ## 📊 Final Statistics
 
-### Repositories Analyzed: 10/10 ✅
+### Repositories Analyzed: 13/13 ✅
 - REGnosys: 4/4 ✅
 - FINOS: 1/1 ✅
 - Camunda: 2/2 ✅
 - Flowable: 2/2 ✅
+- Process Mining: 3/3 ✅ (PM4Py, Apromore Core, Celonis Kafka)
 - uml-codex: 1/1 ✅
 
-### Issues Analyzed: ~275+
+### Issues Analyzed: ~350+
 - REGnosys: 28 issues
 - FINOS CDM: 127+ issues
 - Camunda: 75 issues
 - Flowable: 45 issues
+- Process Mining: 75+ issues (PM4Py, Apromore Core)
 - uml-codex: 0 issues (new repo)
 
-### Files Created: 30+
-- Code review JSONs: 10
-- Issue analysis JSONs: 10
-- Insight documents: 5
+### Files Created: 40+
+- Code review JSONs: 13 (added PM4Py, Apromore, Celonis)
+- Issue analysis JSONs: 12 (added process mining)
+- Insight documents: 7 (added process mining insights + addendum)
 - Schema files: 3
 - Component inventory: 1
 - License analysis: 2
 - Progress/summary docs: 3
+- Research docs: 1 (Celonis open source research)
 
 ### Key Metrics
-- **Design Patterns Identified**: 100+
-- **Requirements Extracted**: 110+
+- **Design Patterns Identified**: 120+
+- **Requirements Extracted**: 130+
 - **Components Cataloged**: 28 (prioritized P0-P3)
-- **Insights Generated**: 60+
-- **Actionable Items**: 50+
-- **Pages of Documentation**: 200+
+- **Insights Generated**: 80+
+- **Actionable Items**: 100+
+- **Pages of Documentation**: 300+
+- **Licenses Analyzed**: 8 (Apache-2.0, LGPL-3.0, AGPL-3.0, EPL-2.0, MIT, BSD-3-Clause, Community Spec, GPL w/exceptions)
 
 ## 🎯 Next Immediate Steps
 

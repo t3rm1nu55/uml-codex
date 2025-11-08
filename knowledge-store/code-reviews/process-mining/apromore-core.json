@@ -1,0 +1,1647 @@
+{
+  "metadata": {
+    "repository": "https://github.com/apromore/ApromoreCore",
+    "analyzed_date": "2025-11-08",
+    "project_name": "Apromore Core",
+    "project_type": "Open Source Process Mining Platform",
+    "status": "ARCHIVED",
+    "archived_date": "2025-08-29",
+    "version": "0.0.1-SNAPSHOT",
+    "stars": 140,
+    "forks": 77,
+    "commits": 12113,
+    "primary_branch": "development"
+  },
+  "license": {
+    "type": "LGPL-3.0",
+    "spdx_identifier": "LGPL-3.0",
+    "reusability_assessment": "MUST_REBUILD",
+    "reasoning": "LGPL v3 is a copyleft license that requires derivative works to be licensed under LGPL. While it allows linking with proprietary code, any modifications or incorporated code must remain LGPL. This makes it incompatible with proprietary licensing for derivative works.",
+    "restrictions": [
+      "Derivative works must be LGPL licensed",
+      "Source code must be made available for modified versions",
+      "Library combination allowed but with restrictions",
+      "Requires prominent notices and GPL documentation"
+    ],
+    "permissions": [
+      "Commercial use allowed",
+      "Modification allowed with LGPL license",
+      "Distribution allowed",
+      "Linking with proprietary applications permitted"
+    ],
+    "recommendations": "Study architectural patterns and implement clean-room reimplementation. Focus on learning from the design patterns, plugin architecture, and process mining workflows rather than code reuse."
+  },
+  "project_overview": {
+    "description": "Apromore Core is the open-source edition of the Apromore toolset for process mining and predictive process analytics. It provides core functionality including a portal, editor, and discovery plugin for process mining operations.",
+    "architecture_type": "Full-Stack Enterprise Platform",
+    "deployment_model": "Spring Boot Monolithic Application with Plugin Architecture",
+    "target_domain": "Business Process Mining and Management"
+  },
+  "technology_stack": {
+    "languages": {
+      "javascript": "60.1%",
+      "java": "35.7%",
+      "css": "4.1%",
+      "html": "Minor",
+      "less": "Minor",
+      "xslt": "Minor"
+    },
+    "backend": {
+      "framework": "Spring Boot",
+      "java_version": "Java SE 11",
+      "build_tool": "Gradle with Wrapper",
+      "orm": "Hibernate",
+      "database_migration": "Liquibase",
+      "authentication": "Spring Security + Keycloak (optional)",
+      "caching": "Ehcache",
+      "testing": "JUnit Platform, EasyMock, PowerMock"
+    },
+    "frontend": {
+      "ui_framework": "ZK Framework",
+      "bundler": "Webpack 4.46.0",
+      "runtime": "Node.js (v6+ npm)",
+      "core_libraries": [
+        "jQuery 3.5.1",
+        "jQuery UI 1.11.4",
+        "Cytoscape 3.21.0 (graph visualization)",
+        "SVG.js 3.0.16",
+        "Konva 7.0.3 (canvas manipulation)",
+        "Moment.js 2.29.4 (date handling)",
+        "Ramda 0.27.1 (functional utilities)"
+      ],
+      "visualization": [
+        "Cytoscape with dagre layout",
+        "SVG.js for process diagrams",
+        "Konva for canvas-based animations",
+        "jsPDF 2.5.1 for export"
+      ],
+      "testing": "Karma 6.3.16 + Jasmine 3.6.0"
+    },
+    "database": {
+      "supported": ["MySQL 8.0", "H2 (in-memory)"],
+      "default": "MySQL",
+      "connection_pool": "HikariCP (via Spring Boot)",
+      "charset": "UTF-8",
+      "timezone": "GMT+10 (configurable)"
+    },
+    "infrastructure": {
+      "container": "Spring Boot embedded Tomcat",
+      "module_system": "OSGi-compatible",
+      "api_documentation": "SpringDoc OpenAPI UI v1.6.7",
+      "code_quality": ["Checkstyle", "SpotBugs", "JaCoCo 0.8.7", "SonarQube"],
+      "license_management": "License Gradle Plugin"
+    }
+  },
+  "architecture": {
+    "style": "Layered Modular Architecture with Plugin System",
+    "layers": [
+      {
+        "name": "Presentation Layer",
+        "components": ["Apromore-Portal", "Apromore-Zk", "Apromore-Frontend"],
+        "technologies": ["ZK Framework", "JavaScript", "jQuery", "Cytoscape"],
+        "responsibilities": "User interface, visualization, interaction handling"
+      },
+      {
+        "name": "Application Layer",
+        "components": ["Apromore-Boot", "Apromore-Manager", "Plugin System"],
+        "technologies": ["Spring Boot", "Spring Security", "REST APIs"],
+        "responsibilities": "Business logic orchestration, plugin coordination, API endpoints"
+      },
+      {
+        "name": "Domain Layer",
+        "components": ["Process Mining Collection", "BPMN Editor", "Log Processing"],
+        "technologies": ["ProM libraries", "OpenXES", "SplitMiner", "JBPT"],
+        "responsibilities": "Process discovery algorithms, model manipulation, event log processing"
+      },
+      {
+        "name": "Infrastructure Layer",
+        "components": ["Apromore-Storage", "Apromore-Database", "Apromore-Cache"],
+        "technologies": ["Hibernate", "MySQL", "Ehcache", "Liquibase"],
+        "responsibilities": "Data persistence, caching, file storage, database migrations"
+      }
+    ],
+    "key_design_patterns": [
+      {
+        "pattern": "Plugin Architecture",
+        "description": "Extensible plugin system with core APIs and 25+ plugins for specialized functionality",
+        "implementation": "OSGi-compatible modular system with plugin-core API and provider separation",
+        "benefits": "Modularity, extensibility, independent deployment, custom functionality"
+      },
+      {
+        "pattern": "Layered Architecture",
+        "description": "Clear separation between presentation, application, domain, and infrastructure layers",
+        "implementation": "Gradle multi-project build with explicit module dependencies",
+        "benefits": "Separation of concerns, maintainability, testability"
+      },
+      {
+        "pattern": "Client-Server Pattern",
+        "description": "Portal acts as client to Manager backend services",
+        "implementation": "manager-client library for communication, REST APIs for integration",
+        "benefits": "Decoupling, scalability, clear API boundaries"
+      },
+      {
+        "pattern": "Repository Pattern",
+        "description": "Storage component abstracts data persistence",
+        "implementation": "Apromore-Storage with database and file system backends",
+        "benefits": "Data access abstraction, flexibility in storage backends"
+      },
+      {
+        "pattern": "Facade Pattern",
+        "description": "Manager component provides unified interface to complex subsystems",
+        "implementation": "Apromore-Manager coordinates database, storage, security, plugins",
+        "benefits": "Simplified API, reduced coupling, centralized control"
+      },
+      {
+        "pattern": "Strategy Pattern",
+        "description": "Multiple process discovery algorithms (SplitMiner, etc.) with common interface",
+        "implementation": "Process-Discoverer-Logic with pluggable mining algorithms",
+        "benefits": "Algorithm flexibility, extensibility"
+      },
+      {
+        "pattern": "Model-View-Controller (MVC)",
+        "description": "ZK framework provides MVC structure for UI components",
+        "implementation": "ZUL markup (View), Java controllers, Domain models",
+        "benefits": "UI organization, separation of presentation logic"
+      }
+    ]
+  },
+  "core_components": {
+    "portal": {
+      "name": "Apromore-Portal",
+      "description": "Main user-facing interface for process mining platform",
+      "location": "Apromore-Core-Components/Apromore-Portal",
+      "key_features": [
+        "Model repository management",
+        "Event log storage and sharing",
+        "User and group management",
+        "Access control",
+        "Model visualization",
+        "Plugin integration framework"
+      ],
+      "technologies": ["ZK Framework", "Spring Security", "JWT (nimbus-jose-jwt 9.7)"],
+      "dependencies": [
+        "Apromore-Manager (business logic)",
+        "Apromore-Storage (data persistence)",
+        "manager-client (backend communication)",
+        "plugin-core APIs (extensibility)",
+        "Apromore-Calendar",
+        "ProcessMining-Collection"
+      ],
+      "ui_architecture": "ZK MVVM with ZUL markup files",
+      "authentication": "Spring Security with optional Keycloak integration",
+      "session_management": "45-minute timeout with HTTP-only cookies"
+    },
+    "manager": {
+      "name": "Apromore-Manager",
+      "description": "Core orchestration layer coordinating business logic and subsystems",
+      "location": "Apromore-Core-Components/Apromore-Manager",
+      "responsibilities": [
+        "Business logic coordination",
+        "Plugin lifecycle management",
+        "Security enforcement",
+        "Transaction management",
+        "Event log processing coordination",
+        "Model lifecycle management"
+      ],
+      "dependencies": [
+        "Apromore-Database",
+        "Apromore-Storage",
+        "Apromore-Cache",
+        "APMLogModule",
+        "Event-Log-Plugin-API",
+        "manager-security",
+        "plugin-core",
+        "Apromore-Calendar"
+      ],
+      "integration_points": [
+        "Email functionality (javax.mail-api, spring-boot-starter-mail)",
+        "Plugin system (plugin-core API and provider)",
+        "Storage layer",
+        "Security layer",
+        "Caching layer (Ehcache)"
+      ],
+      "testing": "EasyMock 4.2, PowerMock 2.0.9"
+    },
+    "frontend": {
+      "name": "Apromore-Frontend",
+      "description": "JavaScript-based frontend modules for process visualization and interaction",
+      "location": "Apromore-Frontend",
+      "modules": [
+        {
+          "name": "processdiscoverer",
+          "output": "processdiscoverer.js",
+          "deployment": "Process-Discoverer-Portal-Plugin",
+          "purpose": "Interactive process discovery interface"
+        },
+        {
+          "name": "loganimation",
+          "output": "loganimationbpmn.js",
+          "deployment": "Log-Animation-Portal-Plugin",
+          "purpose": "Event log animation on BPMN models"
+        },
+        {
+          "name": "bpmneditor",
+          "output": "bpmneditor.js",
+          "deployment": "Apromore-BPMN-Editor-Portal",
+          "purpose": "BPMN model editing and creation"
+        },
+        {
+          "name": "processmap",
+          "purpose": "Process map visualization"
+        },
+        {
+          "name": "commons",
+          "purpose": "Shared utilities and components"
+        },
+        {
+          "name": "utils",
+          "purpose": "General utility functions"
+        }
+      ],
+      "build_system": {
+        "tool": "Webpack 4.46.0",
+        "commands": {
+          "build": "Production bundle generation",
+          "dev": "Development build",
+          "start": "webpack-serve development mode",
+          "test": "Karma test runner"
+        }
+      },
+      "visualization_libraries": {
+        "graph": "Cytoscape 3.21.0 with dagre layout and editing extensions",
+        "svg": "SVG.js 3.0.16",
+        "canvas": "Konva 7.0.3",
+        "charts": "Custom implementations"
+      },
+      "export_capabilities": [
+        "jsPDF 2.5.1 (PDF export)",
+        "html-to-image 1.9.0",
+        "dom-to-svg 0.12.2",
+        "FileSaver 2.0.5"
+      ]
+    },
+    "bpmn_editor": {
+      "name": "Apromore-BPMN-Editor",
+      "description": "BPMN 2.0 model editor integration",
+      "location": "Apromore-Core-Components/Apromore-BPMN-Editor",
+      "subcomponents": [
+        "Apromore-BPMN-Editor-Portal (backend integration)",
+        "Apromore-BPMN-Modeler-JS (JavaScript editor)"
+      ],
+      "capabilities": [
+        "BPMN 2.0 diagram creation",
+        "Model editing and modification",
+        "Process element palette",
+        "Validation",
+        "Import/Export BPMN XML"
+      ],
+      "integration": "Embedded in portal via plugin system"
+    },
+    "process_discoverer": {
+      "name": "Process Discoverer",
+      "description": "Automated process discovery from event logs",
+      "components": [
+        {
+          "name": "Process-Discoverer-Portal-Plugin",
+          "type": "Portal Integration",
+          "version": "2.0.0"
+        },
+        {
+          "name": "Process-Discoverer-Logic",
+          "type": "Mining Algorithms"
+        }
+      ],
+      "algorithms": [
+        {
+          "name": "SplitMiner",
+          "description": "Main process discovery algorithm",
+          "implementation": "SplitMiner-Logic module",
+          "approach": "Formal methods using Petri nets and graph structures",
+          "key_libraries": [
+            "de-jbpt 0.2.77 (Java Business Process Toolkit)",
+            "uma 1.3.1 (Petri net unfolding)",
+            "pnapi-java 1.0.5 (Petri net API)"
+          ]
+        }
+      ],
+      "input_format": "OpenXES (XES standard for event logs)",
+      "output_format": "BPMN 2.0 models",
+      "features": [
+        "Automated process model generation",
+        "Interactive filtering and refinement",
+        "Process map visualization",
+        "Performance metrics",
+        "Variant analysis"
+      ],
+      "dependencies": [
+        "OpenXES (event log handling)",
+        "Log-Logic (log manipulation)",
+        "APMLogModule (advanced log processing)",
+        "ProcessMining-Collection (mining infrastructure)",
+        "Log-Filter-Portal-Plugin (filtering UI)",
+        "RoaringBitmap 0.9.10 (optimization)",
+        "interval-tree 1.0.0 (temporal data)"
+      ]
+    },
+    "log_animation": {
+      "name": "Log Animation",
+      "description": "Visual replay of event logs on process models",
+      "components": [
+        "Log-Animation-Portal-Plugin",
+        "Log-Animation-Logic",
+        "Log-Animation-Portal-Plugin-API"
+      ],
+      "capabilities": [
+        "Token replay animation",
+        "Temporal visualization",
+        "Trace replay",
+        "Performance overlay",
+        "Bottleneck identification"
+      ],
+      "integration": "Cytoscape-based visualization in frontend"
+    },
+    "storage": {
+      "name": "Apromore-Storage",
+      "description": "Data persistence abstraction layer",
+      "location": "Apromore-Core-Components/Apromore-Storage",
+      "storage_types": [
+        {
+          "type": "Database",
+          "content": "All data except event logs",
+          "technology": "MySQL/H2 via Hibernate"
+        },
+        {
+          "type": "File System",
+          "content": "Event logs, attachments",
+          "location": "${user_home}/.apromore/Event-Logs-Repository"
+        },
+        {
+          "type": "Repository Files",
+          "content": "Process models, metadata",
+          "location": "${user_home}/.apromore/Repository"
+        }
+      ],
+      "backup_requirements": "Both database and file system directories must be backed up"
+    },
+    "database": {
+      "name": "Apromore-Database",
+      "description": "Database schema and migration management",
+      "location": "Apromore-Database",
+      "migration_tool": "Liquibase",
+      "migration_files": [
+        "changeLog.yaml (master changelog)",
+        "changeLog-Schema-init.yaml (initial schema)",
+        "changeLog-Schema.yaml (schema evolution)",
+        "changeLog-Data.yaml (data seeding)",
+        "sql/ directory (SQL scripts)"
+      ],
+      "schema_management": "Declarative YAML-based with SQL support",
+      "data_model_areas": [
+        "User and group management",
+        "Process model repository",
+        "Log metadata (logs stored on file system)",
+        "Access control",
+        "Calendar definitions",
+        "System configuration"
+      ]
+    },
+    "process_mining_collection": {
+      "name": "Apromore-ProcessMining-Collection",
+      "description": "Process mining algorithms and ProM integration",
+      "location": "Apromore-ProcessMining-Collection",
+      "modules": [
+        {
+          "name": "jgraph",
+          "purpose": "Graph visualization library"
+        },
+        {
+          "name": "prom-bpmn",
+          "purpose": "ProM BPMN integration",
+          "dependencies": ["prom-models", "prom-widgets", "jgraph", "commons-io 2.6", "xpp3 1.1.4c"],
+          "integration": "OSGi module bridging ProM and BPMN"
+        },
+        {
+          "name": "prom-models",
+          "purpose": "ProM process model structures",
+          "dependencies": ["jgraph"]
+        },
+        {
+          "name": "prom-widgets",
+          "purpose": "ProM UI components"
+        },
+        {
+          "name": "similaritysearch",
+          "purpose": "Process model similarity detection"
+        }
+      ],
+      "prom_integration": "Leverages ProM (Process Mining framework) for advanced analytics"
+    },
+    "calendar": {
+      "name": "Apromore-Calendar",
+      "description": "Business calendar management for duration calculations",
+      "purpose": "Working hours, holidays, business time calculations",
+      "usage": "Process performance analysis, simulation, time-based metrics"
+    },
+    "openxes": {
+      "name": "OpenXES",
+      "description": "Event log format handling (XES standard)",
+      "location": "Apromore-Extras/OpenXES",
+      "version": "2.27",
+      "standard": "eXtensible Event Stream (XES)",
+      "capabilities": [
+        "XES log parsing",
+        "Log serialization/deserialization",
+        "Event stream processing",
+        "Log format conversion"
+      ],
+      "dependencies": [
+        "xstream 1.4.19 (XML processing)",
+        "jaxb-api (XML binding)",
+        "kryo 4.0.2 (binary serialization)",
+        "spex 1.0 (processing extension)",
+        "eclipse-collections 10.4.0"
+      ]
+    },
+    "apm_log_module": {
+      "name": "APMLogModule",
+      "description": "Advanced Process Mining log processing module",
+      "location": "Apromore-Extras/APMLogModule",
+      "capabilities": [
+        "Advanced log filtering",
+        "Log transformation",
+        "Performance analysis",
+        "Trace clustering",
+        "Variant detection"
+      ],
+      "dependencies": ["OpenXES", "Apromore-Calendar", "Apromore-Zk"]
+    }
+  },
+  "plugin_architecture": {
+    "description": "Extensible OSGi-compatible plugin system enabling modular functionality",
+    "core_infrastructure": [
+      "plugin-core (API definitions)",
+      "plugin-core:api (plugin contracts)",
+      "plugin-core:provider (plugin implementation support)",
+      "plugin-templates (custom plugin templates)"
+    ],
+    "plugin_types": [
+      {
+        "type": "Portal Plugins",
+        "description": "UI extensions integrated into the portal",
+        "api": "plugin-core:portal:api",
+        "examples": ["Process-Discoverer-Portal-Plugin", "Log-Animation-Portal-Plugin", "User-Admin-Portal-Plugin"]
+      },
+      {
+        "type": "Editor Plugins",
+        "description": "Extensions to the BPMN editor",
+        "api": "plugin-core:editor:api",
+        "examples": ["BPMN-Editor-Portal"]
+      },
+      {
+        "type": "Logic Plugins",
+        "description": "Backend processing and algorithm implementations",
+        "examples": ["Process-Discoverer-Logic", "SplitMiner-Logic", "Log-Logic"]
+      }
+    ],
+    "plugin_catalog": [
+      {
+        "name": "Account-Portal-Plugin",
+        "category": "User Management",
+        "purpose": "User account management"
+      },
+      {
+        "name": "Access-Control-Portal-Plugin",
+        "category": "Security",
+        "purpose": "Permissions and access control"
+      },
+      {
+        "name": "User-Admin-Portal-Plugin",
+        "category": "Administration",
+        "purpose": "User and group administration"
+      },
+      {
+        "name": "File-Portal-Plugin",
+        "category": "Data Import/Export",
+        "purpose": "File management"
+      },
+      {
+        "name": "Log-Importer-Portal-Plugin",
+        "category": "Data Import",
+        "purpose": "Event log import"
+      },
+      {
+        "name": "CSV-Exporter-Portal-Plugin",
+        "category": "Data Export",
+        "purpose": "CSV export functionality"
+      },
+      {
+        "name": "Parquet-Exporter-Portal-Plugin",
+        "category": "Data Export",
+        "purpose": "Parquet format export"
+      },
+      {
+        "name": "Process-Discoverer-Portal-Plugin",
+        "category": "Process Mining",
+        "purpose": "Interactive process discovery",
+        "version": "2.0.0"
+      },
+      {
+        "name": "SplitMiner-Portal-Plugin",
+        "category": "Process Mining",
+        "purpose": "SplitMiner algorithm interface"
+      },
+      {
+        "name": "Similarity-Search-Portal-Plugin",
+        "category": "Process Analysis",
+        "purpose": "Model similarity detection"
+      },
+      {
+        "name": "Log-Animation-Portal-Plugin",
+        "category": "Visualization",
+        "purpose": "Event log replay animation"
+      },
+      {
+        "name": "BPMN-Editor-Portal",
+        "category": "Modeling",
+        "purpose": "BPMN 2.0 model editing"
+      },
+      {
+        "name": "Merge-Portal-Plugin",
+        "category": "Operations",
+        "purpose": "Model merging operations"
+      },
+      {
+        "name": "Process-Publisher-Portal-Plugin",
+        "category": "Publishing",
+        "purpose": "Process model publishing"
+      },
+      {
+        "name": "Simulation-Info-Portal-Plugin",
+        "category": "Simulation",
+        "purpose": "Process simulation data"
+      },
+      {
+        "name": "Calendar-Portal-Plugin",
+        "category": "Configuration",
+        "purpose": "Business calendar management"
+      },
+      {
+        "name": "Log-Filter-Portal-Plugin",
+        "category": "Data Processing",
+        "purpose": "Log filtering UI"
+      },
+      {
+        "name": "Generic-Portal-Plugin",
+        "category": "Infrastructure",
+        "purpose": "Reusable portal components"
+      }
+    ],
+    "plugin_development": {
+      "template": "plugin-templates/portal-custom-gui",
+      "base_dependencies": ["plugin-core API", "Apromore-Manager", "Apromore-Portal"],
+      "lifecycle": "Spring Boot manages plugin lifecycle",
+      "deployment": "Plugins compiled into application at build time"
+    }
+  },
+  "multi_user_collaboration": {
+    "user_management": {
+      "authentication": [
+        "Local username/password (SHA-256 with salt)",
+        "Keycloak integration (SAML, OAuth2, LDAP)",
+        "Legacy MD5 support with automatic upgrade"
+      ],
+      "user_registration": "Full registration enabled (configurable)",
+      "password_security": {
+        "algorithm": "SHA-256",
+        "salt_length": "10 characters",
+        "legacy_support": "MD5-UNSALTED",
+        "auto_upgrade": "Enabled"
+      },
+      "session_management": {
+        "timeout": "45 minutes",
+        "cookies": "HTTP-only",
+        "security": "Spring Security"
+      }
+    },
+    "access_control": {
+      "model": "Role-Based Access Control (RBAC)",
+      "default_role": "Viewer (automatic assignment)",
+      "plugins": [
+        "Access-Control-Portal-Plugin",
+        "User-Admin-Portal-Plugin",
+        "Account-Portal-Plugin"
+      ],
+      "group_support": "User groups for permissions (based on README)",
+      "granularity": "Model and log level permissions"
+    },
+    "collaboration_features": [
+      "Shared model repository",
+      "Group-based access control",
+      "Model sharing between users",
+      "Public file sharing (configurable)"
+    ],
+    "multi_tenancy": {
+      "supported": false,
+      "note": "No explicit multi-tenant architecture found in codebase. Single-instance deployment model."
+    },
+    "version_control": {
+      "model_versioning": "Not explicitly documented",
+      "note": "No version control references found in search. May exist but not prominently documented."
+    }
+  },
+  "bpmn_integration": {
+    "standard": "BPMN 2.0",
+    "capabilities": [
+      "BPMN model import",
+      "BPMN model export",
+      "Visual BPMN editor",
+      "Process discovery to BPMN",
+      "BPMN diff (feature flag)",
+      "BPMN animation"
+    ],
+    "editor": {
+      "implementation": "Apromore-BPMN-Modeler-JS (JavaScript)",
+      "integration": "Embedded via BPMN-Editor-Portal plugin",
+      "features": [
+        "Drag-and-drop design",
+        "Element properties",
+        "Validation",
+        "XML import/export"
+      ]
+    },
+    "prom_integration": {
+      "module": "prom-bpmn",
+      "purpose": "Bridge ProM process mining framework with BPMN",
+      "architecture": "OSGi module",
+      "dependencies": ["prom-models", "prom-widgets", "jgraph"]
+    },
+    "process_discovery_output": "Generates BPMN models from event logs",
+    "visualization": "Cytoscape-based BPMN rendering in frontend"
+  },
+  "process_mining_capabilities": {
+    "event_log_support": {
+      "format": "XES (eXtensible Event Stream)",
+      "library": "OpenXES 2.27",
+      "import": "Log-Importer-Portal-Plugin",
+      "storage": "File system (Event-Logs-Repository)",
+      "processing": "APMLogModule for advanced operations"
+    },
+    "process_discovery": {
+      "algorithms": ["SplitMiner (primary)"],
+      "approach": "Formal methods using Petri nets",
+      "output": "BPMN 2.0 models",
+      "features": [
+        "Automated model generation",
+        "Interactive filtering",
+        "Performance metrics",
+        "Variant analysis",
+        "Process map visualization"
+      ]
+    },
+    "log_analysis": {
+      "filtering": "Advanced log filtering (Log-Filter-Portal-Plugin)",
+      "transformation": "Log transformation operations",
+      "performance_analysis": "Duration calculations with business calendars",
+      "trace_clustering": "APMLogModule capabilities",
+      "variant_detection": "Process variant identification"
+    },
+    "visualization": {
+      "log_animation": "Token replay on BPMN models",
+      "process_maps": "Interactive process map visualization",
+      "performance_overlay": "Frequency and duration heatmaps",
+      "bottleneck_detection": "Visual bottleneck identification"
+    },
+    "model_operations": {
+      "similarity_search": "Process model similarity detection",
+      "model_merging": "Merge-Portal-Plugin",
+      "model_comparison": "BPMN diff (feature flag)",
+      "model_publishing": "Process-Publisher-Portal-Plugin"
+    },
+    "enterprise_features": {
+      "note": "Enterprise edition includes additional features not in open source",
+      "missing_from_oss": [
+        "Conformance checking",
+        "Performance dashboards",
+        "Process simulation",
+        "Predictive monitoring",
+        "Generative AI features"
+      ]
+    }
+  },
+  "configuration": {
+    "application_properties": {
+      "server_port": 8181,
+      "database": {
+        "url": "jdbc:mysql://localhost:3306/apromore",
+        "username": "apromore",
+        "ddl_auto": "none",
+        "liquibase_enabled": true
+      },
+      "security": {
+        "session_timeout": "45m",
+        "csrf_enabled": true,
+        "csp_headers": "Restrictive with unsafe-eval/inline exceptions"
+      },
+      "file_upload": {
+        "max_size": "500MB"
+      },
+      "storage": {
+        "repository_path": "${user_home}/.apromore/Repository",
+        "log_path": "${user_home}/.apromore/Event-Logs-Repository"
+      },
+      "features": {
+        "calendar": true,
+        "bpmn_diff": true,
+        "conformance_checking": true,
+        "similarity_search": true,
+        "model_publishing": true,
+        "process_simulation_export": true,
+        "log_animation": true,
+        "new_conformance_check": false
+      }
+    },
+    "profiles": {
+      "dev": "Development profile with H2 database",
+      "prod": "Production profile with MySQL"
+    },
+    "keycloak": {
+      "enabled": false,
+      "version": "14.0.0",
+      "capabilities": ["SAML", "OAuth2", "LDAP integration"]
+    }
+  },
+  "dependencies": {
+    "spring_ecosystem": [
+      {
+        "name": "spring-boot-starter",
+        "purpose": "Core Spring Boot"
+      },
+      {
+        "name": "spring-boot-starter-web",
+        "purpose": "Web application support"
+      },
+      {
+        "name": "spring-boot-starter-security",
+        "purpose": "Authentication and authorization"
+      },
+      {
+        "name": "spring-boot-starter-jersey",
+        "purpose": "REST framework"
+      },
+      {
+        "name": "spring-boot-starter-mail",
+        "purpose": "Email functionality"
+      },
+      {
+        "name": "spring-boot-devtools",
+        "purpose": "Development tools"
+      }
+    ],
+    "security": [
+      {
+        "name": "keycloak-spring-boot-starter",
+        "version": "14.0.0",
+        "license": "Apache 2.0"
+      },
+      {
+        "name": "nimbus-jose-jwt",
+        "version": "9.7",
+        "purpose": "JWT handling",
+        "license": "Apache 2.0"
+      }
+    ],
+    "database": [
+      {
+        "name": "hibernate-core",
+        "purpose": "ORM",
+        "license": "LGPL 2.1",
+        "note": "CVE-2022-22965 mitigation noted"
+      },
+      {
+        "name": "liquibase",
+        "purpose": "Database migrations",
+        "license": "Apache 2.0"
+      },
+      {
+        "name": "mysql-connector-java",
+        "purpose": "MySQL driver",
+        "license": "GPL 2.0 with FOSS exception"
+      },
+      {
+        "name": "h2",
+        "purpose": "In-memory database",
+        "license": "EPL 1.0 / MPL 2.0"
+      }
+    ],
+    "ui_framework": [
+      {
+        "name": "ZK Framework",
+        "purpose": "Java web UI framework",
+        "license": "LGPL 3.0 (open source) / Commercial",
+        "note": "Uses ZKoss Maven repository"
+      },
+      {
+        "name": "jquery",
+        "version": "3.5.1",
+        "license": "MIT"
+      },
+      {
+        "name": "cytoscape",
+        "version": "3.21.0",
+        "purpose": "Graph visualization",
+        "license": "MIT"
+      },
+      {
+        "name": "svg.js",
+        "version": "3.0.16",
+        "purpose": "SVG manipulation",
+        "license": "MIT"
+      },
+      {
+        "name": "konva",
+        "version": "7.0.3",
+        "purpose": "Canvas library",
+        "license": "MIT"
+      }
+    ],
+    "process_mining": [
+      {
+        "name": "OpenXES",
+        "version": "2.27",
+        "purpose": "XES log format",
+        "license": "LGPL 3.0"
+      },
+      {
+        "name": "de-jbpt",
+        "version": "0.2.77",
+        "purpose": "Java Business Process Toolkit",
+        "license": "LGPL 3.0"
+      },
+      {
+        "name": "uma",
+        "version": "1.3.1",
+        "purpose": "Petri net unfolding",
+        "license": "Unknown (academic)"
+      },
+      {
+        "name": "pnapi-java",
+        "version": "1.0.5",
+        "purpose": "Petri net API",
+        "license": "LGPL"
+      }
+    ],
+    "utilities": [
+      {
+        "name": "guava",
+        "version": "30.1.1-jre",
+        "license": "Apache 2.0"
+      },
+      {
+        "name": "commons-lang3",
+        "license": "Apache 2.0"
+      },
+      {
+        "name": "commons-io",
+        "version": "2.8.0",
+        "license": "Apache 2.0"
+      },
+      {
+        "name": "groovy",
+        "version": "2.4.7",
+        "license": "Apache 2.0"
+      },
+      {
+        "name": "lombok",
+        "purpose": "Annotation processing",
+        "license": "MIT"
+      },
+      {
+        "name": "eclipse-collections",
+        "version": "10.4.0",
+        "license": "EPL 1.0 / BSD 3-Clause"
+      },
+      {
+        "name": "moment.js",
+        "version": "2.29.4",
+        "license": "MIT"
+      },
+      {
+        "name": "ramda",
+        "version": "0.27.1",
+        "purpose": "Functional utilities",
+        "license": "MIT"
+      }
+    ],
+    "serialization": [
+      {
+        "name": "xstream",
+        "version": "1.4.19",
+        "purpose": "XML serialization",
+        "license": "BSD 3-Clause"
+      },
+      {
+        "name": "kryo",
+        "version": "4.0.2",
+        "purpose": "Binary serialization",
+        "license": "BSD 3-Clause"
+      },
+      {
+        "name": "json",
+        "version": "20201115",
+        "license": "JSON License"
+      }
+    ],
+    "testing": [
+      {
+        "name": "junit-platform",
+        "license": "EPL 2.0"
+      },
+      {
+        "name": "easymock",
+        "version": "4.2-4.3",
+        "license": "Apache 2.0"
+      },
+      {
+        "name": "powermock",
+        "version": "2.0.9",
+        "license": "Apache 2.0"
+      },
+      {
+        "name": "karma",
+        "version": "6.3.16",
+        "license": "MIT"
+      },
+      {
+        "name": "jasmine",
+        "version": "3.6.0",
+        "license": "MIT"
+      }
+    ],
+    "build_tools": [
+      {
+        "name": "webpack",
+        "version": "4.46.0",
+        "license": "MIT"
+      },
+      {
+        "name": "gradle",
+        "purpose": "Build automation",
+        "license": "Apache 2.0"
+      }
+    ]
+  },
+  "license_analysis": {
+    "primary_license": "LGPL-3.0",
+    "dependency_licenses": {
+      "copyleft": [
+        "LGPL 3.0 (ZK Framework, OpenXES, de-jbpt, Hibernate)",
+        "LGPL 2.1 (Hibernate)",
+        "GPL 2.0 with exception (MySQL Connector)"
+      ],
+      "permissive": [
+        "Apache 2.0 (Spring, Keycloak, Guava, Commons, etc.)",
+        "MIT (jQuery, Cytoscape, SVG.js, Konva, Lombok, etc.)",
+        "BSD 3-Clause (XStream, Kryo, Eclipse Collections)",
+        "EPL 1.0/2.0 (JUnit, H2, Eclipse Collections)"
+      ],
+      "restrictive": [
+        "JSON License (JSON library - not recommended)"
+      ]
+    },
+    "license_compatibility": {
+      "issue": "LGPL 3.0 main license requires derivative works to be LGPL",
+      "dependencies_concern": "Multiple LGPL dependencies compound the issue",
+      "recommendation": "Cannot directly reuse code in proprietary system"
+    },
+    "reusability_by_component": {
+      "cannot_reuse": [
+        "Core application code (LGPL 3.0)",
+        "ZK Framework integration (LGPL 3.0)",
+        "OpenXES (LGPL 3.0)",
+        "Process mining algorithms using JBPT (LGPL 3.0)",
+        "Hibernate integration (LGPL 2.1)"
+      ],
+      "can_study": [
+        "Architecture patterns",
+        "Plugin system design",
+        "API design patterns",
+        "Module organization",
+        "Frontend architecture"
+      ],
+      "can_reuse_concepts": [
+        "Layered architecture approach",
+        "Plugin architecture pattern",
+        "REST API design",
+        "Frontend modularization",
+        "Process discovery workflow",
+        "BPMN integration patterns"
+      ]
+    }
+  },
+  "complexity_assessment": {
+    "overall_complexity": "HIGH",
+    "lines_of_code": "Estimated 100,000+ (multi-module project)",
+    "module_count": "40+ Gradle subprojects",
+    "plugin_count": "25+ plugins",
+    "complexity_factors": [
+      {
+        "factor": "Multi-layered Architecture",
+        "rating": "High",
+        "description": "Four distinct layers with complex interactions"
+      },
+      {
+        "factor": "Plugin System",
+        "rating": "High",
+        "description": "OSGi-compatible plugin architecture with lifecycle management"
+      },
+      {
+        "factor": "Technology Stack Diversity",
+        "rating": "High",
+        "description": "Java, JavaScript, ZK Framework, Spring Boot, Hibernate, etc."
+      },
+      {
+        "factor": "Process Mining Algorithms",
+        "rating": "Very High",
+        "description": "Complex algorithms (SplitMiner) using Petri nets, graph theory"
+      },
+      {
+        "factor": "Frontend Complexity",
+        "rating": "Medium-High",
+        "description": "Multiple frontend modules with Cytoscape, Canvas, SVG visualizations"
+      },
+      {
+        "factor": "Integration Points",
+        "rating": "High",
+        "description": "ProM, BPMN, OpenXES, Keycloak, multiple data formats"
+      },
+      {
+        "factor": "Data Model",
+        "rating": "Medium-High",
+        "description": "Liquibase migrations, dual storage (DB + filesystem)"
+      },
+      {
+        "factor": "Build System",
+        "rating": "Medium",
+        "description": "Gradle multi-project with 40+ modules"
+      }
+    ],
+    "technical_debt_indicators": [
+      "Repository archived (no longer maintained)",
+      "CVE mitigation noted (CVE-2022-22965)",
+      "Legacy password support (MD5-UNSALTED)",
+      "Mixed technology stack (Java + JavaScript + ZK)",
+      "Large monolithic deployment model"
+    ],
+    "maintainability": "Medium (well-structured but large codebase)",
+    "testability": "Medium-High (testing frameworks in place, separation of concerns)",
+    "scalability": "Medium (monolithic architecture with caching)"
+  },
+  "recommendations": {
+    "for_learning": [
+      "Study the plugin architecture pattern for extensible systems",
+      "Examine layered architecture implementation with Spring Boot",
+      "Review process discovery workflow and algorithm integration",
+      "Analyze BPMN integration patterns",
+      "Study frontend modularization with Webpack",
+      "Review REST API design in Manager component",
+      "Examine separation between logic and portal plugins",
+      "Study Cytoscape integration for graph visualization",
+      "Review Liquibase migration patterns for database evolution"
+    ],
+    "for_reimplementation": [
+      "Adopt microservices architecture instead of monolithic",
+      "Use modern frontend framework (React, Vue) instead of ZK",
+      "Implement plugin system with clear service interfaces",
+      "Separate process mining algorithms into algorithm service",
+      "Use event-driven architecture for log processing",
+      "Implement proper multi-tenancy from the start",
+      "Add comprehensive model versioning",
+      "Use PostgreSQL instead of MySQL for better JSON support",
+      "Implement GraphQL for flexible API queries",
+      "Add real-time collaboration features",
+      "Use message queue (Kafka/RabbitMQ) for async processing"
+    ],
+    "architecture_improvements": [
+      "Decompose monolith into microservices",
+      "Separate frontend as standalone SPA",
+      "Implement API gateway pattern",
+      "Add service mesh for inter-service communication",
+      "Implement CQRS for read/write separation",
+      "Add event sourcing for audit trail",
+      "Implement container orchestration (Kubernetes)",
+      "Add proper distributed caching (Redis)",
+      "Implement message-driven architecture",
+      "Add comprehensive observability (metrics, tracing, logging)"
+    ],
+    "technology_stack_alternatives": [
+      {
+        "current": "ZK Framework (LGPL)",
+        "alternative": "React + TypeScript + Material-UI",
+        "benefit": "Modern stack, better developer experience, MIT license"
+      },
+      {
+        "current": "Spring Boot Monolith",
+        "alternative": "Spring Boot Microservices + Spring Cloud",
+        "benefit": "Better scalability, independent deployment"
+      },
+      {
+        "current": "MySQL",
+        "alternative": "PostgreSQL",
+        "benefit": "Better JSON support, advanced features"
+      },
+      {
+        "current": "Ehcache",
+        "alternative": "Redis",
+        "benefit": "Distributed caching, pub/sub, persistence"
+      },
+      {
+        "current": "Cytoscape.js",
+        "alternative": "D3.js + Custom rendering",
+        "benefit": "More flexibility, better performance for large graphs"
+      },
+      {
+        "current": "Hibernate",
+        "alternative": "jOOQ or Spring Data JPA with optimizations",
+        "benefit": "Better query control, type safety"
+      }
+    ],
+    "security_improvements": [
+      "Implement OAuth 2.0 / OIDC by default",
+      "Add API rate limiting",
+      "Implement comprehensive audit logging",
+      "Add RBAC with fine-grained permissions",
+      "Implement multi-tenancy with data isolation",
+      "Add encryption at rest for sensitive data",
+      "Implement security headers (OWASP recommendations)",
+      "Add vulnerability scanning in CI/CD",
+      "Implement secret management (Vault)",
+      "Add SIEM integration"
+    ]
+  },
+  "extractable_requirements": {
+    "functional_requirements": [
+      {
+        "id": "FR-001",
+        "category": "Event Log Management",
+        "requirement": "System shall support import of event logs in XES format",
+        "priority": "High"
+      },
+      {
+        "id": "FR-002",
+        "category": "Event Log Management",
+        "requirement": "System shall store event logs separately from metadata on file system",
+        "priority": "High"
+      },
+      {
+        "id": "FR-003",
+        "category": "Process Discovery",
+        "requirement": "System shall automatically discover process models from event logs",
+        "priority": "High"
+      },
+      {
+        "id": "FR-004",
+        "category": "Process Discovery",
+        "requirement": "System shall generate BPMN 2.0 compliant process models",
+        "priority": "High"
+      },
+      {
+        "id": "FR-005",
+        "category": "Process Discovery",
+        "requirement": "System shall provide interactive filtering for process discovery",
+        "priority": "Medium"
+      },
+      {
+        "id": "FR-006",
+        "category": "BPMN Editor",
+        "requirement": "System shall provide visual BPMN 2.0 editor",
+        "priority": "High"
+      },
+      {
+        "id": "FR-007",
+        "category": "BPMN Editor",
+        "requirement": "System shall support BPMN model import and export",
+        "priority": "High"
+      },
+      {
+        "id": "FR-008",
+        "category": "Visualization",
+        "requirement": "System shall animate event log replay on process models",
+        "priority": "Medium"
+      },
+      {
+        "id": "FR-009",
+        "category": "Visualization",
+        "requirement": "System shall display performance metrics on process visualizations",
+        "priority": "Medium"
+      },
+      {
+        "id": "FR-010",
+        "category": "Model Repository",
+        "requirement": "System shall store and manage process models in repository",
+        "priority": "High"
+      },
+      {
+        "id": "FR-011",
+        "category": "Model Repository",
+        "requirement": "System shall support model sharing between users",
+        "priority": "High"
+      },
+      {
+        "id": "FR-012",
+        "category": "User Management",
+        "requirement": "System shall support user authentication with password hashing",
+        "priority": "High"
+      },
+      {
+        "id": "FR-013",
+        "category": "User Management",
+        "requirement": "System shall support user registration and account management",
+        "priority": "High"
+      },
+      {
+        "id": "FR-014",
+        "category": "Access Control",
+        "requirement": "System shall implement role-based access control",
+        "priority": "High"
+      },
+      {
+        "id": "FR-015",
+        "category": "Access Control",
+        "requirement": "System shall support group-based permissions",
+        "priority": "Medium"
+      },
+      {
+        "id": "FR-016",
+        "category": "Business Calendar",
+        "requirement": "System shall support business calendar definitions for working hours",
+        "priority": "Medium"
+      },
+      {
+        "id": "FR-017",
+        "category": "Business Calendar",
+        "requirement": "System shall calculate durations based on business calendars",
+        "priority": "Medium"
+      },
+      {
+        "id": "FR-018",
+        "category": "Data Export",
+        "requirement": "System shall export event logs in CSV format",
+        "priority": "Medium"
+      },
+      {
+        "id": "FR-019",
+        "category": "Data Export",
+        "requirement": "System shall export process diagrams as PDF",
+        "priority": "Low"
+      },
+      {
+        "id": "FR-020",
+        "category": "Plugin System",
+        "requirement": "System shall support plugin architecture for extensibility",
+        "priority": "High"
+      },
+      {
+        "id": "FR-021",
+        "category": "Process Analysis",
+        "requirement": "System shall identify process variants",
+        "priority": "Medium"
+      },
+      {
+        "id": "FR-022",
+        "category": "Process Analysis",
+        "requirement": "System shall detect process model similarities",
+        "priority": "Low"
+      },
+      {
+        "id": "FR-023",
+        "category": "Model Operations",
+        "requirement": "System shall support merging of process models",
+        "priority": "Low"
+      },
+      {
+        "id": "FR-024",
+        "category": "Model Operations",
+        "requirement": "System shall compare BPMN models for differences",
+        "priority": "Low"
+      },
+      {
+        "id": "FR-025",
+        "category": "Integration",
+        "requirement": "System shall support SSO via Keycloak (SAML, OAuth2, LDAP)",
+        "priority": "Medium"
+      }
+    ],
+    "non_functional_requirements": [
+      {
+        "id": "NFR-001",
+        "category": "Performance",
+        "requirement": "System shall handle process models up to 5000 nodes and 15000 arcs",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-002",
+        "category": "Performance",
+        "requirement": "System shall support file uploads up to 500MB",
+        "priority": "Medium"
+      },
+      {
+        "id": "NFR-003",
+        "category": "Security",
+        "requirement": "System shall use SHA-256 with salt for password hashing",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-004",
+        "category": "Security",
+        "requirement": "System shall enforce 45-minute session timeout",
+        "priority": "Medium"
+      },
+      {
+        "id": "NFR-005",
+        "category": "Security",
+        "requirement": "System shall use HTTP-only cookies",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-006",
+        "category": "Security",
+        "requirement": "System shall implement Content Security Policy headers",
+        "priority": "Medium"
+      },
+      {
+        "id": "NFR-007",
+        "category": "Scalability",
+        "requirement": "System shall support caching for improved performance",
+        "priority": "Medium"
+      },
+      {
+        "id": "NFR-008",
+        "category": "Reliability",
+        "requirement": "System shall support database connection auto-reconnect",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-009",
+        "category": "Maintainability",
+        "requirement": "System shall use Liquibase for database schema versioning",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-010",
+        "category": "Maintainability",
+        "requirement": "System shall provide OpenAPI documentation for REST APIs",
+        "priority": "Medium"
+      },
+      {
+        "id": "NFR-011",
+        "category": "Usability",
+        "requirement": "System shall provide responsive web interface",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-012",
+        "category": "Compatibility",
+        "requirement": "System shall run on Linux, Windows, and macOS",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-013",
+        "category": "Compatibility",
+        "requirement": "System shall support MySQL 8.0 and H2 databases",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-014",
+        "category": "Standards Compliance",
+        "requirement": "System shall comply with BPMN 2.0 standard",
+        "priority": "High"
+      },
+      {
+        "id": "NFR-015",
+        "category": "Standards Compliance",
+        "requirement": "System shall support XES standard for event logs",
+        "priority": "High"
+      }
+    ],
+    "architectural_requirements": [
+      {
+        "id": "AR-001",
+        "requirement": "System shall implement layered architecture with separation of concerns",
+        "rationale": "Maintainability and testability"
+      },
+      {
+        "id": "AR-002",
+        "requirement": "System shall support plugin-based extensibility",
+        "rationale": "Modularity and customization"
+      },
+      {
+        "id": "AR-003",
+        "requirement": "System shall separate business logic from presentation",
+        "rationale": "Reusability and testability"
+      },
+      {
+        "id": "AR-004",
+        "requirement": "System shall use REST APIs for inter-component communication",
+        "rationale": "Loose coupling and integration"
+      },
+      {
+        "id": "AR-005",
+        "requirement": "System shall separate event log storage from metadata storage",
+        "rationale": "Performance and scalability"
+      },
+      {
+        "id": "AR-006",
+        "requirement": "System shall support multiple database backends",
+        "rationale": "Flexibility and deployment options"
+      }
+    ]
+  },
+  "key_learnings": {
+    "design_patterns": [
+      "Plugin architecture enables high extensibility",
+      "Layered architecture provides clear separation of concerns",
+      "Client-server pattern decouples UI from business logic",
+      "Repository pattern abstracts data access",
+      "Facade pattern simplifies complex subsystem interactions",
+      "Strategy pattern allows algorithm flexibility"
+    ],
+    "architectural_decisions": [
+      "ZK Framework choice enables rapid Java-based UI development but limits frontend flexibility",
+      "File system storage for event logs separate from DB optimizes large file handling",
+      "Spring Boot provides comprehensive enterprise features out of the box",
+      "Gradle multi-project enables modular build and dependency management",
+      "Liquibase ensures controlled database evolution",
+      "OSGi-compatible plugins enable runtime modularity"
+    ],
+    "technology_choices": [
+      "Cytoscape for graph visualization provides rich interactive capabilities",
+      "OpenXES standard ensures interoperability with other process mining tools",
+      "ProM integration leverages established process mining algorithms",
+      "Hibernate ORM simplifies database operations but adds LGPL dependency",
+      "Webpack enables modern frontend build pipeline",
+      "Ehcache provides caching without external dependencies"
+    ],
+    "implementation_insights": [
+      "Separating portal and logic plugins enables UI-independent algorithm development",
+      "Business calendar support essential for accurate process performance analysis",
+      "Interactive filtering crucial for process discovery refinement",
+      "Log animation significantly aids process understanding",
+      "Dual storage model (DB + filesystem) balances performance and capability",
+      "Plugin template facilitates custom extension development"
+    ]
+  },
+  "gaps_and_limitations": {
+    "identified_gaps": [
+      "No explicit multi-tenancy support",
+      "Model versioning not prominently implemented",
+      "Limited real-time collaboration features",
+      "Monolithic deployment limits scalability",
+      "No microservices architecture",
+      "Limited API for external integrations",
+      "No GraphQL support",
+      "No built-in conformance checking (enterprise only)",
+      "No predictive monitoring (enterprise only)",
+      "Limited cloud-native features"
+    ],
+    "technical_limitations": [
+      "Process model size limits (5000 nodes, 15000 arcs)",
+      "File upload size limit (500MB)",
+      "Monolithic architecture scalability constraints",
+      "ZK Framework vendor lock-in",
+      "LGPL license restrictions",
+      "Single-instance deployment model",
+      "No distributed deployment support",
+      "Limited horizontal scalability"
+    ],
+    "usability_limitations": [
+      "ZK Framework learning curve for developers",
+      "Complex setup process",
+      "Manual MySQL configuration required",
+      "Limited cloud deployment guidance",
+      "No containerization out of the box",
+      "Complex Gradle multi-project structure"
+    ]
+  },
+  "migration_considerations": {
+    "if_reimplementing": [
+      "Design for multi-tenancy from the start",
+      "Implement comprehensive model versioning and audit trail",
+      "Use modern frontend framework (React/Vue) instead of ZK",
+      "Adopt microservices architecture for scalability",
+      "Implement event-driven architecture for asynchronous processing",
+      "Add GraphQL for flexible API queries",
+      "Use containerization (Docker) and orchestration (Kubernetes)",
+      "Implement distributed caching (Redis)",
+      "Add message queue (Kafka/RabbitMQ) for event processing",
+      "Design API-first with comprehensive OpenAPI specs",
+      "Implement comprehensive observability (Prometheus, Grafana, Jaeger)",
+      "Add real-time collaboration features (WebSockets)",
+      "Use permissive licenses (Apache 2.0, MIT) for all dependencies",
+      "Implement CQRS and event sourcing for complex domains",
+      "Add comprehensive integration testing",
+      "Implement CI/CD pipelines with automated testing",
+      "Design for cloud-native deployment (AWS, Azure, GCP)"
+    ],
+    "data_model_considerations": [
+      "Design for multi-tenancy with tenant isolation",
+      "Implement comprehensive audit logging",
+      "Version all entities (process models, logs, configurations)",
+      "Use UUIDs instead of sequential IDs for distributed systems",
+      "Design for horizontal sharding",
+      "Implement soft deletes for data recovery",
+      "Add full-text search (Elasticsearch)",
+      "Design for event sourcing",
+      "Implement time-series data optimization for logs",
+      "Add comprehensive metadata and tagging"
+    ],
+    "api_design_considerations": [
+      "Design RESTful APIs with proper resource modeling",
+      "Implement GraphQL for flexible queries",
+      "Add comprehensive API versioning",
+      "Implement API rate limiting and throttling",
+      "Add webhook support for event notifications",
+      "Design async APIs for long-running operations",
+      "Implement comprehensive error handling and status codes",
+      "Add pagination, filtering, sorting on all list endpoints",
+      "Implement HATEOAS for API discoverability",
+      "Add comprehensive API documentation (OpenAPI 3.0)"
+    ]
+  },
+  "documentation_quality": {
+    "readme": "Good - comprehensive setup instructions and feature overview",
+    "code_documentation": "Unknown - not accessible via web fetch",
+    "architecture_documentation": "Limited - inferred from build files and structure",
+    "api_documentation": "SpringDoc OpenAPI UI provided",
+    "setup_documentation": "Good - detailed installation instructions",
+    "plugin_development": "Limited - template provided but documentation unclear"
+  },
+  "summary": {
+    "verdict": "Apromore Core is a comprehensive open-source process mining platform with strong architectural patterns and extensive features. However, LGPL 3.0 licensing prohibits direct code reuse in proprietary systems. The platform demonstrates excellent plugin architecture, layered design, and separation of concerns that can be studied and adapted.",
+    "reusability": "MUST_REBUILD - LGPL 3.0 license requires derivative works to be LGPL, incompatible with proprietary licensing",
+    "learning_value": "HIGH - Excellent reference for plugin architecture, process mining workflows, BPMN integration, and enterprise platform design",
+    "complexity": "HIGH - Large multi-module codebase with complex algorithms and diverse technology stack",
+    "modernization_needed": "SIGNIFICANT - Monolithic architecture, ZK Framework, limited cloud-native features",
+    "key_strengths": [
+      "Well-structured plugin architecture",
+      "Clear layered architecture with separation of concerns",
+      "Comprehensive process mining capabilities",
+      "Good BPMN 2.0 integration",
+      "Extensive visualization features",
+      "Modular Gradle build system",
+      "Good separation of logic and UI plugins"
+    ],
+    "key_weaknesses": [
+      "LGPL 3.0 license restricts reusability",
+      "Archived repository (no longer maintained)",
+      "Monolithic architecture limits scalability",
+      "ZK Framework vendor lock-in",
+      "No explicit multi-tenancy",
+      "Limited model versioning",
+      "Complex technology stack",
+      "Large monolithic codebase"
+    ],
+    "recommended_approach": "Study architectural patterns, plugin system design, and process mining workflows. Implement clean-room reimplementation using modern technology stack (React, Spring Boot microservices, PostgreSQL, Redis, Kafka) with microservices architecture, API-first design, and comprehensive multi-tenancy support."
+  },
+  "related_projects": {
+    "apromore_enterprise": {
+      "description": "Commercial edition with additional features",
+      "url": "https://apromore.com/",
+      "additional_features": [
+        "Conformance checking",
+        "Performance dashboards",
+        "Process simulation",
+        "Predictive monitoring",
+        "Generative AI features"
+      ],
+      "license": "Commercial/Proprietary"
+    },
+    "prom_framework": {
+      "description": "Process Mining framework integrated in Apromore",
+      "url": "http://www.promtools.org/",
+      "license": "Various (mostly open source)"
+    },
+    "alternatives": [
+      "Camunda Platform (Apache 2.0)",
+      "Flowable (Apache 2.0)",
+      "Celonis (Commercial)",
+      "ProcessGold (Commercial)",
+      "Disco (Commercial)"
+    ]
+  },
+  "action_items": [
+    "Review plugin architecture pattern for UML Codex extensibility",
+    "Study layered architecture implementation for separation of concerns",
+    "Examine process discovery workflow for mining algorithm integration",
+    "Analyze BPMN integration patterns for standards compliance",
+    "Review frontend modularization approach with Webpack",
+    "Study Cytoscape integration for graph visualization techniques",
+    "Examine REST API design in Manager component",
+    "Review Liquibase migration patterns for database evolution strategy",
+    "Consider modern alternatives to ZK Framework (React, Vue)",
+    "Design microservices architecture based on Apromore's module boundaries",
+    "Plan multi-tenancy architecture from the start",
+    "Design comprehensive model versioning system",
+    "Ensure all dependencies use permissive licenses (Apache 2.0, MIT)",
+    "Design for cloud-native deployment from the start"
+  ]
+}

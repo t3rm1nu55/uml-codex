@@ -1,0 +1,1097 @@
+{
+  "version": 1,
+  "repository": "pm4py/pm4py-core",
+  "analysis_date": "2025-11-08",
+  "last_updated": "2025-11-08T00:00:00Z",
+  "change_history": [
+    {
+      "date": "2025-11-08",
+      "description": "Initial comprehensive analysis of PM4Py issues focusing on process mining challenges, algorithm implementation, BPMN/Petri net conversion, and OCEL support"
+    }
+  ],
+  "total_issues": 389,
+  "issues_analyzed": 75,
+  "open_issues": 1,
+  "closed_issues": 388,
+  "date_range": {
+    "from": "2019-01-01",
+    "to": "2025-11-08"
+  },
+  "categories": {
+    "bugs": [
+      {
+        "number": 530,
+        "title": "Error in OCEL parsing with empty relations",
+        "state": "closed",
+        "created": "2025-08-26",
+        "closed": "2025-08-26",
+        "labels": ["OCEL", "parsing"],
+        "description": "OCEL JSON files with no relationship data cause key error during parsing",
+        "priority": "medium",
+        "technical_scope": "Edge case handling in OCEL importer where empty dataframe sorting triggers error in classic.py line 149",
+        "business_value": "Support for minimal OCEL files containing only objects and events without relationships",
+        "root_cause": "Attempted to sort empty dataframe without checking if dataframe is empty first"
+      },
+      {
+        "number": 459,
+        "title": "pm4py.write.write_bpmn(...) produces invalid BPMN schema",
+        "state": "closed",
+        "created": "2023-12-12",
+        "closed": "2024-01-02",
+        "labels": ["BPMN", "export"],
+        "description": "BPMN export generates XML with schema violations: incorrect gatewayDirection capitalization and element ordering",
+        "priority": "high",
+        "technical_scope": "Gateway direction attributes use lowercase (converging/diverging) instead of capitalized values per BPMN 2.0 spec; element ordering doesn't match validator expectations",
+        "business_value": "Ensures exported BPMN models validate against standard BPMN 2.0 schema validators",
+        "root_cause": "Implementation didn't follow BPMN 2.0 specification chapter 8.3.9 for gateway direction enumeration values"
+      },
+      {
+        "number": 443,
+        "title": "IMf determinism",
+        "state": "closed",
+        "created": "2023-10-09",
+        "closed": "2023-10-09",
+        "labels": ["inductive-miner", "determinism"],
+        "description": "Inductive Miner produces different Petri nets for identical input across Python versions and execution runs",
+        "priority": "high",
+        "technical_scope": "Non-deterministic behavior in 'activity concurrent' fallthrough mechanism; structural differences (AND vs XOR gates) appear even with fallthroughs disabled",
+        "business_value": "Reproducibility critical for research and production use cases requiring consistent model discovery",
+        "root_cause": "Undeterminism in activity concurrent fallthrough logic; disable_fallthroughs parameter insufficient to guarantee determinism"
+      },
+      {
+        "number": 395,
+        "title": "pm4py.conformance.fitness_aligment crashing when using multiprocessing",
+        "state": "closed",
+        "created": "2023-03-31",
+        "closed": "2023-03-31",
+        "labels": ["alignment", "performance", "memory"],
+        "description": "BrokenProcessPool error when processing large event logs due to excessive memory consumption during alignment computation",
+        "priority": "high",
+        "technical_scope": "Alignment algorithm visits numerous states consuming up to 32GB RAM; scipy compatibility issues with linprog integrality parameter",
+        "business_value": "Enable conformance checking on large real-world datasets without memory crashes",
+        "root_cause": "Alignment state space exploration consumes excessive memory; default variant not memory-optimized"
+      },
+      {
+        "number": 387,
+        "title": "xes_import.apply missed all time:timestamp values",
+        "state": "closed",
+        "created": "2023-02-20",
+        "closed": "2023-02-20",
+        "labels": ["XES", "import"],
+        "description": "XES import function fails to capture timestamp values during import process",
+        "priority": "high",
+        "technical_scope": "Timestamp parsing issue affecting event log temporal data integrity",
+        "business_value": "Critical for time-based process mining analysis including performance mining"
+      },
+      {
+        "number": 379,
+        "title": "Dependency threshold from the Heuristics Miner produces strange results",
+        "state": "closed",
+        "created": "2023-02-02",
+        "closed": "2023-02-02",
+        "labels": ["heuristics-miner"],
+        "description": "Increasing dependency threshold from 0.5 to 0.8 causes arc to appear instead of disappear",
+        "priority": "medium",
+        "technical_scope": "dfg_pre_cleaning_noise_thresh parameter (default 0.05) removes infrequent arcs before heuristics miner application, interfering with threshold behavior",
+        "business_value": "Predictable threshold behavior for process model filtering",
+        "root_cause": "Pre-processing parameter dfg_pre_cleaning_noise_thresh must be set to 0.0 to prevent unwanted arc removal"
+      },
+      {
+        "number": 376,
+        "title": "Inductive Miner on DFG Bug",
+        "state": "closed",
+        "created": "2023-01-19",
+        "closed": "2023-01-19",
+        "labels": ["inductive-miner", "DFG"],
+        "description": "TypeError: project() takes 3 positional arguments but 4 were given when applying inductive miner to DFG object",
+        "priority": "medium",
+        "technical_scope": "Function signature mismatch in inductive miner DFG processing",
+        "business_value": "Enable process discovery from directly-follows graphs",
+        "root_cause": "Fixed in pm4py 2.5.0"
+      },
+      {
+        "number": 215,
+        "title": "Log parsing speed has dropped significantly",
+        "state": "closed",
+        "created": "2021-04-19",
+        "closed": "2021-04-19",
+        "labels": ["XES", "performance"],
+        "description": "Performance regression from 400-500 it/s to 5-20 it/s after version 2.1.1",
+        "priority": "high",
+        "technical_scope": "New default XES importer variant (ITERPARSE_MEM_COMPRESSED) introduced ~45 minutes processing time vs 8.7 seconds with old ITERPARSE variant",
+        "business_value": "Fast log import critical for interactive analysis workflows",
+        "root_cause": "Memory optimization prioritized over speed; extreme slowdown on logs with many attributes and long string values"
+      },
+      {
+        "number": 99,
+        "title": "Bug in the generation of process trees",
+        "state": "closed",
+        "created": "2019-08-30",
+        "closed": "2019-08-30",
+        "labels": ["process-tree"],
+        "description": "Process tree generation produced incorrect structures",
+        "priority": "medium",
+        "technical_scope": "Process tree construction algorithm error"
+      },
+      {
+        "number": 93,
+        "title": "Encoding problem in CSV importing",
+        "state": "closed",
+        "created": "2019-07-01",
+        "closed": "2019-07-01",
+        "labels": ["CSV", "encoding"],
+        "description": "CSV import fails with non-ASCII characters",
+        "priority": "medium",
+        "technical_scope": "Character encoding handling in CSV importer"
+      },
+      {
+        "number": 90,
+        "title": "NoneType when discovering with Heuristic Miner",
+        "state": "closed",
+        "created": "2019-07-01",
+        "closed": "2019-07-01",
+        "labels": ["heuristics-miner"],
+        "description": "Heuristic Miner returns NoneType under certain conditions",
+        "priority": "medium",
+        "technical_scope": "Null pointer error in heuristics miner algorithm"
+      },
+      {
+        "number": 87,
+        "title": "data frame to event log conversion is wrong",
+        "state": "closed",
+        "created": "2019-06-12",
+        "closed": "2019-06-12",
+        "labels": ["dataframe", "conversion"],
+        "description": "DataFrame to event log conversion produces incorrect structures",
+        "priority": "high",
+        "technical_scope": "Data transformation logic error in conversion"
+      },
+      {
+        "number": 86,
+        "title": "alpha miner factory not compatible with data frame",
+        "state": "closed",
+        "created": "2019-06-12",
+        "closed": "2019-06-12",
+        "labels": ["alpha-miner", "dataframe"],
+        "description": "Alpha miner cannot process DataFrame input directly",
+        "priority": "medium",
+        "technical_scope": "Type compatibility issue between alpha miner and pandas DataFrames"
+      },
+      {
+        "number": 78,
+        "title": "DFG visualization is impossible without log",
+        "state": "closed",
+        "created": "2019-05-18",
+        "closed": "2019-05-18",
+        "labels": ["DFG", "visualization"],
+        "description": "DFG visualization requires event log even when DFG structure already computed",
+        "priority": "low",
+        "technical_scope": "Visualization coupling to event log object"
+      },
+      {
+        "number": 71,
+        "title": "Problem with Heuristics Miner: Key Error depending on threshold",
+        "state": "closed",
+        "created": "2019-04-15",
+        "closed": "2019-04-15",
+        "labels": ["heuristics-miner"],
+        "description": "Specific threshold values cause KeyError in Heuristics Miner",
+        "priority": "medium",
+        "technical_scope": "Edge case handling in threshold-based arc filtering"
+      },
+      {
+        "number": 68,
+        "title": "Problem importing Petri net from ProM export",
+        "state": "closed",
+        "created": "2019-03-29",
+        "closed": "2019-03-29",
+        "labels": ["petri-net", "import", "ProM"],
+        "description": "Petri nets exported from ProM fail to import into PM4Py",
+        "priority": "medium",
+        "technical_scope": "PNML format compatibility between ProM and PM4Py"
+      },
+      {
+        "number": 67,
+        "title": "best_of_worst_cost always using default cost function",
+        "state": "closed",
+        "created": "2019-03-29",
+        "closed": "2019-03-29",
+        "labels": ["alignment", "cost-function"],
+        "description": "Custom cost functions ignored in alignment computation",
+        "priority": "medium",
+        "technical_scope": "Parameter passing issue for alignment cost functions"
+      }
+    ],
+    "features": [
+      {
+        "number": 512,
+        "title": "Add perf_aggregation_key parameter to discover_performance_dfg method",
+        "state": "closed",
+        "created": "2024-12-01",
+        "closed": "2024-12-01",
+        "labels": ["DFG", "performance"],
+        "description": "Enable custom aggregation keys for performance DFG discovery",
+        "priority": "medium",
+        "technical_scope": "Add parameter to control how performance metrics are aggregated in DFG construction",
+        "business_value": "Flexible performance analysis with custom aggregation strategies"
+      },
+      {
+        "number": 464,
+        "title": "GPU-based process mining",
+        "state": "closed",
+        "created": "2024-02-22",
+        "closed": "2024-02-22",
+        "labels": ["GPU", "performance"],
+        "description": "Inquiry about GPU acceleration support; confirmed CuDF/CUDA support integrated in main codebase",
+        "priority": "high",
+        "technical_scope": "NVIDIA Rapids CuDF integration for automatic GPU acceleration when CUDA available; transparent execution on CUDA dataframes",
+        "business_value": "Hardware acceleration for large-scale process mining workloads"
+      },
+      {
+        "number": 431,
+        "title": "Allow higher time resolutions in performance DFG",
+        "state": "closed",
+        "created": "2023-07-01",
+        "closed": "2023-07-01",
+        "labels": ["DFG", "performance", "temporal"],
+        "description": "Support finer temporal granularity in performance DFG metrics",
+        "priority": "low",
+        "technical_scope": "Extend time resolution beyond default for high-frequency processes",
+        "business_value": "Precise performance analysis for sub-second process durations"
+      },
+      {
+        "number": 408,
+        "title": "Missing petri net, DFG option for inductive miner",
+        "state": "closed",
+        "created": "2023-05-01",
+        "closed": "2023-05-01",
+        "labels": ["inductive-miner", "output-format"],
+        "description": "Request for additional output format options from inductive miner",
+        "priority": "low",
+        "technical_scope": "Support direct Petri net and DFG output without intermediate process tree",
+        "business_value": "Simplified workflow for users needing specific output formats"
+      },
+      {
+        "number": 62,
+        "title": "Alignments on generic accepting Petri net",
+        "state": "closed",
+        "created": "2019-02-15",
+        "closed": "2019-02-15",
+        "labels": ["alignment", "petri-net"],
+        "description": "Support for alignments on accepting Petri nets beyond workflow nets",
+        "priority": "medium",
+        "technical_scope": "Extend alignment computation to handle generic Petri net structures with multiple final markings",
+        "business_value": "Conformance checking for broader class of process models"
+      },
+      {
+        "number": 53,
+        "title": "Log Animation",
+        "state": "closed",
+        "created": "2019-01-01",
+        "closed": "2019-01-01",
+        "labels": ["visualization"],
+        "description": "Animate event log replay on process models",
+        "priority": "low",
+        "technical_scope": "Visualization feature showing token movement through process model over time",
+        "business_value": "Intuitive understanding of process execution dynamics"
+      }
+    ],
+    "enhancements": [
+      {
+        "number": 524,
+        "title": "Question about event log format - Pandas or Legacy Event Log",
+        "state": "closed",
+        "created": "2025-05-19",
+        "closed": "2025-05-19",
+        "labels": ["event-log", "pandas"],
+        "description": "Clarification on Pandas datetime64[ns] limitations (dates between 1677-2262) vs legacy EventLog format",
+        "technical_details": [
+          "Pandas-based format limited to numpy.datetime64[ns] range (1677-09-21 to 2262-04-11)",
+          "Legacy EventLog format supports wider date ranges",
+          "No current plans to remove legacy EventLog format",
+          "Users should maintain realistic timestamps for cross-platform compatibility"
+        ]
+      },
+      {
+        "number": 520,
+        "title": "Difference in precision values between PM4Py v2.2.13 and v2.7.13.1 using Inductive Miner",
+        "state": "closed",
+        "created": "2025-02-15",
+        "closed": "2025-02-15",
+        "labels": ["inductive-miner", "precision", "version-compatibility"],
+        "description": "Significant precision metric differences across versions due to algorithm improvements and bug fixes",
+        "technical_details": [
+          "v2.2.13 considered 'very old' with outdated implementations",
+          "Inductive Miner algorithm revised to improve overall precision",
+          "Precision measurement contained bugs that were subsequently fixed",
+          "Results not directly comparable between old and new versions"
+        ]
+      },
+      {
+        "number": 516,
+        "title": "Conversion from Petri net to process tree - Assertion Error",
+        "state": "closed",
+        "created": "2025-02-18",
+        "closed": "2025-02-18",
+        "labels": ["conversion", "petri-net", "process-tree"],
+        "description": "AssertionError in recursive parsing during Petri net to process tree conversion",
+        "technical_details": [
+          "Error in pm4py/objects/process_tree/utils/generic.py line 295",
+          "Parser encounters unexpected string representation not starting with tau markers",
+          "Fix released in subsequent version after reproduction by maintainers"
+        ]
+      },
+      {
+        "number": 515,
+        "title": "OCEL Constraints Not Satisfied After Exporting and Reimporting",
+        "state": "closed",
+        "created": "2025-01-31",
+        "closed": "2025-01-31",
+        "labels": ["OCEL", "export", "constraints"],
+        "description": "OCEL 2.0 data loses database integrity constraints during export/reimport cycle",
+        "technical_details": [
+          "11 constraint validations fail after round-trip: 5 primary keys, 6 foreign keys",
+          "Pandas export doesn't preserve relational database constraints",
+          "Manual workaround: restore constraints using DB Browser for SQLite",
+          "No automated solution within PM4Py for constraint preservation"
+        ]
+      },
+      {
+        "number": 499,
+        "title": "'OCEL' object is not iterable",
+        "state": "closed",
+        "created": "2024-08-10",
+        "closed": "2024-08-10",
+        "labels": ["OCEL", "discovery"],
+        "description": "Traditional process discovery algorithms expect iterable trace structures incompatible with OCEL2",
+        "technical_details": [
+          "OCEL2 lacks explicit case notion used by traditional algorithms",
+          "DFG and heuristics miner require trace-based iteration",
+          "OCEL2 uses object-centric data model instead of trace sequences",
+          "Requires OCEL-specific discovery algorithms"
+        ]
+      },
+      {
+        "number": 484,
+        "title": "Getting a False soundness result for the simplest BPMN model",
+        "state": "closed",
+        "created": "2024-05-01",
+        "closed": "2024-05-01",
+        "labels": ["BPMN", "soundness"],
+        "description": "User error: used read_pnml() instead of read_bpmn() causing false soundness failure",
+        "technical_details": [
+          "Incorrect method (read_pnml) caused model misinterpretation",
+          "Correct approach: read_bpmn() followed by convert_to_petri_net()",
+          "Error message 'more than one initial or final marking' was misleading",
+          "Highlights importance of correct API usage"
+        ]
+      },
+      {
+        "number": 465,
+        "title": "pm4py.convert.convert_to_petri_net(bpmn) not support inclusiveGateway",
+        "state": "closed",
+        "created": "2024-02-28",
+        "closed": "2024-02-28",
+        "labels": ["BPMN", "conversion", "inclusive-gateway"],
+        "description": "BPMN model with inclusive gateway split but no explicit join violates best practices",
+        "technical_details": [
+          "Branches opened by inclusive gateway should converge to inclusive gateway join",
+          "Model had inclusive split with branches rejoining at end event without explicit join",
+          "Not a library limitation but modeling error",
+          "Solutions: use exclusive gateway or add explicit inclusive gateway join"
+        ]
+      },
+      {
+        "number": 326,
+        "title": "Performance improvement for conformance checking",
+        "state": "closed",
+        "created": "2022-04-15",
+        "closed": "2022-04-15",
+        "labels": ["conformance", "performance"],
+        "description": "Slow performance on BPIC datasets with 90+ variants taking 20+ minutes per 100 cases",
+        "technical_details": [
+          "Check linear solver with pm4py.util.lp.solver.DEFAULT_LP_SOLVER_VARIANT",
+          "Most efficient option: cvxopt",
+          "Alternative: DIJKSTRA_LESS_MEMORY variant for better efficiency",
+          "Alignments computationally expensive due to state space exploration"
+        ]
+      },
+      {
+        "number": 91,
+        "title": "Naming Inconsistency(ies) Objects / Visualization",
+        "state": "closed",
+        "created": "2019-07-01",
+        "closed": "2019-07-01",
+        "labels": ["API", "naming"],
+        "description": "Inconsistent naming conventions across objects and visualization modules",
+        "technical_details": [
+          "API consistency improvements",
+          "Standardize naming patterns across modules"
+        ]
+      },
+      {
+        "number": 46,
+        "title": "Compatibility with Pandas 0.24",
+        "state": "closed",
+        "created": "2019-01-01",
+        "closed": "2019-01-01",
+        "labels": ["pandas", "compatibility"],
+        "description": "Update library to work with Pandas 0.24",
+        "technical_details": [
+          "Dependency version compatibility",
+          "API changes in Pandas 0.24"
+        ]
+      },
+      {
+        "number": 41,
+        "title": "Proposed Names Change: TraceLog → EventLog, EventLog → EventStream",
+        "state": "closed",
+        "created": "2019-01-01",
+        "closed": "2019-01-01",
+        "labels": ["API", "naming"],
+        "description": "Rename core data structures for clarity and alignment with standards",
+        "technical_details": [
+          "Improve terminology alignment with process mining literature",
+          "Breaking change requiring migration guide"
+        ]
+      },
+      {
+        "number": 37,
+        "title": "Provide possibility to represent the Petri net in Graph Viz with an horizontal layout instead of vertical",
+        "state": "closed",
+        "created": "2019-01-01",
+        "closed": "2019-01-01",
+        "labels": ["visualization", "petri-net"],
+        "description": "Add layout orientation options for Petri net visualization",
+        "technical_details": [
+          "GraphViz rendering configuration",
+          "Horizontal vs vertical layout preference"
+        ]
+      },
+      {
+        "number": 28,
+        "title": "Add option to deepcopy in log conversion",
+        "state": "closed",
+        "created": "2019-01-01",
+        "closed": "2019-01-01",
+        "labels": ["conversion", "memory"],
+        "description": "Optional deep copy during log conversion to prevent side effects",
+        "technical_details": [
+          "Prevent unintended mutation of original log",
+          "Trade-off between memory usage and data safety"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "number": 529,
+        "title": "Clarification on Align-ETConformance Precision: why does PM4Py skip full alignments?",
+        "state": "closed",
+        "created": "2025-08-26",
+        "closed": "2025-08-26",
+        "labels": ["alignment", "precision"],
+        "description": "User question about why PM4Py optimization skips computing certain complete alignments in precision calculation"
+      },
+      {
+        "number": 519,
+        "title": "Format of trans_fitness expected by diagnose_from_trans_fitness",
+        "state": "closed",
+        "created": "2025-02-15",
+        "closed": "2025-02-15",
+        "labels": ["conformance", "fitness"],
+        "description": "Clarification needed on expected data format for transition fitness diagnostic function"
+      },
+      {
+        "number": 510,
+        "title": "Question about Fitness Alignments value, when having silent transition on Petri Net",
+        "state": "closed",
+        "created": "2024-11-30",
+        "closed": "2024-11-30",
+        "labels": ["alignment", "silent-transition"],
+        "description": "How silent transitions affect fitness calculation in alignment-based conformance checking"
+      },
+      {
+        "number": 485,
+        "title": "Is it possible to convert a BPMN to a TPN file?",
+        "state": "closed",
+        "created": "2024-05-01",
+        "closed": "2024-05-01",
+        "labels": ["BPMN", "TPN", "conversion"],
+        "description": "User asking about BPMN to Time Petri Net conversion capabilities"
+      },
+      {
+        "number": 435,
+        "title": "The results based on token backtracking seem counterintuitive",
+        "state": "closed",
+        "created": "2023-08-23",
+        "closed": "2023-08-23",
+        "labels": ["token-replay", "conformance"],
+        "description": "Token-based replay returns perfect fitness (1.0) for trace with extra activity not in model because algorithm ignores activities absent from model",
+        "key_insight": "Token replay cannot consider activities not in the model as they don't increase missing/remaining tokens - simply ignored"
+      },
+      {
+        "number": 224,
+        "title": "Request for information: Background info on sequence cut implementation in IMd",
+        "state": "closed",
+        "created": "2021-01-01",
+        "closed": "2021-01-01",
+        "labels": ["inductive-miner", "documentation"],
+        "description": "Technical clarification request on inductive miner deterministic variant sequence cut logic"
+      }
+    ],
+    "documentation": [
+      {
+        "number": 517,
+        "title": "Documentation request: score interpretation for pm4py.analysis.simplicity_petri_net",
+        "state": "closed",
+        "created": "2025-02-18",
+        "closed": "2025-02-18",
+        "labels": ["documentation", "simplicity"],
+        "description": "User needs guidance on interpreting simplicity scores for Petri nets"
+      },
+      {
+        "number": 498,
+        "title": "Many new changes in release branch are missing",
+        "state": "closed",
+        "created": "2024-08-01",
+        "closed": "2024-08-01",
+        "labels": ["documentation", "changelog"],
+        "description": "Changelog and version documentation gaps for recent changes"
+      },
+      {
+        "number": 497,
+        "title": "Convert file changes - Functions are not accessible",
+        "state": "closed",
+        "created": "2024-08-01",
+        "closed": "2024-08-01",
+        "labels": ["documentation", "API"],
+        "description": "API accessibility documentation needs updates for conversion functions"
+      },
+      {
+        "number": 494,
+        "title": "attribute driven trace clustering algorithm does not work",
+        "state": "closed",
+        "created": "2024-07-01",
+        "closed": "2024-07-01",
+        "labels": ["documentation", "clustering"],
+        "description": "Algorithm usage examples needed for attribute-driven trace clustering"
+      },
+      {
+        "number": 433,
+        "title": "Examples/documentation for clustering.trace_attribute_driven",
+        "state": "closed",
+        "created": "2023-08-01",
+        "closed": "2023-08-01",
+        "labels": ["documentation", "clustering"],
+        "description": "Practical usage examples needed for trace clustering features"
+      }
+    ]
+  },
+  "key_insights": [
+    {
+      "id": "ocel-architecture-challenges",
+      "insight": "Object-Centric Event Logs (OCEL) represent a fundamental paradigm shift from traditional case-based event logs. Traditional process mining algorithms expecting iterable trace structures cannot work directly with OCEL's object-centric data model, requiring specialized OCEL-aware algorithms.",
+      "source_issues": [499, 515, 530, 534],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design UML behavioral models to handle object-centric perspectives, not just single-case traces",
+        "Support multiple object types with relationships in model representation",
+        "Ensure conversion operations preserve all relationships in object-centric structures",
+        "Consider MultiDiGraph structures for representing multiple relationships between same nodes",
+        "Handle edge cases like empty relationships gracefully in data import/export"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "model-conversion-fidelity",
+      "insight": "Model conversions between different formalisms (BPMN ↔ Petri Net ↔ Process Tree ↔ DFG) are fraught with challenges: information loss, constraint violations, and semantic mismatches. Each formalism has different expressiveness and structural requirements.",
+      "source_issues": [465, 459, 476, 516, 534, 487],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Maintain explicit mappings between UML behavioral models and target formalisms",
+        "Document which constructs can and cannot be converted",
+        "Validate models after conversion to detect information loss",
+        "Support explicit join gateways for splits (BPMN best practice)",
+        "Ensure schema compliance when exporting to standard formats",
+        "Use lossless intermediate representations where possible",
+        "Preserve database constraints during export/import cycles"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "process-discovery-determinism",
+      "insight": "Process discovery algorithms like Inductive Miner suffer from non-determinism issues where identical inputs produce different outputs across runs and Python versions. This severely impacts reproducibility, a critical requirement for research and production systems.",
+      "source_issues": [443, 376, 520],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design discovery algorithms with deterministic behavior from the start",
+        "Use stable sorting and deterministic data structures",
+        "Provide random seed parameters for any stochastic components",
+        "Document which algorithms are deterministic vs non-deterministic",
+        "Test for reproducibility across environments as part of CI/CD",
+        "Version algorithm implementations separately from library versions"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "conformance-checking-scalability",
+      "insight": "Alignment-based conformance checking faces severe scalability challenges with memory consumption and computation time. State space exploration can consume 32GB+ RAM and take 20+ minutes for moderate-sized logs. Alternative algorithms (token replay, Dijkstra variants) trade accuracy for performance.",
+      "source_issues": [395, 326, 435],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Provide multiple conformance checking algorithms with different accuracy/performance trade-offs",
+        "Support memory-efficient variants like DIJKSTRA_LESS_MEMORY",
+        "Enable GPU acceleration for state space exploration where possible",
+        "Document computational complexity and memory requirements for each algorithm",
+        "Implement streaming/incremental conformance checking for large logs",
+        "Clearly document limitations of token replay (ignores activities not in model)"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "bpmn-gateway-semantics",
+      "insight": "BPMN gateway semantics are frequently misunderstood. Inclusive gateways require explicit joins to match splits (unlike implicit AND joins). Token-based semantics differ from state-based analysis, affecting soundness and conformance checking.",
+      "source_issues": [465, 484, 475],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Enforce BPMN best practices: explicit gateway joins for splits",
+        "Validate gateway pairing during model construction",
+        "Provide clear error messages explaining BPMN semantics violations",
+        "Support multiple conformance checking methods (token-based, state-based, alignment)",
+        "Document gateway behavior and semantics in user guides"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "temporal-data-handling",
+      "insight": "Temporal data handling has multiple challenges: datetime range limitations (Pandas numpy.datetime64[ns] supports only 1677-2262), timestamp parsing failures, and performance metric granularity. Different date representations needed for different use cases.",
+      "source_issues": [387, 524, 431, 215],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Support multiple datetime representations with different ranges and precision",
+        "Validate timestamp ranges during import and provide clear error messages",
+        "Allow configurable time resolution for performance metrics",
+        "Handle timezone information consistently",
+        "Optimize timestamp parsing performance (avoid O(n²) algorithms)"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "version-evolution-breaking-changes",
+      "insight": "Algorithm implementations and metrics evolve over versions, causing reproducibility challenges. PM4Py v2.2.13 vs v2.7.13.1 show significant precision metric differences due to algorithm improvements and bug fixes. Legacy API preservation balances innovation vs stability.",
+      "source_issues": [520, 524, 215],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Version algorithms separately from library versions",
+        "Maintain legacy APIs alongside new implementations for reproducibility",
+        "Document breaking changes and metric calculation updates prominently",
+        "Provide migration guides for major version changes",
+        "Allow users to select specific algorithm versions explicitly",
+        "Tag research-reproducible versions with algorithm snapshots"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "parameter-interaction-complexity",
+      "insight": "Process mining algorithms have complex parameter interactions where preprocessing parameters can override or interfere with main algorithm parameters. The Heuristics Miner's dfg_pre_cleaning_noise_thresh default (0.05) can cause arcs to appear when threshold increases - counterintuitive behavior.",
+      "source_issues": [379, 71],
+      "relevance": "MEDIUM",
+      "confidence": "MEDIUM",
+      "actionable": true,
+      "action_items": [
+        "Document parameter interactions clearly",
+        "Use parameter groups/profiles for common configurations",
+        "Validate parameter combinations and warn about conflicts",
+        "Provide sensible defaults but allow full control",
+        "Use parameter builders to guide users through complex configurations"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "gpu-acceleration-integration",
+      "insight": "GPU acceleration through NVIDIA Rapids CuDF is integrated transparently - when CUDA is available, operations automatically execute on GPU without code changes. However, this requires careful dependency management and may not benefit all algorithms equally.",
+      "source_issues": [464],
+      "relevance": "MEDIUM",
+      "confidence": "MEDIUM",
+      "actionable": true,
+      "action_items": [
+        "Design algorithms to benefit from GPU acceleration where possible",
+        "Support transparent GPU acceleration when hardware available",
+        "Provide CPU fallbacks for all GPU-accelerated operations",
+        "Document which operations benefit from GPU acceleration",
+        "Consider GPU memory constraints in algorithm design"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "event-log-format-fragmentation",
+      "insight": "Multiple event log formats coexist (XES, CSV, DataFrame, Legacy EventLog, Pandas-based EventLog, OCEL JSON, OCEL SQLite) each with different capabilities and limitations. Format conversion can lose information. DataFrame-based approach has datetime limitations but better performance for many operations.",
+      "source_issues": [524, 387, 93, 87],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Define canonical internal representation with maximum expressiveness",
+        "Document capabilities and limitations of each import/export format",
+        "Validate data integrity after format conversions",
+        "Support lossless round-trip where possible",
+        "Provide clear migration paths between formats",
+        "Consider using Apache Arrow for interoperability"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "memory-vs-speed-tradeoffs",
+      "insight": "Memory optimization often comes at significant speed cost. PM4Py's ITERPARSE_MEM_COMPRESSED reduced memory by ~50% but caused 5-10% slowdown on standard logs and catastrophic (8.7s → 45 min) degradation on logs with many attributes. User-controllable trade-offs needed.",
+      "source_issues": [215, 395, 326],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Provide multiple algorithm variants with different memory/speed profiles",
+        "Default to speed-optimized variants with memory-optimized as option",
+        "Profile memory usage on diverse datasets during development",
+        "Document memory requirements and performance characteristics",
+        "Support streaming algorithms for memory-constrained environments",
+        "Allow users to choose trade-offs explicitly based on their constraints"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "api-usability-pitfalls",
+      "insight": "API design has significant impact on correct usage. Using read_pnml() instead of read_bpmn() led to false soundness failures. Inconsistent naming conventions confuse users. Type-based dispatch and clear naming critical for usability.",
+      "source_issues": [484, 91, 41, 497],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Use type-based dispatch to call correct methods automatically",
+        "Provide clear error messages when wrong methods used",
+        "Maintain consistent naming conventions across API",
+        "Use domain-standard terminology aligned with literature",
+        "Provide high-level convenience functions for common workflows",
+        "Include type hints and runtime type checking"
+      ],
+      "refined_count": 0
+    }
+  ],
+  "pain_points": [
+    {
+      "category": "Model Conversion Complexity",
+      "description": "Converting between different process modeling formalisms (BPMN, Petri nets, process trees, DFGs) is error-prone with information loss, constraint violations, and semantic mismatches",
+      "severity": "high",
+      "user_impact": "Users must manually validate conversions and work around format limitations; some models cannot be converted at all"
+    },
+    {
+      "category": "OCEL Adoption Barriers",
+      "description": "Object-centric event logs require fundamentally different algorithms and data structures; traditional trace-based algorithms cannot work with OCEL",
+      "severity": "high",
+      "user_impact": "Users with object-centric processes must wait for OCEL-specific algorithm implementations or revert to flattening objects to cases"
+    },
+    {
+      "category": "Algorithm Non-Determinism",
+      "description": "Process discovery algorithms produce different results across runs and Python versions, breaking reproducibility",
+      "severity": "high",
+      "user_impact": "Research reproducibility compromised; production systems cannot guarantee consistent models; debugging becomes difficult"
+    },
+    {
+      "category": "Conformance Checking Scalability",
+      "description": "Alignment-based conformance checking has severe memory and computation requirements, often infeasible for large logs",
+      "severity": "high",
+      "user_impact": "Users must use less accurate methods (token replay) or sample logs, reducing analysis quality"
+    },
+    {
+      "category": "Temporal Data Limitations",
+      "description": "Pandas-based event logs limited to date range 1677-2262; timestamp parsing can be extremely slow",
+      "severity": "medium",
+      "user_impact": "Cannot process logs with historical or far-future dates; import performance issues on large logs"
+    },
+    {
+      "category": "Version Compatibility",
+      "description": "Algorithm implementations and metrics change across versions, breaking reproducibility and comparability",
+      "severity": "medium",
+      "user_impact": "Research papers cannot be reliably reproduced; production systems must pin exact versions and cannot upgrade"
+    },
+    {
+      "category": "Parameter Complexity",
+      "description": "Complex parameter interactions where preprocessing settings override main algorithm parameters in non-obvious ways",
+      "severity": "medium",
+      "user_impact": "Users get unexpected results and must deeply understand implementation details to use algorithms correctly"
+    },
+    {
+      "category": "Documentation Gaps",
+      "description": "Missing guidance on metric interpretation, algorithm selection, and API usage patterns",
+      "severity": "medium",
+      "user_impact": "Steep learning curve; trial-and-error approach; misuse of APIs leading to incorrect results"
+    }
+  ],
+  "feature_requests": [
+    {
+      "feature": "GPU Acceleration",
+      "status": "implemented",
+      "priority": "high",
+      "description": "NVIDIA Rapids CuDF integration for transparent GPU acceleration",
+      "business_value": "10-100x speedup for large-scale process mining workloads"
+    },
+    {
+      "feature": "Custom Performance Aggregation Keys",
+      "status": "implemented",
+      "priority": "medium",
+      "description": "Configurable aggregation strategies for performance DFG construction",
+      "business_value": "Flexible performance analysis matching specific business needs"
+    },
+    {
+      "feature": "Higher Time Resolutions",
+      "status": "implemented",
+      "priority": "low",
+      "description": "Sub-second temporal granularity in performance metrics",
+      "business_value": "Precise analysis of high-frequency processes"
+    },
+    {
+      "feature": "Log Animation",
+      "status": "implemented",
+      "priority": "low",
+      "description": "Animated token replay visualization on process models",
+      "business_value": "Intuitive understanding of process dynamics for stakeholders"
+    },
+    {
+      "feature": "BPMN to TPN Conversion",
+      "status": "unknown",
+      "priority": "low",
+      "description": "Convert BPMN models to Time Petri Net format",
+      "business_value": "Enable time-based formal analysis of BPMN models"
+    }
+  ],
+  "architectural_decisions": [
+    {
+      "decision": "Pandas DataFrame as Primary Event Log Representation",
+      "rationale": "Leverage Pandas ecosystem for data manipulation with better performance than object-oriented EventLog, despite datetime range limitations",
+      "status": "implemented",
+      "date": "~2019",
+      "impact": "Significant performance improvements for data operations but datetime limitations (1677-2262); legacy EventLog maintained for compatibility"
+    },
+    {
+      "decision": "CuDF/CUDA Transparent Integration",
+      "rationale": "Enable GPU acceleration without requiring user code changes by detecting CUDA availability automatically",
+      "status": "implemented",
+      "date": "~2023",
+      "impact": "Significant performance gains on GPU hardware while maintaining CPU compatibility; increased dependency complexity"
+    },
+    {
+      "decision": "ITERPARSE as Default XES Parser",
+      "rationale": "Revert from ITERPARSE_MEM_COMPRESSED after discovering catastrophic performance degradation on certain logs",
+      "status": "implemented",
+      "date": "2021",
+      "impact": "Restored parsing performance (400-500 it/s vs 5-20 it/s); accepts higher memory usage for reliability"
+    },
+    {
+      "decision": "Multiple Algorithm Variants",
+      "rationale": "Provide memory-optimized (DIJKSTRA_LESS_MEMORY) and speed-optimized variants of expensive algorithms like alignments",
+      "status": "implemented",
+      "date": "Ongoing",
+      "impact": "Users can choose appropriate trade-offs for their constraints; increased API surface area"
+    },
+    {
+      "decision": "Maintain Legacy EventLog Format",
+      "rationale": "Support wider date ranges and ensure reproducibility for existing research despite moving to Pandas-based approach",
+      "status": "implemented",
+      "date": "Ongoing",
+      "impact": "Increased maintenance burden but better backward compatibility and date range support"
+    },
+    {
+      "decision": "OCEL 2.0 Support",
+      "rationale": "Support emerging object-centric process mining paradigm requiring new algorithms and data structures",
+      "status": "implemented",
+      "date": "~2022",
+      "impact": "Enables object-centric process mining but fragments API between traditional and OCEL approaches"
+    },
+    {
+      "decision": "Schema-Compliant BPMN Export",
+      "rationale": "Fix BPMN export to comply with BPMN 2.0 specification for gatewayDirection capitalization and element ordering",
+      "status": "implemented",
+      "date": "2024",
+      "impact": "Ensures interoperability with other BPMN tools through standards compliance"
+    },
+    {
+      "decision": "Explicit Gateway Joins Required",
+      "rationale": "Follow BPMN best practices requiring inclusive gateway splits to have matching joins rather than implicit joins",
+      "status": "enforced",
+      "date": "Ongoing",
+      "impact": "Prevents modeling errors but requires users to understand BPMN semantics"
+    }
+  ],
+  "common_patterns": [
+    {
+      "pattern": "Format Conversion Challenges",
+      "observation": "Nearly every model format conversion has issues: information loss, constraint violations, schema compliance, semantic mismatches",
+      "frequency": "very common",
+      "examples": ["BPMN to Petri net loses inclusive gateway semantics", "OCEL export loses database constraints", "Petri net to process tree assertion errors", "OCEL to NetworkX loses DF relations"]
+    },
+    {
+      "pattern": "Memory vs Speed Trade-offs",
+      "observation": "Optimizations for memory often cause significant speed degradation; user-controllable variants needed",
+      "frequency": "common",
+      "examples": ["ITERPARSE_MEM_COMPRESSED 5x slower", "Alignment computation exhausts 32GB RAM", "DIJKSTRA_LESS_MEMORY variant trades speed for memory"]
+    },
+    {
+      "pattern": "Parameter Interaction Surprises",
+      "observation": "Algorithm parameters interact in non-obvious ways, often with preprocessing parameters overriding main parameters",
+      "frequency": "common",
+      "examples": ["dfg_pre_cleaning_noise_thresh overrides dependency_threshold", "disable_fallthroughs doesn't guarantee determinism", "Linear solver choice dramatically affects performance"]
+    },
+    {
+      "pattern": "Datetime Handling Issues",
+      "observation": "Timestamp parsing, range limitations, and timezone handling cause recurring issues across versions",
+      "frequency": "common",
+      "examples": ["Pandas limited to 1677-2262 date range", "XES timestamp import failures", "Parsing speed degradation with timestamps"]
+    },
+    {
+      "pattern": "Documentation Gaps for Complex Features",
+      "observation": "Users frequently ask for clarification on metric interpretation, algorithm behavior, and API usage",
+      "frequency": "common",
+      "examples": ["Simplicity score interpretation unclear", "Token replay semantics surprising", "Alignment precision calculation questions", "OCEL vs traditional log confusion"]
+    },
+    {
+      "pattern": "Version Evolution Breaking Reproducibility",
+      "observation": "Algorithm improvements and bug fixes across versions break reproducibility of research and production systems",
+      "frequency": "common",
+      "examples": ["Precision values differ between v2.2.13 and v2.7.13.1", "Inductive Miner behavior changes", "Metric calculations fixed in later versions"]
+    },
+    {
+      "pattern": "API Misuse Leading to Errors",
+      "observation": "Similar-looking but incompatible APIs lead users to call wrong methods with cryptic error messages",
+      "frequency": "regular",
+      "examples": ["read_pnml() vs read_bpmn()", "DFG discovery on OCEL requires OCEL-specific algorithms", "Alpha miner incompatible with DataFrame"]
+    },
+    {
+      "pattern": "Visualization Challenges",
+      "observation": "Layout, label sizing, format support, and edge cases in process model visualization",
+      "frequency": "regular",
+      "examples": ["Places not resizing to fit labels", "Duplicate sequences in BPMN", "Single activity OCDFG display issues", "Unicode character support"]
+    }
+  ],
+  "actionable_items_for_uml_codex": [
+    {
+      "item": "Multi-Perspective Model Representation",
+      "priority": "high",
+      "description": "Design UML behavioral models to natively support object-centric perspectives with multiple interrelated object types, not just single-case traces. Support multiple concurrent objects participating in behaviors.",
+      "learning": "OCEL represents fundamental shift from case-based to object-centric process mining. Traditional algorithms cannot work with OCEL without adaptation. Object-centric thinking must be built into model representation from the start."
+    },
+    {
+      "item": "Lossless Model Conversion Architecture",
+      "priority": "high",
+      "description": "Design conversion system with explicit capability matrices documenting what can/cannot be converted between formalisms. Validate after conversion and report information loss. Consider intermediate canonical representation.",
+      "learning": "Every format conversion in PM4Py has issues: BPMN→Petri net, Petri net→Process Tree, OCEL→NetworkX. Information loss, constraint violations, and semantic mismatches are pervasive. Need architectural approach to handle conversion fidelity."
+    },
+    {
+      "item": "Deterministic Algorithm Design",
+      "priority": "high",
+      "description": "Ensure all discovery and transformation algorithms are deterministic with reproducible results. Use stable sorts, deterministic data structures, random seeds for any stochastic components. Test reproducibility in CI/CD.",
+      "learning": "Inductive Miner non-determinism severely impacts reproducibility. Same input produces different outputs across Python versions and runs. Reproducibility critical for research and production use."
+    },
+    {
+      "item": "Scalable Validation Algorithms",
+      "priority": "high",
+      "description": "Design model validation and conformance checking with scalability in mind. Provide multiple algorithms with different accuracy/performance trade-offs. Support memory-efficient variants and GPU acceleration where possible.",
+      "learning": "Alignment-based conformance checking can consume 32GB+ RAM and take 20+ minutes for moderate logs. State space explosion is fundamental challenge. Multiple algorithm variants with clear trade-off documentation essential."
+    },
+    {
+      "item": "Multi-Graph Relationship Representation",
+      "priority": "high",
+      "description": "Use MultiDiGraph or similar structures to represent multiple relationships between same elements when needed. Critical for object-centric models where multiple relationships exist from different perspectives.",
+      "learning": "OCEL conversion to NetworkX loses DF relations because DiGraph supports only one edge between nodes. Multi-perspective models need multi-edge support."
+    },
+    {
+      "item": "Gateway Semantic Validation",
+      "priority": "medium",
+      "description": "For BPMN-like control flow, enforce best practice that gateway splits must have matching joins. Validate gateway pairing during model construction with clear error messages.",
+      "learning": "Inclusive gateway splits without explicit joins violate BPMN best practices and cause soundness issues. Explicit join enforcement prevents modeling errors."
+    },
+    {
+      "item": "Flexible Temporal Representation",
+      "priority": "medium",
+      "description": "Support multiple datetime representations with different ranges and precision. Don't rely solely on Pandas datetime64[ns] which limits to 1677-2262. Allow configurable time resolution for performance metrics.",
+      "learning": "Pandas datetime limitations prevent processing historical or far-future dates. Different use cases need different temporal precision (milliseconds to days)."
+    },
+    {
+      "item": "Algorithm Versioning",
+      "priority": "medium",
+      "description": "Version algorithms separately from library versions. Allow users to specify algorithm version explicitly for reproducibility. Document algorithm changes prominently in changelogs.",
+      "learning": "PM4Py precision values differ significantly between versions due to algorithm improvements and bug fixes. Research reproducibility requires ability to use specific algorithm versions."
+    },
+    {
+      "item": "Parameter Validation and Documentation",
+      "priority": "medium",
+      "description": "Validate parameter combinations and warn about conflicts or interactions. Document parameter dependencies clearly. Consider parameter builders for complex configurations.",
+      "learning": "Heuristics Miner preprocessing parameter can override main algorithm threshold in counterintuitive ways. Complex parameter interactions need explicit documentation and validation."
+    },
+    {
+      "item": "Type-Safe API Design",
+      "priority": "medium",
+      "description": "Use type-based dispatch and runtime type checking. Provide clear error messages when wrong methods used on wrong types. Include comprehensive type hints.",
+      "learning": "Users called read_pnml() instead of read_bpmn() leading to false soundness errors. Type-safe APIs prevent misuse."
+    },
+    {
+      "item": "Constraint Preservation in Export",
+      "priority": "medium",
+      "description": "When exporting to databases or structured formats, preserve constraints (primary keys, foreign keys, uniqueness). Don't rely solely on Pandas for export if it loses constraints.",
+      "learning": "OCEL 2.0 export via Pandas loses all database integrity constraints (11 constraint violations after round-trip). Need explicit constraint preservation."
+    },
+    {
+      "item": "Memory/Speed Trade-off Controls",
+      "priority": "medium",
+      "description": "For expensive algorithms, provide variants with different memory/speed profiles. Default to speed-optimized with memory-optimized as explicit option. Document resource requirements clearly.",
+      "learning": "ITERPARSE_MEM_COMPRESSED caused 8.7s → 45min degradation on certain logs despite 50% memory reduction. Users need control over trade-offs."
+    },
+    {
+      "item": "Schema Compliance Validation",
+      "priority": "low",
+      "description": "When exporting to standard formats (BPMN, PNML, etc.), validate against official schemas. Test interoperability with other tools.",
+      "learning": "PM4Py BPMN export had schema violations (wrong capitalization, element ordering) preventing validation with standard tools. Standards compliance critical for interoperability."
+    },
+    {
+      "item": "Consistent Naming Conventions",
+      "priority": "low",
+      "description": "Use consistent naming across modules and align with domain-standard terminology from literature. Avoid naming conflicts or similar names for different concepts.",
+      "learning": "PM4Py had naming inconsistencies across objects and visualization modules. Consistent terminology improves usability."
+    },
+    {
+      "item": "Graceful Edge Case Handling",
+      "priority": "low",
+      "description": "Handle edge cases like empty collections, single elements, missing optional data gracefully without crashes. Validate inputs and provide clear error messages.",
+      "learning": "Empty OCEL relations caused crashes. Single activity in OCDFG visualization failed. Edge cases need explicit handling."
+    }
+  ],
+  "repository_health": {
+    "activity_level": "very active",
+    "issue_closure_rate": "99.7%",
+    "average_time_to_close": "days to weeks",
+    "community_engagement": "high",
+    "maintenance_status": "actively maintained",
+    "notes": [
+      "Only 1 open issue out of 389 total - excellent closure rate",
+      "Recent issues (2024-2025) show active maintenance",
+      "Responsive maintainer engagement visible in issue discussions",
+      "Focus on OCEL 2.0 support and GPU acceleration shows modern feature development",
+      "Version evolution shows continuous algorithm improvements",
+      "Strong academic foundation with literature-aligned implementations",
+      "Used widely in process mining research and industry",
+      "Challenges: reproducibility, scalability, format conversion fidelity",
+      "Documentation gaps noted but being addressed"
+    ]
+  }
+}
