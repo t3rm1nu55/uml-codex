@@ -1,0 +1,1064 @@
+{
+  "version": 1,
+  "analysis_date": "2025-11-08",
+  "system_name": "Palantir Foundry",
+  "vendor": "Palantir Technologies",
+  "category": "Enterprise Operations Platform / Data Integration Platform",
+  "analysis_scope": "Complete platform analysis from Nov 2023 - Dec 2024 releases, architecture docs, feature documentation",
+
+  "executive_summary": {
+    "what_is_foundry": "Palantir Foundry is an end-to-end enterprise data operations platform that combines data integration, transformation, semantic modeling (Ontology), application building, AI capabilities, and operational workflows into a unified system. It functions as both a data platform and an application development platform.",
+    "market_position": "Positioned as enterprise data operating system for Fortune 500 companies, particularly strong in aerospace, defense, healthcare, financial services. Competes with Databricks, Snowflake + dbt, and specialized platforms.",
+    "core_differentiators": [
+      "Ontology layer - semantic digital twin of business entities",
+      "Tight integration between data pipelines, semantic layer, and applications",
+      "Built-in governance, lineage, and security at every layer",
+      "AIP (AI Platform) with enterprise LLM capabilities and agent framework",
+      "Low-code/no-code application builder (Workshop) with Ontology integration",
+      "Embedded collaboration and change management (branching, proposals, approvals)"
+    ],
+    "relevance_to_nyqst": "Foundry is the closest existing analog to NYQST System 2 (OpsOS). Both share: (1) Semantic/ontology layer as digital twin, (2) AI agent framework, (3) Workflow orchestration, (4) Validation and governance, (5) Application building on top of operational data. Foundry focuses on data operations; NYQST focuses on operational processes and exception handling."
+  },
+
+  "platform_architecture": {
+    "service_mesh": {
+      "orchestration_engines": {
+        "rubix": "Container orchestration, autoscaling, service deployment management",
+        "apollo": "Delivery platform for coordinating releases and updates"
+      },
+      "architecture_layers": [
+        "Frontend services - Application interfaces (Workshop, Slate, Ontology Manager, etc.)",
+        "Core backend services - Mission-critical infrastructure",
+        "Compute services - Data transformation and processing (Spark, Flink, Python, R)",
+        "Storage tier - Multi-modal persistence"
+      ],
+      "design_principles": [
+        "Hundreds of microservices organized hierarchically",
+        "Consistent autoscaling across core and compute services",
+        "Zero-downtime deployments with granular monitoring",
+        "Service mesh enforces security/lineage without delegating to individual services"
+      ]
+    },
+
+    "storage_technologies": {
+      "blob_hdfs": "Distributed file storage for raw data, datasets",
+      "key_value_stores": "Horizontally scalable for metadata, fast lookups",
+      "relational_databases": "ACID transactions, structured metadata",
+      "time_series_subsystems": "Multi-modal support for sensor data, temporal data",
+      "object_storage_v2": "Purpose-built for Ontology objects with versioning and edit tracking"
+    },
+
+    "security_and_lineage": {
+      "design": "Security and lineage are 'core to every operation' - enforced automatically at every tier",
+      "features": [
+        "Consistent governance policies across all services",
+        "Automatic policy enforcement (not delegated to services)",
+        "Complete provenance tracking (bookkeeping) maintaining audit trails",
+        "Inherited/synchronized security policies preventing drift",
+        "Markings, Organizations, Projects for data access control",
+        "CBAC (Context-Based Access Control) and RBAC",
+        "Cipher for encryption and visual obfuscation"
+      ],
+      "lineage_tracking": "Automatic lineage capture from source data through transforms, pipelines, ontology mappings, to consuming applications"
+    },
+
+    "compute_flexibility": {
+      "data_integration": "Apache Spark (batch), Apache Flink (streaming), external engines (Databricks pushdown)",
+      "code_driven": "Python (3.8-3.11), SQL, Java, TypeScript, JavaScript, R",
+      "specialized": "Custom Ontology engines, semantic search (vector), Model serving",
+      "serverless": "Serverless Python functions, Compute Modules (containerized Docker)"
+    }
+  },
+
+  "core_capabilities": {
+    "1_data_connectivity_integration": {
+      "pipeline_builder": {
+        "description": "Visual, no-code data transformation tool with 200+ built-in functions",
+        "architecture": "Node-based DAG with branching (git-like), proposals, approvals",
+        "transform_types": [
+          "Filters, projections, expressions",
+          "Joins (inner, left, outer, cross, anti, semi, KNN for semantic)",
+          "Aggregations, window functions",
+          "Array/structural (flatten, pivot, unpivot)",
+          "Geospatial operations",
+          "Media transformations (OCR, audio transcription, document extraction)",
+          "LLM operations (Use LLM node with GPT-4o, Claude, Llama)"
+        ],
+        "input_sources": "Datasets, media sets, manually entered tables, virtual tables, generated data",
+        "output_targets": "Datasets, media sets, virtual tables, Ontology objects, Ontology links, geotemporal series",
+        "orchestration": [
+          "Batch, streaming, incremental pipelines",
+          "Scheduling (time, event, dependency-based)",
+          "Branching with Main/feature branches",
+          "Change proposals with impact analysis",
+          "Checkpoints for testing"
+        ],
+        "performance": [
+          "Native acceleration for Spark",
+          "Configurable Spark profiles",
+          "Hive-style partitioning",
+          "Sampling for fast previews",
+          "Job groups for parallel execution",
+          "Caching for LLM nodes (skip reprocessing, 3hr→20min improvements documented)",
+          "Preview caching (40x faster iteration)"
+        ],
+        "screenshots_noted": "Nov 2024: KNN join configuration, Dec 2024: Row caching toggle, LLM token counts, pseudocode rendering"
+      },
+
+      "code_repositories": {
+        "description": "Code-first alternative to Pipeline Builder for developers",
+        "repository_types": {
+          "transforms": "Python/Java/SQL data transformations (Spark or lightweight)",
+          "functions": "TypeScript/Python low-latency business logic (Functions on Objects)",
+          "models": "ML model training and inference",
+          "compute_modules": "Serverless Docker containers (any language)"
+        },
+        "features": [
+          "Lightweight transforms (@lightweight decorator) - 10-60% faster for <10M rows",
+          "Incremental transforms (@incremental decorator)",
+          "External system transforms (@use_external_systems)",
+          "Live preview with debugging (TypeScript functions)",
+          "Breakpoint debugging (Dec 2024)",
+          "Container transforms (publish Jupyter notebooks as pipelines)",
+          "Python 3.11 support with 10-60% performance gains",
+          "Hawk package manager (~25% faster than Mamba)"
+        ],
+        "development_environments": [
+          "In-platform editor with Code Assist (TypeScript language server)",
+          "VS Code workspaces (browser-based, Palantir extension)",
+          "JupyterLab workspaces",
+          "RStudio workspaces with R Markdown reports",
+          "Local development with Palantir VS Code extension (beta)"
+        ],
+        "version_control": "Git-based branching, change proposals, CI checks",
+        "screenshots_noted": "Jan 2024: Function discovery 15.6x faster after optimization, Dec 2024: Debugger interface"
+      },
+
+      "data_connection": {
+        "description": "150+ connectors to external systems",
+        "connector_types": "JDBC (custom drivers), SAP (dedicated connector v2.32), Salesforce, Snowflake, Azure, AWS S3, Databricks, etc.",
+        "sync_modes": {
+          "batch": "Full snapshot, mirror, truncation, incremental",
+          "streaming": "SAP SLT replication server",
+          "media": "Media extract and sync for unstructured data"
+        },
+        "agent_architecture": "Data Connection Agent runs on-prem for private network access",
+        "exports": "Table exports to JDBC systems (6 export modes including mirror, incremental)",
+        "screenshots_noted": "June 2024: JDBC export mode selection, Dec 2024: Custom JDBC property configuration"
+      },
+
+      "media_sets": {
+        "description": "Unstructured data management for images, audio, PDFs (Jan 2024 GA)",
+        "capabilities": [
+          "Transactional or transactionless datasets",
+          "Virtual media sets (Azure/S3)",
+          "File format normalization (8+ audio to MP3)",
+          "Raster tiling for geospatial imagery",
+          "DICOM medical imaging",
+          "PDF text extraction",
+          "GPT-4o vision analysis (Sept 2024)"
+        ],
+        "integration": "Pipeline Builder, Workshop apps, Ontology, Vortex"
+      },
+
+      "data_lineage": {
+        "description": "Automatic end-to-end lineage capture",
+        "granularity": "Dataset → column → transform → ontology property → application widget",
+        "features": [
+          "Impact analysis for changes",
+          "Rollback capability (Nov 2024)",
+          "Transaction history",
+          "Visual lineage graphs"
+        ],
+        "comparison_to_datahub": "Similar to DataHub's lineage but tighter integration with transformation logic and ontology mappings"
+      }
+    },
+
+    "2_ontology_semantic_layer": {
+      "core_concept": "Digital twin connecting data assets to real-world entities (physical assets, transactions, people, events). Sits atop datasets/virtual tables/models and provides semantic meaning.",
+
+      "object_types": {
+        "definition": "Schema defining business entities (e.g., Employee, Asset, Transaction, Incident)",
+        "properties": [
+          "Standard types: string, integer, decimal, boolean, date, timestamp, geopoint, geoshape, media reference, attachment",
+          "Array types for collections",
+          "Struct types for nested objects",
+          "Vector types for semantic search (embeddings)",
+          "Derived properties (computed from base properties)",
+          "Shared properties (reusable across object types)",
+          "Required properties, edit-only properties"
+        ],
+        "backing_datasources": "Datasets, virtual tables, restricted views, multi-datasource objects (MDOs)",
+        "storage": "Object Storage V1 (legacy) or V2 (preferred - with edit history tracking since Oct 2024)",
+        "versioning": "Schema migrations with automated suggestions for breaking changes (Nov 2023)",
+        "edit_tracking": "User edit history (who edited what, when) - Oct 2024"
+      },
+
+      "link_types": {
+        "definition": "Relationships between object types (1-to-1, 1-to-many, many-to-many)",
+        "features": [
+          "Bidirectional links",
+          "Object-backed links (links can have properties/metadata)",
+          "Interface link types for polymorphism",
+          "Extendable interfaces"
+        ],
+        "use_cases": "Employee → Department, Asset → Supplier, Incident → RelatedIncident"
+      },
+
+      "actions": {
+        "definition": "Operations that modify ontology objects (create, update, delete)",
+        "types": [
+          "Synchronous actions (immediate execution)",
+          "Asynchronous actions (background processing)",
+          "Batch actions (operate on multiple objects)"
+        ],
+        "validation": "Submission criteria, required properties, permission checks",
+        "integration": "Workshop forms, API calls, automated workflows (Automate)",
+        "return_edits": "Python batch actions can return edits (Mar 2024)"
+      },
+
+      "functions": {
+        "definition": "Read-only operations on ontology (Functions on Objects - FoO)",
+        "types": [
+          "Aggregations (count, sum, avg, groupby)",
+          "Filters and searches",
+          "Graph traversal (follow links)",
+          "Semantic search (vector similarity)",
+          "Time series queries",
+          "LLM-backed functions (Jan 2024 with AIP Interactive widget)"
+        ],
+        "languages": "TypeScript (primary), Python (beta June 2024)",
+        "performance": "Low-latency for operational use cases; 15.6x faster function discovery (Jan 2024 optimization)"
+      },
+
+      "ontology_manager": {
+        "description": "Primary interface for defining and managing ontology",
+        "features": [
+          "Visual object type editor",
+          "Discover page (customizable landing, June 2024)",
+          "Property configuration with formatting, validation",
+          "Link type management",
+          "Datasource mapping interface",
+          "Cleanup tool with flag-based filtering (Mar 2024)",
+          "Staging/rebasing with conflict resolution (Nov 2024)",
+          "Versioning and change proposals",
+          "Direct integration with Pipeline Builder (view outputs, Mar 2024)"
+        ],
+        "governance": [
+          "Ontology permissions (legacy and new model)",
+          "Object security policies",
+          "Action/function permissions",
+          "Change proposals and reviews",
+          "User edit history tracking"
+        ],
+        "screenshots_noted": "June 2024: Customizable Discover page with sections"
+      },
+
+      "semantic_search": {
+        "description": "K-nearest neighbors search using vector embeddings (Nov 2023 GA)",
+        "implementation": [
+          "Vector property type (float arrays, fixed dimensions)",
+          "KNN functions on objects",
+          "Configurable similarity functions (cosine, euclidean)",
+          "Integration with model embeddings"
+        ],
+        "use_cases": "Document search, similar asset finding, recommendation systems",
+        "workshop_integration": "KNN Object Set configuration (Jan 2024)"
+      },
+
+      "object_monitors_automate": {
+        "description": "Rule-based automation triggered by object changes or schedules (replaced Objects Monitoring Nov 2023)",
+        "conditions": [
+          "Time-based schedules",
+          "Objects modified",
+          "Inline object set definitions",
+          "Combined time + object conditions"
+        ],
+        "effects": [
+          "Send notifications (email, Slack, webhooks as of Dec 2024)",
+          "Execute actions",
+          "Generate Notepad documents",
+          "Property-backed dynamic recipients",
+          "Time series alerts (Dec 2024)"
+        ],
+        "execution_modes": "Per-object, per-group",
+        "use_cases": "Alert when sensor exceeds threshold, daily report generation, approval workflows"
+      }
+    },
+
+    "3_application_building": {
+      "workshop": {
+        "description": "Low-code application builder for operational apps, dashboards, workflows",
+        "architecture": "Module-based with widgets, variables, actions, events",
+
+        "widgets": {
+          "categories": [
+            "Input widgets: Text input, dropdown, date picker, file upload, button groups",
+            "Display widgets: Object table, object list, object view, filter list, status tracker",
+            "Visualization widgets: Chart XY, Vega chart (Oct 2024), maps, timelines, scheduling calendar (Sept 2024)",
+            "Media widgets: Image annotation, PDF viewer with annotations (Dec 2024), audio waveform (Mar 2024)",
+            "Embedded widgets: Workshop embedded module (Nov 2023), Quiver dashboard, Vertex graph, custom widgets (iframe or OSDK)",
+            "AIP widgets: AIP Interactive widget (Jan 2024 - LLM chat interface)"
+          ],
+          "customization": [
+            "Widget setup tab (input/output variables, config)",
+            "Display tab (sizing: auto, absolute, flex)",
+            "Conditional visibility (Boolean variables)",
+            "Custom styling (colors, sizes)",
+            "Tabs widget with 4 design presets (Jan 2024)",
+            "Loop layouts for iterating over object sets (Mar 2024 GA)"
+          ],
+          "screenshots_noted": "Jan 2024: Tab presets (outline, block, prominent, grouped), Dec 2024: PDF annotations, custom widgets"
+        },
+
+        "variables": {
+          "types": "Object, object set, property values, arrays, strings, numbers, booleans",
+          "scoping": "Module-level, page-level, embedded module parameters",
+          "external_ids": "For URL routing (Jan 2024 GA)",
+          "promoted_variables": "Pass between parent and embedded modules (Jan 2024)",
+          "read_write": "AIP Interactive widget can read/write variables (Jan 2024)"
+        },
+
+        "actions_and_events": {
+          "actions": "Ontology actions, navigation, set variable, open modal, execute functions, Workshop events",
+          "events": "Click, selection change, load, custom events",
+          "workflows": "Action chains with conditional logic",
+          "aip_integration": "AIP Interactive widget executes Workshop events (Jan 2024)"
+        },
+
+        "layouts": {
+          "types": "Sections (horizontal/vertical), tabs, accordions, modals, panels",
+          "responsive": "Resizable sections with min/max constraints (Sept 2024)",
+          "templates": "5 page templates (details, grid, inbox, overview, settings) - Nov 2023"
+        },
+
+        "collaboration": {
+          "branching": "Git-like feature branches for development",
+          "proposals": "Change proposals with comments (Nov 2023)",
+          "changelog": "Branch-to-main comparison (June 2024)",
+          "workflow_builder": "Visual dependency graph for debugging (Nov 2024)"
+        },
+
+        "deployment": {
+          "marketpl": "Publish to internal marketplace",
+          "embedding": "Embed in other Workshop modules or external sites",
+          "mobile": "Mobile Workshop with module embedding (Mar 2024)",
+          "consumer_mode": "External user access (introduced 2025)"
+        },
+
+        "new_home_page": "Nov 2023 - templates for rapid app creation (inbox, map, metrics dashboard)",
+
+        "routing": {
+          "description": "URL state sharing (Jan 2024 GA)",
+          "capabilities": "Page IDs and variable external IDs written to URL for shareable links"
+        },
+
+        "translations": {
+          "description": "Multi-language localization (Sept 2024 GA)",
+          "methods": "Manual translation or AIP Assist automation",
+          "features": "Real-time preview, language-specific viewer presentation"
+        }
+      },
+
+      "slate": {
+        "description": "Advanced application builder with more code/scripting capabilities than Workshop",
+        "features": [
+          "TypeScript/JavaScript scripting",
+          "Custom visualizations (Vega-Lite support)",
+          "Flexible layouts",
+          "HTML tooltip customization (Mar 2024)",
+          "Async functions (Mar 2024)",
+          "Strict mode enforcement (Nov 2023, Mar 2024)",
+          "Cross-window messaging (slate.sendMessage, Nov 2023)",
+          "Widget navigation with auto-scroll (Nov 2023)",
+          "Full-width editor panels (Nov 2023)"
+        ],
+        "use_cases": "Custom dashboards, complex visualizations, advanced interactions",
+        "osdk_integration": "OSDK in Slate (beta June 2024) for direct Ontology access"
+      },
+
+      "notepad": {
+        "description": "Document generation and templating engine",
+        "capabilities": [
+          "Markdown support with Function on Objects output (Mar 2024)",
+          "Batched functions for performance (Mar 2024)",
+          "Conditional sections based on inputs (Nov 2023)",
+          "Anchor link improvements (Sept 2024)",
+          "Media preview in templates (Sept 2024)",
+          "PDF generation",
+          "Integration with Automate (attach as PDF in notifications)"
+        ],
+        "entry_screen": "Revamped Nov 2023 with improved search, categories (recent, bookmarked)",
+        "use_cases": "Report generation, compliance documentation, proposal creation"
+      },
+
+      "quiver": {
+        "description": "Time series analytics platform",
+        "features": [
+          "Time series visualization",
+          "Derived time series (GA Oct 2024) - save logic to Ontology",
+          "Transforms (parameterizable inputs, unit conversion - Nov 2023)",
+          "AIP Generate and Configure (Oct 2024, improved Dec 2024)",
+          "Gradient display for overlapping series (June 2024)",
+          "Time series alert automations (Dec 2024)"
+        ],
+        "integration": "Time series properties in Ontology, Workshop embedding",
+        "use_cases": "Sensor data analysis, IoT monitoring, operational metrics"
+      },
+
+      "contour": {
+        "description": "Path-based analytics tool",
+        "features": [
+          "Board-based visualizations",
+          "Analysis tagging (Mar 2024)",
+          "Board collapse for performance (Nov 2023)"
+        ],
+        "use_cases": "Exploratory data analysis, multi-board workflows"
+      },
+
+      "vertex": {
+        "description": "Graph visualization tool",
+        "features": [
+          "Enhanced annotation (shapes, colors) - Mar 2024",
+          "Icon personalization by attributes (June 2024)",
+          "Large graph performance improvements (Nov 2023)"
+        ],
+        "use_cases": "Network analysis, relationship exploration"
+      },
+
+      "foundry_maps": {
+        "features": [
+          "Custom base layers (Nov 2023)",
+          "Geospatial visualizations",
+          "Integration with Workshop Map widget"
+        ]
+      }
+    },
+
+    "4_ai_platform_aip": {
+      "overview": "Palantir's AI Platform integrating LLMs, agents, logic, and tools across Foundry",
+
+      "llm_support": {
+        "models_available": [
+          "OpenAI: GPT-4o (vision, June 2024), GPT-4, GPT-3.5",
+          "Anthropic: Claude 3.5 Sonnet (Sept 2024), Claude 3 Sonnet, Claude 3 Haiku",
+          "Meta: Llama 3.1 70B/8B Instruct (Sept 2024), Llama 3 70B/8B (June 2024)",
+          "All via Azure OpenAI or AWS Bedrock integration"
+        ],
+        "capacity_management": [
+          "TPM (tokens per minute) and RPM (requests per minute) limits",
+          "Project-level rate limits (Dec 2024)",
+          "Dual OpenAI support (Direct + Azure) doubles capacity (Dec 2024)",
+          "Enrollment admin allocation controls"
+        ],
+        "cost_visibility": "Token count metrics in Pipeline Builder (June 2024)"
+      },
+
+      "aip_agent_studio": {
+        "description": "No-code tool to build LLM-powered interactive assistants (Oct 2024 GA)",
+        "agent_configuration": [
+          "System prompts and parameters",
+          "Tool selection (Ontology types, actions, functions)",
+          "Retrieval context (documents, Notepad, platform docs)",
+          "Application state (Workshop variables)",
+          "Model selection",
+          "Agent name and suggested prompts"
+        ],
+        "reasoning": [
+          "Chain-of-thought (multi-step)",
+          "Tool call reasoning visibility",
+          "Agent details panel (Nov 2024) showing configuration transparency"
+        ],
+        "deployment_targets": [
+          "Workshop (via AIP Interactive widget)",
+          "AIP Threads (Oct 2024 beta)",
+          "Third-party apps via Ontology SDK (Dec 2024 GA)",
+          "Platform APIs (Dec 2024)",
+          "Carbon workspaces (Dec 2024)"
+        ],
+        "agent_as_function": "Agents published as Functions for use in Evals, Automate, Code Repositories",
+        "screenshots_noted": "Nov 2024: Agent details panel with tools/reasoning tabs"
+      },
+
+      "aip_assist": {
+        "description": "In-platform AI assistant for developers and users",
+        "modes": [
+          "Platform Assist: General Foundry questions",
+          "Developer Assist: API/SDK documentation, code examples (uses Claude 3.5 Sonnet where available)",
+          "Custom AIP Assist Agents: Source-backed assistants (Oct 2024 beta)"
+        ],
+        "features": [
+          "Suggested questions",
+          "Citation tracking",
+          "Developer Community redirection (June 2024)",
+          "Context-aware attachments in Code Repositories (Nov 2024 beta)",
+          "Performance enhancements (Nov 2024, Dec 2024) - reduced hallucinations"
+        ],
+        "integration": "Available throughout platform (Code Repositories, Workshop, documentation)"
+      },
+
+      "aip_logic": {
+        "description": "Visual logic builder for LLM workflows",
+        "blocks": [
+          "Use LLM blocks (chain-of-thought, single completion)",
+          "Transform blocks (expressions, data manipulation - Mar 2024)",
+          "Conditional blocks",
+          "Loop blocks"
+        ],
+        "outputs": [
+          "Structured data (objects, arrays - Mar 2024)",
+          "Object sets (Mar 2024)",
+          "Properties, strings, numbers"
+        ],
+        "debugging": "Refined debugger (Mar 2024) with toggleable cards, prompt visualization, tool call reset",
+        "use_cases": "Custom LLM workflows, data enrichment, decision logic",
+        "integration": "Workshop, Functions, Pipeline Builder (via Use LLM node)"
+      },
+
+      "aip_threads": {
+        "description": "General-purpose LLM productivity tool (Oct 2024 beta)",
+        "features": [
+          "Document upload (PDF drag-drop)",
+          "AIP Agent interaction",
+          "Citation tracking",
+          "Previously uploaded document access"
+        ],
+        "use_cases": "Quick document analysis, contract review, manual summarization",
+        "note": "Not for highly structured, repetitive tasks"
+      },
+
+      "aip_interactive_widget": {
+        "description": "Workshop widget for LLM chat interface (Jan 2024 GA)",
+        "capabilities": [
+          "Access AIP Logic and Functions on Objects",
+          "Read/write Workshop variables",
+          "Interpret object set variables",
+          "Default LLM tools (traversal, filtering, aggregations)",
+          "Customizable assistant name, prompts",
+          "Debugger integration"
+        ],
+        "use_cases": "Conversational Ontology exploration, intelligent workflow assistance"
+      },
+
+      "pipeline_builder_llm_integration": {
+        "use_llm_node": "Execute LLM prompts on datasets",
+        "features": [
+          "Row-level LLM processing",
+          "Multiple model support",
+          "Caching to skip reprocessed rows (Sept 2024 - 3hr→20min improvements)",
+          "Token count visibility (June 2024)",
+          "Raw prompt/output viewing (Nov 2024)",
+          "Vision support (GPT-4o for images - Sept 2024)"
+        ],
+        "text_to_embeddings": "Generate vector embeddings for semantic search"
+      },
+
+      "build_with_aip": {
+        "description": "Tutorial package for OSDK development (June 2024 GA)",
+        "features": [
+          "Sample applications (To Do app, etc.)",
+          "Examples with bring-your-own-data (Dec 2024)",
+          "AIP-powered walkthroughs (Dec 2024)",
+          "Package for LLM enrichment queries (Sept 2024)"
+        ]
+      },
+
+      "aip_evals": {
+        "mentioned": "System for evaluating AI agent/LLM performance",
+        "integration": "Agents published as Functions can be tested in AIP Evals"
+      },
+
+      "flow_capture": {
+        "description": "Generate documentation from recorded workflows using LLMs (beta Nov 2024)",
+        "use_case": "Automatically document processes"
+      },
+
+      "external_llm_registration": {
+        "description": "Register custom LLMs via TypeScript function interface (Nov 2024 GA)",
+        "use_cases": "Integrate new models quickly (<15 min), cost-effective alternatives"
+      }
+    },
+
+    "5_model_integration_modeling": {
+      "model_assets": {
+        "description": "Train, deploy, and serve ML models in Foundry",
+        "lifecycle": [
+          "Train in Code Repositories (Python/R)",
+          "Preview model I/O (Jan 2024)",
+          "Simplified deployment (Sept 2024 GA) - one-click without Modeling Objectives",
+          "Model Catalog (GA Apr 2024) for discovery"
+        ],
+        "deployment": [
+          "Containerized (Docker) with autoscaling (0 to N replicas)",
+          "Auto-upgrades with branch following",
+          "Fully containerized inference (~1 min startup vs 3 min live)",
+          "Flame graph profiling for debugging (Sept 2024)"
+        ],
+        "inference_history": "Datasets capturing all inference requests/results (Nov 2023 GA)",
+        "integrations": [
+          "Workshop (via Functions)",
+          "Pipeline Builder (model predictions)",
+          "Jupyter notebooks (import models for fine-tuning - Oct 2024)",
+          "Media sets (Sept 2024)"
+        ],
+        "type_safety": "Apache Arrow type checking (Sept 2024)"
+      },
+
+      "functions_registry": {
+        "description": "Publish models as Functions for low-latency consumption (Jan 2024)"
+      }
+    },
+
+    "6_developer_tools": {
+      "ontology_sdk": {
+        "languages": [
+          "TypeScript (GA, OSDK 2.0 Oct 2024 with 15x faster discovery)",
+          "Python (GA Nov 2023)",
+          "Java (GA Oct 2024)"
+        ],
+        "capabilities": [
+          "Object type interactions (read, query, aggregate)",
+          "Link traversal",
+          "Action invocation",
+          "Function calls",
+          "Interface casting, filtering"
+        ],
+        "deployment": [
+          "Workshop via custom widgets",
+          "Third-party applications via APIs",
+          "Jupyter/Python environments",
+          "Java backend services",
+          "Slate (beta June 2024)"
+        ],
+        "developer_console": [
+          "Generate SDKs for any language",
+          "Customized in-platform documentation",
+          "OpenAPI spec export (Jan 2024) for Swagger/Postman",
+          "Beta features opt-in (Nov 2023)",
+          "Tutorial applications",
+          "Refreshed UI (Mar 2024)"
+        ],
+        "build_with_aip_package": "New OSDK package powered by AIP Logic (Sept 2024)"
+      },
+
+      "platform_apis": {
+        "description": "Programmatic access to Foundry (Nov 2024 GA)",
+        "apis": [
+          "Ontology APIs (objects, actions, functions)",
+          "Dataset API",
+          "User API",
+          "Groups API",
+          "Builds API (beta)",
+          "Schedules API (beta)",
+          "AIP Agents API (Dec 2024 beta for OSDK, GA for third-party)"
+        ],
+        "sdks": "Python SDK (beta), TypeScript SDK (beta)",
+        "authentication": "OAuth2 clients with granular scope management (roadmap)",
+        "use_cases": "External integrations, programmatic management, high-scale queries"
+      },
+
+      "developer_assist_mode": {
+        "description": "AIP Assist mode with API documentation and examples (Nov 2024)",
+        "model": "Claude 3.5 Sonnet where regionally available"
+      }
+    },
+
+    "7_governance_security": {
+      "control_panel": {
+        "description": "Centralized administration (redesigned Oct 2024)",
+        "sections": [
+          "Organization and enrollment settings",
+          "User and group management",
+          "Permissions and roles",
+          "Markings and CBAC",
+          "AIP configuration and rate limits",
+          "Resource management",
+          "Approvals (Nov 2023)",
+          "Code Repositories settings (Nov 2024)"
+        ],
+        "features": [
+          "Favorite settings quick-access",
+          "Recently visited settings",
+          "Contextual save actions",
+          "Organization/enrollment selectors"
+        ]
+      },
+
+      "permissions_model": {
+        "primitives": [
+          "Organizations (top-level boundary)",
+          "Markings (data classification)",
+          "Projects (permission boundaries)",
+          "Portfolios (project grouping - Nov 2024 GA)",
+          "Spaces (resource organization, formerly namespaces)"
+        ],
+        "roles": [
+          "Organization administrator",
+          "Data governance officer",
+          "Users and groups administrator (new Nov 2023)",
+          "Organization settings viewer",
+          "Custom roles"
+        ],
+        "migration": "Platform Settings permissions migrated to Control Panel roles (Nov 2023 Phase 1, Q1 2024 Phase 2)"
+      },
+
+      "approvals": {
+        "description": "Workflow approval system",
+        "use_cases": [
+          "Access requests (enhanced Jan 2024 with creator warnings, edit support)",
+          "Network ingress configuration changes (Nov 2023)",
+          "Data exports",
+          "Project template governance (Dec 2024 GA)"
+        ],
+        "features": [
+          "Multi-reviewer workflows",
+          "Group attribute visibility",
+          "Request preview",
+          "Subtask revert",
+          "Override previous approvals",
+          "Persistent filters",
+          "Improved inbox search (June 2024)"
+        ],
+        "integration": "Control Panel approvals tab (Nov 2023)"
+      },
+
+      "authentication": {
+        "methods": "SAML, OpenID Connect, Multipass",
+        "intake_forms": "Capture user attributes not from IdP (beta Oct 2024, GA Nov 2024)",
+        "cloud_identities": "AWS cloud authentication without static credentials (Nov 2023)"
+      },
+
+      "cipher": {
+        "description": "Encryption and obfuscation tool",
+        "capabilities": [
+          "Visual obfuscation for images (Nov 2024 GA) - reversible RGB scrambling",
+          "Channels and licenses",
+          "Decryption frequency limits",
+          "Interactive decryption via Workshop (beta)"
+        ],
+        "use_cases": "PII/PHI redaction, reducing data sensitivity, bias hiding"
+      },
+
+      "sensitive_data_scanner": {
+        "description": "Detect PII in datasets (Sept 2024)",
+        "built_in_conditions": "SSN, email, phone detection",
+        "custom_conditions": "User-defined patterns"
+      },
+
+      "time_based_group_membership": {
+        "description": "Temporary access grants (beta Jan 2024)"
+      },
+
+      "project_templates": {
+        "description": "Standardize security primitives for new projects (Dec 2024 GA)",
+        "enforcement": "Roles, groups, markings, constraints"
+      },
+
+      "cover_pages": {
+        "description": "Project documentation discoverable without access (Nov 2024 GA)"
+      }
+    },
+
+    "8_resource_management_observability": {
+      "resource_management": {
+        "features": [
+          "Compute usage tracking",
+          "Anomaly detection for spikes/troughs/flatlines (Jan 2024)",
+          "Business metrics visibility (Nov 2023) - data scale, DAU",
+          "Per-usage account metrics",
+          "AIP rate limit configuration (Dec 2024)"
+        ]
+      },
+
+      "monitoring_views": {
+        "integrations": "Slack (Dec 2024), webhooks (Dec 2024), existing PagerDuty support",
+        "severity_filtering": "Configure alerts by severity level"
+      },
+
+      "linter": {
+        "description": "Cost optimization and best practices tool (Sept 2024 GA)",
+        "capabilities": [
+          "Workflow design recommendations",
+          "Unnecessary compute identification",
+          "Outdated feature detection",
+          "Fix assistant for streamlined implementation",
+          "Sweep scheduling across Projects/Spaces"
+        ],
+        "impact_tracking": "Actioned recommendation counts"
+      },
+
+      "live_logs": {
+        "description": "Real-time job visibility (Sept 2024 GA)",
+        "features": [
+          "Real-time streaming",
+          "Color-coded severity (warnings/errors)",
+          "Pause/resume controls",
+          "JSON parameter viewing",
+          "Long-running task inspection"
+        ],
+        "integration": "Builds application"
+      },
+
+      "job_tracker": {
+        "features": [
+          "CPU architecture display (Jan 2024) - AMD64/ARM64",
+          "Executor profiling with flame graphs (Nov 2023)",
+          "Performance debugging"
+        ]
+      }
+    },
+
+    "9_collaboration_training": {
+      "training_application": {
+        "description": "In-platform role-based learning (Sept 2024 GA)",
+        "features": [
+          "Role-specific courses (data analysts, AI engineers)",
+          "Organization documentation integration",
+          "Learning pathways"
+        ]
+      },
+
+      "walkthroughs": {
+        "description": "Interactive in-platform tutorials (beta Nov 2024, GA Mar 2025)",
+        "creation": "Custom tutorial creation"
+      },
+
+      "developer_community": {
+        "description": "community.palantir.com (June 2024 GA)",
+        "features": "Q&A, product feedback, events, peer support",
+        "integration": "AIP Assist redirection for unanswerable queries (June 2024)"
+      },
+
+      "foundry_newsletter": {
+        "description": "Monthly updates (Nov 2023)",
+        "opt_in": "User Settings > Notifications"
+      },
+
+      "platform_updates": {
+        "description": "In-platform release notes access (Oct 2024 GA)",
+        "location": "Sidebar notifications, Support menu"
+      },
+
+      "foundry_builder_foundations_badge": {
+        "description": "LinkedIn-shareable certification (Sept 2024 GA)",
+        "format": "10-question quiz on learn.palantir.com"
+      },
+
+      "documentation_feedback": {
+        "description": "Send feedback on docs pages (Dec 2024 GA)"
+      }
+    },
+
+    "10_marketplace_devops": {
+      "marketplace": {
+        "description": "Internal app store for sharing Foundry applications",
+        "capabilities": [
+          "Publish Workshop apps, Functions, models",
+          "Store overview (Sept 2024)",
+          "Breadcrumb navigation (Sept 2024)",
+          "Improved global search (Sept 2024)",
+          "Compute Modules compatibility (Nov 2024)"
+        ]
+      },
+
+      "branching_and_proposals": {
+        "description": "Git-like change management across all Foundry resources",
+        "features": [
+          "Feature branches",
+          "Change proposals with comments",
+          "Impact analysis",
+          "Merge conflict resolution",
+          "Ontology Manager rebasing (Nov 2024)",
+          "Pipeline Builder protected branches (multiple, Sept 2024)",
+          "Fallback branches (Mar 2024)"
+        ]
+      },
+
+      "checkpoints": {
+        "description": "Approval gates for sensitive operations",
+        "use_cases": "OpenAPI exports, production deployments",
+        "admin_role": "Migrated to Data Governance Officer (Jan 2024)"
+      }
+    },
+
+    "11_compute_modules": {
+      "description": "Serverless Docker containers (Nov 2024 beta)",
+      "capabilities": [
+        "Any programming language support",
+        "Custom APIs/functions",
+        "Dynamic horizontal scaling",
+        "Internal Foundry connections (datasets, Ontology, schedules, builds)",
+        "External connections (REST, WebSockets, SSE)",
+        "Zero-downtime updates",
+        "Marketplace compatibility"
+      ],
+      "use_cases": [
+        "Real-time data streaming",
+        "Custom model deployment (Hugging Face, etc.)",
+        "Third-party integrations",
+        "Custom Ontology SDK backing"
+      ],
+      "vs_functions": "More flexible (any language, external deps) but less integrated than TypeScript/Python functions"
+    }
+  },
+
+  "release_chronology_major_milestones": {
+    "nov_2023": [
+      "Ontology SDK for Python (GA)",
+      "Semantic search (vector properties, KNN) (GA)",
+      "Automate (replaced Objects Monitoring) (GA)",
+      "Embedded module widgets in Workshop (GA)",
+      "Developer Community and Newsletter",
+      "Control Panel roles migration (Phase 1)",
+      "Multiple enhancements (50+ features)"
+    ],
+    "jan_2024": [
+      "Media Sets (GA)",
+      "Workshop Routing (URL state sharing) (GA)",
+      "AIP Interactive Widget (GA)",
+      "TypeScript FoO performance (15.6x faster)",
+      "OpenAPI spec export",
+      "Multiple workshop/ontology enhancements (23 features)"
+    ],
+    "mar_2024": [
+      "Loop layouts in Workshop (GA)",
+      "Container transforms in Code Workspaces (GA)",
+      "Batched functions in Notepad (GA)",
+      "AIP Logic enhancements (object sets, transform blocks, arrays)",
+      "40 features across platform"
+    ],
+    "june_2024": [
+      "Build with AIP for OSDK (GA)",
+      "Python Functions (beta)",
+      "Python 3.11 support (GA)",
+      "Hawk package manager (GA)",
+      "150+ new data connectors",
+      "Llama 3, GPT-4o, Claude 3 Sonnet models",
+      "Pipeline caching (40x faster previews)",
+      "16 major features"
+    ],
+    "sept_2024": [
+      "Linter for cost optimization (GA)",
+      "Simplified model deployment (GA)",
+      "Workshop translations (GA)",
+      "Llama 3.1, Claude 3.5 Sonnet (GA)",
+      "GPT-4o vision in Pipeline Builder",
+      "LLM row caching (3hr→20min)",
+      "Live logs (GA)",
+      "Scheduling calendar widget",
+      "19 features"
+    ],
+    "oct_2024": [
+      "AIP Agent Studio (GA)",
+      "AIP Threads (beta)",
+      "TypeScript OSDK 2.0 (GA)",
+      "Java OSDK (GA)",
+      "Derived time series (GA)",
+      "Control Panel redesign",
+      "AIP Assist Agents (beta)",
+      "User intake forms (beta)",
+      "Platform Updates feature",
+      "18 features"
+    ],
+    "nov_2024": [
+      "Platform APIs and SDKs (GA/beta)",
+      "Compute Modules (beta)",
+      "Workflow Builder (GA)",
+      "Portfolios (GA)",
+      "Visual obfuscation in Cipher (GA)",
+      "External LLM registration (GA)",
+      "OSDK React in VS Code (beta)",
+      "Python Compute Modules in VS Code (beta)",
+      "AIP Assist performance enhancements",
+      "18 features"
+    ],
+    "dec_2024": [
+      "AIP Agents in third-party apps via APIs (GA)",
+      "Serverless Python functions (beta)",
+      "TypeScript debugging in Code Repositories (GA)",
+      "Python functions in Pipeline Builder (beta)",
+      "Custom widgets with bidirectional communication (GA)",
+      "PDF annotations in Workshop (GA)",
+      "Project templates (GA)",
+      "Slack/webhook integrations for monitoring",
+      "Dual OpenAI support (2x capacity)",
+      "AIP rate limits at project level",
+      "KNN join in Pipeline Builder (GA)",
+      "Time series alert automations",
+      "20 features"
+    ]
+  },
+
+  "gui_analysis_from_screenshots": {
+    "note": "Based on screenshot descriptions from release notes (actual images not available in text extraction)",
+
+    "pipeline_builder_ui": {
+      "canvas": "Node-based graph with drag-drop; pseudocode rendering option (Dec 2024)",
+      "node_configuration": "Side panel with transform logic, preview, output config",
+      "data_preview": "Table view with sampling, map view for geospatial (Nov 2023)",
+      "llm_integration": "Use LLM node with token counts, raw prompt/output viewer (Nov 2024)",
+      "knn_join": "Configuration dialog for semantic similarity matching (Dec 2024)",
+      "caching_indicators": "Lightning bolt icon for cached results (June 2024)",
+      "search_panel": "Multi-condition search with keyboard navigation (Nov 2023)"
+    },
+
+    "ontology_manager_ui": {
+      "discover_page": "Customizable landing with sections, favorites, recently viewed (June 2024)",
+      "object_type_editor": "Property configuration, datasource mapping, validation rules",
+      "schema_migrations": "Automated suggestions, one-click application (Nov 2023)",
+      "staging_dialog": "Redesigned for rebasing and conflict resolution (Nov 2024)",
+      "cleanup_tool": "Flag-based filtering, ordering by flag quantity (Mar 2024)"
+    },
+
+    "workshop_ui": {
+      "canvas": "WYSIWYG with widget placement, drag-drop",
+      "widget_selector": "Categorized menu with search",
+      "widget_configuration": "Setup, Display, Events tabs",
+      "tabs_widget": "4 design presets (outline, block, prominent, grouped) with preview (Jan 2024)",
+      "loop_layouts": "Embedded module repetition for collections (Mar 2024)",
+      "pdf_viewer": "Annotation overlay with colors, selection actions (Dec 2024)",
+      "custom_widgets": "Configuration panel with variable mapping (Dec 2024)",
+      "workflow_builder": "Visual dependency graph with bulk actions (Nov 2024)",
+      "home_page": "Template selection (inbox, map, metrics) with data input (Nov 2023)"
+    },
+
+    "code_repositories_ui": {
+      "editor": "Side-by-side code and preview",
+      "debugger": "Breakpoint placement, step controls, frame inspection (Dec 2024)",
+      "libraries_panel": "NPM package search with add/install automation (Nov 2023)",
+      "file_template_wizard": "Guided configuration for Python transforms (Nov 2024)",
+      "preview": "Live dataset preview with file support",
+      "vs_code_workspace": "Full VS Code in browser with Palantir extension (Nov 2024)"
+    },
+
+    "aip_agent_studio_ui": {
+      "configuration": "Prompt, tools, retrieval context, reasoning sections",
+      "agent_details_panel": "Overview, Tools, Reasoning tabs showing configuration (Nov 2024)",
+      "tool_selection": "Checkboxes for Ontology types, actions, functions",
+      "deployment": "Publish to Workshop, APIs, Functions"
+    },
+
+    "control_panel_ui": {
+      "navigation": "Favorites sidebar, recently visited, categorized settings (Oct 2024)",
+      "header": "Organization/enrollment selectors",
+      "approvals_tab": "Inbox with filtering, request preview, subtask management (Nov 2023)",
+      "aip_settings": "Model enablement, rate limit configuration (Dec 2024)"
+    },
+
+    "quiver_ui": {
+      "canvas": "Time series boards with transform logic",
+      "aip_generate": "Input field beneath cards with suggestions (Dec 2024)",
+      "derived_series": "Save logic button, configuration interface (Oct 2024)"
+    },
+
+    "slate_ui": {
+      "editor": "Full-width panels with code/config (Nov 2023)",
+      "sidebar": "Layout, data, logic, debugging tools (June 2024)",
+      "canvas": "Widget auto-scroll on selection (Nov 2023)"
+    },
+
+    "platform_updates_ui": {
+      "interface": "Monthly sidebar advertising, application filtering, announcement/release tabs (Oct 2024)"
+    }
+  }
+}

@@ -1,0 +1,943 @@
+{
+  "version": 1,
+  "analysis_date": "2025-11-08",
+  "category": "Enterprise Operational Systems",
+  "systems_analyzed": ["ServiceNow", "Jira/Jira Service Management", "Confluence"],
+  "analysis_purpose": "Understand integration points, data models, and capabilities for NYQST bidirectional integration",
+
+  "executive_summary": {
+    "overview": "ServiceNow, Jira/JSM, and Confluence are the dominant platforms where financial services operational work happens. ServiceNow leads in enterprise ITSM/GRC, Jira leads in agile teams/service management, and Confluence leads in knowledge documentation. NYQST must integrate bidirectionally to read operational state and write enriched analysis back.",
+    "integration_criticality": "CRITICAL - These systems contain the operational telemetry NYQST needs (incidents, changes, tickets, documentation) and are where users work daily. NYQST's copilot must surface contextual assistance within these systems.",
+    "key_finding": "All three platforms have mature REST APIs and webhook capabilities. Integration is technically feasible. Challenge: capturing tacit knowledge that exists in user actions, not just ticket fields."
+  },
+
+  "servicenow_platform": {
+    "overview": {
+      "vendor": "ServiceNow Inc.",
+      "category": "Enterprise Service Management Platform",
+      "core_products": [
+        "IT Service Management (ITSM)",
+        "IT Operations Management (ITOM)",
+        "Integrated Risk Management (IRM) / GRC",
+        "Security Operations",
+        "Customer Service Management",
+        "HR Service Delivery"
+      ],
+      "market_position": "Leader in enterprise ITSM, particularly strong in Fortune 500 financial services",
+      "deployment": "Cloud-based SaaS (multi-instance), on-premise available",
+      "relevance_to_nyqst": "Primary operational system for incident management, change management, problem management. Contains CMDB (system relationships), workflow engine. NYQST System 2 must integrate to capture operational reality."
+    },
+
+    "architecture": {
+      "platform_foundation": {
+        "database": "Proprietary relational database with table hierarchy (inheritance)",
+        "scripting": "JavaScript (Rhino engine) for business rules, UI actions, workflows",
+        "workflow_engine": "Flow Designer (visual, low-code) + Legacy Workflow (code-based)",
+        "data_model": "Table-based with inheritance (e.g., Task table → Incident, Change Request, Problem inherit)",
+        "ui_framework": "Service Portal (Angular), UI Builder (modern), Classic UI"
+      },
+
+      "key_architectural_concepts": {
+        "tables": "Core data structure. Each record type is a table (incident, change_request, cmdb_ci, etc.). Tables can extend other tables (inheritance).",
+        "glide_record": "Server-side API for database queries (similar to ORM)",
+        "business_rules": "Server-side JavaScript triggered on CRUD operations",
+        "client_scripts": "Client-side JavaScript for UI logic",
+        "script_includes": "Reusable server-side JavaScript libraries",
+        "ui_actions": "Buttons/links on forms (e.g., 'Approve', 'Reject')",
+        "acls": "Access Control Lists for security"
+      },
+
+      "integration_layer": {
+        "rest_api": "Table API (CRUD on any table), Scripted REST APIs (custom endpoints), Import Set API",
+        "soap_api": "Legacy, still used for some integrations",
+        "webhooks": "Outbound REST messages (configurable), Business rules can trigger webhooks",
+        "events": "Event-driven architecture (sys_event table), can trigger notifications/workflows",
+        "integrations_hub": "Pre-built connectors (spoke pattern) for common systems"
+      }
+    },
+
+    "core_capabilities": {
+      "itsm_modules": {
+        "incident_management": {
+          "table": "incident",
+          "key_fields": [
+            "number (INC0010001)",
+            "short_description, description",
+            "priority (1-5), urgency (1-3), impact (1-3)",
+            "state (New, In Progress, Resolved, Closed)",
+            "assigned_to, assignment_group",
+            "category, subcategory",
+            "cmdb_ci (related configuration item)",
+            "sys_created_on, sys_updated_on",
+            "opened_by, resolved_by, closed_by",
+            "resolution_code, close_notes"
+          ],
+          "lifecycle": "New → In Progress → Resolved → Closed",
+          "relationships": "Can be related to CI (cmdb_ci), Change Request (change_request), Problem (problem)",
+          "sla": "SLA definitions with pause conditions, calendar",
+          "assignment_rules": "Assignment rules can auto-assign based on category, CI, etc.",
+          "notifications": "Email/SMS/Push for state changes, assignments",
+          "what_nyqst_gets": [
+            "Incident telemetry (what went wrong, when, who resolved)",
+            "CI relationships (which system had issue)",
+            "Resolution patterns (how experts resolved similar incidents)",
+            "SLA breach data (operational performance)"
+          ],
+          "what_nyqst_sends_back": [
+            "Enriched root cause analysis (Bayesian RCA from digital twin)",
+            "Suggested resolution (based on similar past incidents)",
+            "Proactive alerts (FMEA identified vulnerability in related CI)",
+            "Control test recommendations (incident suggests control failure)"
+          ]
+        },
+
+        "change_management": {
+          "table": "change_request",
+          "key_fields": [
+            "number (CHG0010001)",
+            "type (Standard, Normal, Emergency)",
+            "short_description, description",
+            "risk (1-4), impact (1-3)",
+            "state (Draft, Assess, Authorize, Scheduled, Implement, Review, Closed)",
+            "requested_by, assigned_to, assignment_group",
+            "planned_start_date, planned_end_date",
+            "cmdb_ci, affected_cis (many-to-many via task_ci table)",
+            "implementation_plan, backout_plan, test_plan",
+            "approval (CAB approval, change approver)",
+            "review_status, review_date"
+          ],
+          "types": {
+            "standard": "Pre-approved, low-risk changes (e.g., password reset)",
+            "normal": "Requires CAB approval, risk assessment, implementation plan",
+            "emergency": "High urgency, streamlined approval"
+          },
+          "approvals": "Multi-stage approvals (manager, CAB, change manager)",
+          "cab": "Change Advisory Board - reviews high-risk changes",
+          "relationships": "Linked to CIs (affected_cis), Incidents (caused by change), Problems",
+          "what_nyqst_gets": [
+            "Change patterns (what changes happen frequently)",
+            "Approval workflows (who approves what, duration)",
+            "Failed changes (which changes caused incidents)",
+            "CI impact analysis (which CIs affected by change)"
+          ],
+          "what_nyqst_sends_back": [
+            "Impact assessment (digital twin predicts downstream CI impact)",
+            "Risk score (FMEA-based risk of change failure)",
+            "Similar past changes (success/failure patterns)",
+            "Suggested approvers (based on CI ownership)"
+          ]
+        },
+
+        "problem_management": {
+          "table": "problem",
+          "key_fields": [
+            "number (PRB0010001)",
+            "short_description, description",
+            "state (New, Assess, Root Cause Analysis, Fix in Progress, Resolved, Closed)",
+            "priority, impact",
+            "assigned_to, assignment_group",
+            "related_incidents (many-to-many)",
+            "workaround, fix_notes",
+            "root_cause, known_error (boolean)"
+          ],
+          "purpose": "Identify root cause of recurring incidents, implement permanent fix",
+          "relationships": "Linked to multiple incidents (problem ← many incidents)",
+          "known_errors": "Problems with documented workarounds (until permanent fix)",
+          "what_nyqst_gets": [
+            "Root cause patterns (what causes recurring incidents)",
+            "Workarounds (temporary fixes, could become procedures)",
+            "Known errors (documented operational knowledge)"
+          ],
+          "what_nyqst_sends_back": [
+            "Automated RCA (Bayesian model suggests likely root cause)",
+            "Proactive problem identification (FMEA finds potential problems before incidents)",
+            "Solution recommendations (based on similar problems in digital twin)"
+          ]
+        },
+
+        "cmdb": {
+          "description": "Configuration Management Database - single source of truth for IT infrastructure",
+          "table": "cmdb_ci (parent table for all CIs)",
+          "ci_types_examples": [
+            "cmdb_ci_computer (servers, desktops)",
+            "cmdb_ci_server",
+            "cmdb_ci_database",
+            "cmdb_ci_app_server",
+            "cmdb_ci_service (business services)",
+            "cmdb_ci_network_adapter",
+            "cmdb_ci_storage_device"
+          ],
+          "key_fields": [
+            "name, u_name (display name)",
+            "asset_tag, serial_number",
+            "ip_address, mac_address",
+            "operational_status (Operational, Non-Operational, Retired)",
+            "sys_class_name (CI type)",
+            "owned_by, managed_by, support_group",
+            "location, department"
+          ],
+          "relationships": {
+            "cmdb_rel_ci": "CI-to-CI relationships table (parent-child, connected-to, runs-on, etc.)",
+            "relationship_types": "Depends On, Runs On, Connected To, Member Of, etc.",
+            "dependency_views": "Visual dependency maps in Service Mapping"
+          },
+          "discovery": "ServiceNow Discovery automatically populates CMDB by scanning infrastructure",
+          "csdm": "Common Services Data Model - ServiceNow's reference architecture for CMDB",
+          "what_nyqst_gets": [
+            "System inventory (what CIs exist)",
+            "CI relationships (which systems depend on which)",
+            "CI ownership (who owns/manages what)",
+            "CI changes (change history for each CI)"
+          ],
+          "what_nyqst_sends_back": [
+            "CI risk scores (FMEA-based operational risk)",
+            "Suggested relationships (digital twin identifies undocumented dependencies)",
+            "Impact analysis (if CI X fails, what's affected)"
+          ]
+        },
+
+        "service_catalog": {
+          "description": "Self-service portal for requesting IT services (new laptop, software access, etc.)",
+          "table": "sc_request (parent), sc_req_item (child), sc_task (workflow tasks)",
+          "key_concepts": [
+            "Catalog items (e.g., 'Request New Laptop', 'VPN Access')",
+            "Variables (form fields for catalog item)",
+            "Workflows (background processing)",
+            "Approval flows"
+          ],
+          "what_nyqst_gets": "Request patterns (what services requested most, by whom)",
+          "what_nyqst_sends_back": "Proactive suggestions (e.g., 'User X usually requests Y after Z')"
+        },
+
+        "knowledge_management": {
+          "table": "kb_knowledge",
+          "key_fields": [
+            "short_description, text (article content)",
+            "article_type (Solution, How-to, Known Error, Reference)",
+            "kb_knowledge_base (which knowledge base)",
+            "workflow_state (Draft, Published, Retired)",
+            "author, owned_by",
+            "valid_to (expiration date)",
+            "views, helpful_count, not_helpful_count"
+          ],
+          "relationships": "Can be linked to incidents, problems, changes",
+          "search": "Full-text search, tags",
+          "what_nyqst_gets": [
+            "Existing knowledge base (documented procedures, workarounds)",
+            "Knowledge usage (which articles viewed most)",
+            "Knowledge gaps (what's searched but not found)"
+          ],
+          "what_nyqst_sends_back": [
+            "Suggested knowledge articles (from digital twin validated procedures)",
+            "Knowledge quality scores (confidence-scored vs usage)",
+            "Auto-generated articles (from resolved incidents with novel solutions)"
+          ]
+        }
+      },
+
+      "grc_irm_modules": {
+        "policy_and_compliance": {
+          "tables": ["sn_compliance_policy", "sn_compliance_policy_section", "sn_compliance_citation"],
+          "capabilities": [
+            "Policy library management",
+            "Citation mapping (regulatory → policy → control)",
+            "Policy attestation workflows",
+            "Exception management"
+          ],
+          "what_nyqst_gets": "Policy definitions, attestation status, exceptions",
+          "what_nyqst_sends_back": "Gap analysis (digital twin identifies missing controls), suggested policy updates"
+        },
+
+        "risk_management": {
+          "tables": ["sn_risk_risk", "sn_risk_statement", "sn_risk_framework"],
+          "capabilities": [
+            "Risk register",
+            "Risk assessment workflows",
+            "Risk response plans",
+            "Risk indicators (KRIs)"
+          ],
+          "integration_with_itsm": "Risks can be linked to CIs, incidents, changes",
+          "what_nyqst_gets": "Risk register, risk assessments, risk owners",
+          "what_nyqst_sends_back": [
+            "FMEA-identified risks (proactive)",
+            "Risk scores from digital twin",
+            "Suggested mitigations"
+          ]
+        },
+
+        "control_management": {
+          "tables": ["sn_compliance_control", "sn_compliance_control_test", "sn_compliance_attestation"],
+          "capabilities": [
+            "Control library",
+            "Control testing schedules",
+            "Test evidence upload",
+            "Control effectiveness ratings"
+          ],
+          "what_nyqst_gets": [
+            "Control definitions",
+            "Test results (pass/fail, evidence)",
+            "Control owners, test frequency"
+          ],
+          "what_nyqst_sends_back": [
+            "Suggested controls (based on digital twin risk analysis)",
+            "Control test automation (where possible)",
+            "Control effectiveness analysis (does control actually mitigate risk?)"
+          ]
+        },
+
+        "audit_management": {
+          "tables": ["sn_audit_entity", "sn_audit_issue", "sn_audit_test"],
+          "capabilities": [
+            "Audit planning",
+            "Issue tracking",
+            "Remediation workflows"
+          ]
+        }
+      },
+
+      "workflow_engine": {
+        "flow_designer": {
+          "description": "Visual, low-code workflow builder (modern)",
+          "components": [
+            "Triggers (Record created/updated, Schedule, etc.)",
+            "Actions (Create record, Update record, Call API, etc.)",
+            "Flow logic (If, For Each, Wait, etc.)",
+            "Subflows (reusable flows)",
+            "Integrations (Spokes for common systems)"
+          ],
+          "use_cases": "Incident assignment, approval routing, notifications, integrations",
+          "what_nyqst_observes": "Workflow execution logs (how long steps take, who approves what)",
+          "what_nyqst_could_influence": "Inject decision logic (e.g., 'Route to expert X based on digital twin')"
+        },
+
+        "legacy_workflow": {
+          "description": "Code-based workflow (being phased out)",
+          "scripting": "JavaScript-based workflow activities",
+          "still_used": "Complex logic not yet migrated to Flow Designer"
+        },
+
+        "business_rules": {
+          "description": "Server-side JavaScript triggered on table operations",
+          "when_runs": "Before/After Insert, Update, Delete, Query",
+          "use_cases": "Data validation, calculations, automatic assignments, integrations",
+          "what_nyqst_could_add": "Business rule calling NYQST API for intelligent routing"
+        }
+      },
+
+      "reporting_and_analytics": {
+        "performance_analytics": {
+          "description": "KPI/metric tracking, dashboards, trending",
+          "indicators": "Incident volume, MTTR, SLA compliance, Change success rate",
+          "breakdowns": "By assignment group, category, priority, CI"
+        },
+        "reporting": "Ad-hoc reports, scheduled reports, export to Excel/PDF",
+        "dashboards": "Configurable dashboards with gauges, charts, lists"
+      }
+    },
+
+    "api_integration": {
+      "rest_api": {
+        "table_api": {
+          "description": "Generic CRUD API for any table",
+          "base_url": "https://<instance>.service-now.com/api/now/table/{table_name}",
+          "methods": ["GET (read), POST (create), PUT (update), PATCH (partial update), DELETE (delete)"],
+          "authentication": "Basic Auth, OAuth 2.0",
+          "query_parameters": [
+            "sysparm_query (encoded query, e.g., priority=1^state=2)",
+            "sysparm_display_value (true/all returns display values for reference fields)",
+            "sysparm_fields (comma-separated list of fields to return)",
+            "sysparm_limit (max records to return)",
+            "sysparm_offset (pagination)",
+            "sysparm_exclude_reference_link (exclude reference field links)"
+          ],
+          "response_format": "JSON",
+          "examples": {
+            "get_incidents": "GET /api/now/table/incident?sysparm_query=state=1^priority=1",
+            "get_incident_with_ci": "GET /api/now/table/incident/abc123?sysparm_display_value=true",
+            "create_incident": "POST /api/now/table/incident with JSON body {short_description, description, urgency, ...}",
+            "update_incident": "PUT /api/now/table/incident/abc123 with JSON body {state: 3, close_notes: '...'}",
+            "dot_walking": "GET /api/now/table/change_request?sysparm_fields=cmdb_ci.name,cmdb_ci.type (get CI name/type directly)"
+          }
+        },
+
+        "scripted_rest_apis": {
+          "description": "Custom REST endpoints defined in ServiceNow",
+          "use_case": "Complex logic not suitable for Table API (e.g., multi-step operations, custom calculations)",
+          "example": "GET /api/<namespace>/<api_name>/<resource_path>"
+        },
+
+        "import_set_api": {
+          "description": "Bulk data import API",
+          "use_case": "Load large datasets into ServiceNow",
+          "process": "POST data to staging table → Transform maps apply → Data loaded into target table"
+        },
+
+        "attachment_api": {
+          "description": "Upload/download file attachments",
+          "endpoints": [
+            "POST /api/now/attachment/file (upload)",
+            "GET /api/now/attachment/{sys_id}/file (download)"
+          ]
+        }
+      },
+
+      "webhooks_outbound": {
+        "description": "ServiceNow can POST data to external systems",
+        "mechanism": "REST Message (configured in ServiceNow) triggered by Business Rule, Workflow, Flow",
+        "payload": "Configurable JSON/XML",
+        "use_case_for_nyqst": [
+          "Incident created → POST to NYQST → NYQST enriches with RCA → POSTS back",
+          "Change approved → POST to NYQST → NYQST performs impact analysis → POSTs back risk score",
+          "Control test failed → POST to NYQST → NYQST identifies related risks → POSTs back"
+        ]
+      },
+
+      "webhooks_inbound": {
+        "description": "ServiceNow can receive webhook calls",
+        "mechanism": "Scripted REST API endpoint",
+        "use_case_for_nyqst": [
+          "NYQST detects pattern → POST to ServiceNow to create incident/problem",
+          "NYQST FMEA identifies risk → POST to ServiceNow to create risk record",
+          "NYQST validates procedure → POST to ServiceNow to update knowledge article"
+        ]
+      },
+
+      "graphql_api": {
+        "status": "Limited support (as of 2024, not fully mature)",
+        "use_case": "Query related data in single request (e.g., incident + CI + related changes)"
+      }
+    },
+
+    "what_nyqst_will_get_from_servicenow": {
+      "operational_telemetry": [
+        "Incidents: what failed, when, who resolved, how long, resolution notes",
+        "Changes: what changed, risk assessment, approval chain, success/failure",
+        "Problems: root causes, workarounds, known errors",
+        "CMDB: system inventory, dependencies, ownership",
+        "Controls: control tests, evidence, effectiveness",
+        "Risks: risk assessments, mitigations, KRIs"
+      ],
+      "relationship_data": [
+        "Incident → CI (which system failed)",
+        "Change → Affected CIs (impact scope)",
+        "Problem → Incidents (recurring patterns)",
+        "Control → Risk (what mitigates what)",
+        "CI → CI (system dependencies)"
+      ],
+      "process_execution_data": [
+        "Workflow execution logs (how long approvals take)",
+        "Assignment patterns (who handles what)",
+        "SLA breaches (where operational bottlenecks are)",
+        "Knowledge article usage (what's searched, viewed)"
+      ],
+      "organizational_data": [
+        "Users, Groups, Roles",
+        "Locations, Departments",
+        "Ownership (who owns which CI, control, risk)"
+      ]
+    },
+
+    "what_nyqst_will_send_back_to_servicenow": {
+      "enriched_analysis": [
+        "Root cause predictions (Bayesian RCA)",
+        "Suggested resolutions (from digital twin similar incidents)",
+        "Impact assessments (FMEA-based risk for changes)",
+        "Proactive alerts (FMEA identifies vulnerable CI before failure)"
+      ],
+      "knowledge_updates": [
+        "New knowledge articles (auto-generated from novel incident resolutions)",
+        "Procedure validation status (confidence scores)",
+        "Knowledge gap identification (what's missing)"
+      ],
+      "intelligent_routing": [
+        "Suggested assignees (based on expertise in digital twin)",
+        "Escalation recommendations (when SLA breach imminent)",
+        "Expert identification (who resolved similar issues)"
+      ],
+      "compliance_insights": [
+        "Control effectiveness scores (does control actually work?)",
+        "Suggested new controls (based on risk analysis)",
+        "Audit findings (from continuous validation)"
+      ]
+    },
+
+    "integration_architecture_for_nyqst": {
+      "recommended_pattern": "Bidirectional REST API + Webhooks",
+      "nyqst_reads_servicenow": {
+        "method": "REST API polling + webhooks",
+        "frequency": "Webhooks for real-time (incident created), Polling for batch (daily pull of all incidents)",
+        "data_sync": "Store ServiceNow sys_id + sys_updated_on for change tracking"
+      },
+      "nyqst_writes_servicenow": {
+        "method": "REST API (Table API)",
+        "examples": [
+          "Create incident (NYQST-detected issue) → POST /api/now/table/incident",
+          "Update incident (add RCA) → PATCH /api/now/table/incident/{sys_id} (update work_notes or resolution_notes)",
+          "Create knowledge article → POST /api/now/table/kb_knowledge",
+          "Update risk score → PATCH /api/now/table/sn_risk_risk/{sys_id}"
+        ]
+      },
+      "authentication": "OAuth 2.0 (preferred) or Basic Auth",
+      "security": "ServiceNow API rate limits (apply backoff), Use service account with minimal permissions",
+      "schema_evolution": "Monitor ServiceNow upgrades (quarterly releases can change table schemas)"
+    }
+  },
+
+  "jira_platform": {
+    "overview": {
+      "vendor": "Atlassian",
+      "products_in_suite": [
+        "Jira (issue tracking)",
+        "Jira Service Management (JSM - ITSM)",
+        "Jira Software (agile development)",
+        "Confluence (knowledge management)"
+      ],
+      "market_position": "Leader in agile teams, strong in tech companies, growing in enterprise ITSM (competing with ServiceNow)",
+      "deployment": "Cloud (Atlassian Cloud), Data Center (self-hosted)",
+      "relevance_to_nyqst": "Widely used for IT service requests, incident management (lighter than ServiceNow), project management. Strong in developer/tech teams. NYQST needs to integrate to capture operational tickets and augment with intelligence."
+    },
+
+    "architecture": {
+      "data_model": {
+        "core_concept": "Issues (generic term for any work item: ticket, bug, story, epic, etc.)",
+        "issue_types": "Configurable (Bug, Task, Story, Epic, Incident, Service Request, Change, Problem)",
+        "projects": "Container for issues, each project has its own configuration",
+        "workflows": "State machines for issues (e.g., To Do → In Progress → Done)",
+        "fields": "System fields + custom fields (attached to issue types)",
+        "screens": "Forms showing subsets of fields (Create, Edit, View screens)",
+        "schemes": "Configuration sets (workflow scheme, field configuration scheme, permission scheme)"
+      },
+
+      "jira_service_management_specifics": {
+        "request_types": "Customer-facing templates (e.g., 'Get IT Help', 'Request Access')",
+        "queues": "Filtered views of issues for agents (e.g., 'Unassigned Incidents', 'SLA Breached')",
+        "sla": "Service Level Agreements with goals, conditions, calendars",
+        "service_desk_portal": "Customer self-service portal",
+        "cmdb_assets": "Asset management (JSM Assets) - CIs, relationships (lighter than ServiceNow CMDB)",
+        "automation": "Rule-based automation (if-then rules)",
+        "approvals": "Multi-step approval workflows"
+      },
+
+      "integration_layer": {
+        "rest_api_v3": "Current API (v2 deprecated)",
+        "webhooks": "Outbound (Jira → external) and Inbound (external → Jira via Automation)",
+        "apps_marketplace": "Atlassian Marketplace - 1000s of apps",
+        "forge": "Serverless app framework (JavaScript)",
+        "connect": "Integration framework for external apps"
+      }
+    },
+
+    "core_capabilities": {
+      "jira_service_management": {
+        "request_management": {
+          "description": "Customer requests via portal → routed to agents → resolved",
+          "request_types": "Incident, Service Request, Change, Problem",
+          "fields_per_request_type": "Customizable (e.g., Service Request has 'Justification', Incident has 'Severity')",
+          "lifecycle": "Configurable workflow per request type",
+          "what_nyqst_gets": [
+            "Requests (who requested what, when)",
+            "Resolutions (how resolved, by whom, duration)",
+            "SLA data (breaches, time-to-resolve)"
+          ],
+          "what_nyqst_sends_back": [
+            "Suggested resolutions (from digital twin)",
+            "Auto-triage (classify request type based on description)",
+            "Expert routing (suggest assignee)"
+          ]
+        },
+
+        "incident_management": {
+          "fields_typical": [
+            "Summary, Description",
+            "Priority (Highest, High, Medium, Low, Lowest)",
+            "Status (workflow states: Open, In Progress, Waiting, Resolved, Closed)",
+            "Assignee, Reporter",
+            "Affected Service (linked asset)",
+            "Resolution, Resolution Date",
+            "Custom fields (e.g., Root Cause, Workaround)"
+          ],
+          "sla_tracking": "Time to First Response, Time to Resolution",
+          "parent_child": "Incidents can have sub-tasks"
+        },
+
+        "change_management": {
+          "types": "Standard (pre-approved), Normal (requires approval), Emergency",
+          "approvals": "Multi-step approvals with conditions",
+          "risk_assessment": "Custom fields for risk, impact",
+          "cab": "Change Advisory Board - approvers group",
+          "what_nyqst_adds": "Risk scoring (FMEA-based), Impact analysis (digital twin predicts affected systems)"
+        },
+
+        "problem_management": {
+          "purpose": "Identify root cause of recurring incidents",
+          "relationship": "Problem → linked to multiple Incidents",
+          "what_nyqst_adds": "Automated RCA (Bayesian model), Proactive problem detection (FMEA)"
+        },
+
+        "asset_management": {
+          "description": "JSM Assets (formerly Insight) - lightweight CMDB",
+          "object_types": "Hardware, Software, Services (customizable)",
+          "relationships": "Dependencies, Connections",
+          "discovery": "Manual entry, CSV import, API integration (no auto-discovery like ServiceNow)",
+          "what_nyqst_gets": "Asset inventory, relationships, change history",
+          "what_nyqst_sends_back": "Suggested relationships (digital twin identifies dependencies)"
+        },
+
+        "sla_management": {
+          "goals": "Time-based (e.g., Respond within 4 hours)",
+          "conditions": "When SLA starts (e.g., Priority = High), When SLA pauses (e.g., Status = Waiting for Customer)",
+          "calendars": "Business hours (24/7 or custom)",
+          "tracking": "Remaining time shown on issues, SLA reports",
+          "what_nyqst_observes": "SLA breach patterns (where bottlenecks are)",
+          "what_nyqst_predicts": "SLA breach likelihood (for proactive escalation)"
+        },
+
+        "automation": {
+          "description": "If-Then rules (trigger → conditions → actions)",
+          "triggers": [
+            "Issue created, updated, transitioned",
+            "Field value changed",
+            "SLA goal reached (e.g., 75% of time elapsed)",
+            "Comment added",
+            "Incoming webhook"
+          ],
+          "conditions": [
+            "Issue matches JQL (Jira Query Language)",
+            "Field value equals X",
+            "User in group Y"
+          ],
+          "actions": [
+            "Assign issue",
+            "Transition issue (change status)",
+            "Send notification (email, Slack, webhook)",
+            "Create sub-task",
+            "Add comment",
+            "Call webhook (POST JSON to external URL)"
+          ],
+          "use_case_for_nyqst": [
+            "Incident created → Automation calls NYQST webhook → NYQST performs RCA → NYQST posts back via API",
+            "SLA 75% elapsed → Automation notifies NYQST → NYQST suggests escalation"
+          ]
+        },
+
+        "queues": {
+          "description": "Saved filters for agents (e.g., 'My open incidents', 'SLA breached')",
+          "jql": "Jira Query Language (powerful SQL-like query)",
+          "example": "project = IT AND type = Incident AND status != Closed ORDER BY priority DESC"
+        }
+      },
+
+      "confluence_knowledge_base": {
+        "description": "Often used alongside Jira for documentation, runbooks, procedures",
+        "spaces": "Top-level containers (e.g., 'IT Operations', 'Engineering')",
+        "pages": "Hierarchical (parent-child)",
+        "content": "Rich text editor, macros (dynamic content), attachments",
+        "integration_with_jira": "Link Confluence pages to Jira issues, embed Jira issues in Confluence",
+        "what_nyqst_gets": [
+          "Documented procedures (runbooks, SOPs)",
+          "Knowledge articles (how-tos)",
+          "Page structure (what's documented where)"
+        ],
+        "what_nyqst_sends_back": [
+          "Auto-generated pages (from validated digital twin procedures)",
+          "Confidence scores on pages (how accurate is this procedure?)",
+          "Suggested updates (procedure changed, Confluence out of date)"
+        ]
+      }
+    },
+
+    "api_integration": {
+      "rest_api_v3": {
+        "base_url": "https://<site>.atlassian.net/rest/api/3/",
+        "authentication": "Basic Auth (username + API token), OAuth 2.0",
+        "rate_limits": "Atlassian Cloud: ~5 requests/second/user, Data Center: configurable",
+        "key_endpoints": {
+          "issues": {
+            "get_issue": "GET /rest/api/3/issue/{issueIdOrKey}",
+            "search_issues": "POST /rest/api/3/search (JQL query in body)",
+            "create_issue": "POST /rest/api/3/issue",
+            "update_issue": "PUT /rest/api/3/issue/{issueIdOrKey}",
+            "transition_issue": "POST /rest/api/3/issue/{issueIdOrKey}/transitions",
+            "add_comment": "POST /rest/api/3/issue/{issueIdOrKey}/comment"
+          },
+          "fields": {
+            "get_fields": "GET /rest/api/3/field (list all fields including custom)",
+            "get_field_options": "GET /rest/api/3/field/{fieldKey}/option (for select fields)"
+          },
+          "projects": {
+            "get_projects": "GET /rest/api/3/project",
+            "get_project": "GET /rest/api/3/project/{projectIdOrKey}"
+          },
+          "workflows": {
+            "get_workflows": "GET /rest/api/3/workflow (Cloud only)",
+            "get_transitions": "GET /rest/api/3/issue/{issueIdOrKey}/transitions (available transitions for issue)"
+          }
+        },
+        "custom_fields": {
+          "note": "Custom fields have IDs like 'customfield_10001'",
+          "getting_field_id": "Call GET /rest/api/3/field, find field by name",
+          "setting_custom_field": "In issue update/create, use {'fields': {'customfield_10001': 'value'}}"
+        }
+      },
+
+      "webhooks": {
+        "outbound": {
+          "description": "Jira sends HTTP POST to external URL when events occur",
+          "setup": "Jira settings → System → Webhooks (admin only)",
+          "events": [
+            "Issue created, updated, deleted",
+            "Issue commented",
+            "Issue assigned, transitioned",
+            "Sprint started, closed (for Jira Software)",
+            "Comment created, updated, deleted",
+            "Worklog updated"
+          ],
+          "payload": "JSON with issue details, changelog (what changed)",
+          "use_case_for_nyqst": [
+            "Incident created → Jira webhook → NYQST ingests → NYQST performs RCA",
+            "Issue transitioned to Resolved → Jira webhook → NYQST extracts resolution pattern"
+          ],
+          "note": "Requires Premium or Enterprise plan in JSM"
+        },
+
+        "inbound": {
+          "description": "External system triggers Jira Automation via webhook",
+          "setup": "Jira Automation rule with 'Incoming webhook' trigger",
+          "payload": "Configurable JSON",
+          "use_case_for_nyqst": [
+            "NYQST detects anomaly → POST to Jira Automation webhook → Jira creates incident",
+            "NYQST FMEA identifies risk → POST to Jira → Jira creates Change Request"
+          ]
+        }
+      },
+
+      "confluence_api": {
+        "rest_api_v2": "Current (v1 deprecated)",
+        "base_url": "https://<site>.atlassian.net/wiki/api/v2/",
+        "key_endpoints": {
+          "pages": {
+            "get_pages": "GET /pages",
+            "get_page": "GET /pages/{id}",
+            "get_page_content": "GET /pages/{id}?body-format=storage (HTML)",
+            "create_page": "POST /pages",
+            "update_page": "PUT /pages/{id}"
+          },
+          "hierarchy": {
+            "get_children": "GET /pages/{id}/children",
+            "get_ancestors": "GET /pages/{id}/ancestors"
+          },
+          "search": {
+            "search_cql": "GET /search?cql={cql_query} (Confluence Query Language)"
+          }
+        },
+        "page_hierarchy": {
+          "note": "Pages have parent-child relationships",
+          "parentId": "Specify when creating page",
+          "v2_limitation": "Creating child of non-page (database, folder) requires v1 Move API workaround"
+        }
+      }
+    },
+
+    "what_nyqst_will_get_from_jira": {
+      "operational_tickets": [
+        "Incidents, Service Requests, Changes, Problems",
+        "Status transitions (how long in each state)",
+        "Resolutions (how issues resolved)",
+        "Assignees (who works on what)",
+        "SLA data (breaches, time-to-resolve)",
+        "Comments (collaboration, decision-making)"
+      ],
+      "relationships": [
+        "Issue → Asset (which system affected)",
+        "Problem → Incidents (recurring patterns)",
+        "Change → Related Issues"
+      ],
+      "workflow_data": [
+        "Approval chains (who approved, duration)",
+        "Automation execution (which rules triggered)",
+        "Queue metrics (backlog, throughput)"
+      ],
+      "knowledge_from_confluence": [
+        "Documented procedures, runbooks",
+        "Knowledge articles",
+        "Page hierarchy (organizational structure)"
+      ]
+    },
+
+    "what_nyqst_will_send_back_to_jira": {
+      "enriched_incidents": [
+        "RCA suggestions (comment on issue)",
+        "Resolution recommendations (comment or custom field)",
+        "Similar past incidents (linked issues)"
+      ],
+      "intelligent_routing": [
+        "Suggested assignee (via Automation or direct API)",
+        "Priority adjustment (based on digital twin impact analysis)"
+      ],
+      "proactive_tickets": [
+        "Create incident (NYQST-detected anomaly)",
+        "Create change request (NYQST-suggested remediation)",
+        "Create problem (NYQST-identified recurring pattern)"
+      ],
+      "knowledge_updates_to_confluence": [
+        "Auto-generated procedure pages (from validated digital twin)",
+        "Confidence scores (custom field or page property)",
+        "Suggested page updates (procedure changed)"
+      ]
+    },
+
+    "integration_architecture_for_nyqst": {
+      "recommended_pattern": "REST API + Webhooks (bidirectional)",
+      "nyqst_reads_jira": {
+        "real_time": "Webhooks (issue created/updated)",
+        "batch": "JQL search via API (daily pull for historical analysis)",
+        "pagination": "Use startAt parameter for large result sets",
+        "fields": "Request specific fields only (reduce payload size): ?fields=summary,status,assignee,customfield_10001"
+      },
+      "nyqst_writes_jira": {
+        "create_issue": "POST /rest/api/3/issue (NYQST-detected anomaly → Jira incident)",
+        "add_comment": "POST /rest/api/3/issue/{key}/comment (NYQST RCA → Jira comment)",
+        "update_custom_field": "PUT /rest/api/3/issue/{key} with {'fields': {'customfield_10001': 'NYQST Risk Score: 7.5'}}",
+        "transition_issue": "POST /rest/api/3/issue/{key}/transitions (NYQST auto-resolves if appropriate)"
+      },
+      "authentication": "API tokens (Basic Auth) or OAuth 2.0",
+      "rate_limit_handling": "Exponential backoff, respect 'Retry-After' header",
+      "data_sync": "Store Jira key (e.g., INC-123) and updated timestamp for change detection"
+    }
+  },
+
+  "confluence_platform": {
+    "covered_in_jira_section": "See Jira.confluence_knowledge_base above for core capabilities and API"
+  },
+
+  "cross_platform_integration_strategy": {
+    "servicenow_vs_jira_decision": {
+      "when_customer_has_servicenow": "Integrate primarily with ServiceNow (more comprehensive ITSM/GRC)",
+      "when_customer_has_jira": "Integrate primarily with Jira (lighter, more agile)",
+      "when_customer_has_both": "Integrate with both (common: Jira for development teams, ServiceNow for enterprise IT)"
+    },
+
+    "unified_nyqst_data_model": {
+      "approach": "NYQST's digital twin abstracts platform differences",
+      "mappings": {
+        "nyqst_incident": "← ServiceNow incident OR Jira issue (type=Incident)",
+        "nyqst_change": "← ServiceNow change_request OR Jira issue (type=Change)",
+        "nyqst_ci": "← ServiceNow cmdb_ci OR Jira Assets object",
+        "nyqst_control": "← ServiceNow sn_compliance_control OR custom Jira field",
+        "nyqst_risk": "← ServiceNow sn_risk_risk OR custom Jira field"
+      },
+      "normalization": "NYQST normalizes to common schema (handle platform-specific fields as metadata)"
+    },
+
+    "bidirectional_sync_patterns": {
+      "read_operational_state": {
+        "frequency": "Real-time (webhooks) + Batch (daily full sync)",
+        "what": "Incidents, Changes, Tickets, Assets, Controls, Risks, Knowledge",
+        "where_stored": "NYQST operational telemetry database (time-series + graph)"
+      },
+      "write_enriched_analysis": {
+        "frequency": "Real-time (as analysis completes)",
+        "what": "RCA, Suggestions, Risk Scores, Knowledge Articles, Proactive Alerts",
+        "how": "API calls (POST/PUT/PATCH) or via platform's workflow automation"
+      }
+    },
+
+    "authentication_and_security": {
+      "servicenow": "OAuth 2.0 with service account (minimal permissions)",
+      "jira": "API tokens (Basic Auth) or OAuth 2.0",
+      "confluence": "Same credentials as Jira (Atlassian accounts)",
+      "credential_storage": "NYQST stores encrypted credentials per customer instance",
+      "multi_tenancy": "Each NYQST customer has isolated credentials and data"
+    }
+  },
+
+  "what_nyqst_fills_that_these_platforms_lack": {
+    "no_tacit_knowledge_capture": {
+      "gap": "ServiceNow/Jira store ticket fields and comments. They don't capture WHY experts made decisions.",
+      "nyqst_solution": "NYQST Copilot asks 'Why did you approve this exception?' → Stores rationale → Builds decision model"
+    },
+    "no_multi_source_validation": {
+      "gap": "Knowledge articles in ServiceNow/Confluence are static. No mechanism to validate accuracy over time.",
+      "nyqst_solution": "Confidence scoring, distributed user validation (Dawid-Skene), SME governance"
+    },
+    "reactive_not_proactive": {
+      "gap": "ServiceNow/Jira react to incidents. No FMEA-style proactive risk identification.",
+      "nyqst_solution": "FMEA on digital twin predicts failures before they occur"
+    },
+    "no_bayesian_rca": {
+      "gap": "Manual root cause analysis (humans write in ticket). No statistical correlation.",
+      "nyqst_solution": "Bayesian RCA identifies statistically significant drivers from historical patterns"
+    },
+    "no_agent_governance": {
+      "gap": "ServiceNow/Jira have automation (If-Then rules). Not designed for AI agents.",
+      "nyqst_solution": "Agent Operating Model (Identity, Policy, Tools, Coordination, Assurance)"
+    },
+    "siloed_data": {
+      "gap": "ServiceNow has incidents + CMDB + GRC. Jira has tickets + assets. Data not connected across domains.",
+      "nyqst_solution": "Digital twin integrates across platforms (ServiceNow + Jira + Celonis + Confluence) into unified operational model"
+    }
+  },
+
+  "recommendations_for_nyqst_development": {
+    "phase_0_mvp": {
+      "servicenow_integration": [
+        "Read incidents via Table API (GET /api/now/table/incident)",
+        "Read CMDB CIs (GET /api/now/table/cmdb_ci)",
+        "Write RCA comment back to incident (PATCH work_notes field)",
+        "Webhook: incident created → NYQST ingests"
+      ],
+      "jira_integration": [
+        "Read issues via REST API (POST /rest/api/3/search with JQL)",
+        "Write comment with RCA (POST /rest/api/3/issue/{key}/comment)",
+        "Webhook: issue created → NYQST ingests"
+      ],
+      "confluence_integration": [
+        "Read pages (GET /wiki/api/v2/pages)",
+        "Extract procedures (parse HTML body)",
+        "Write new page (POST /wiki/api/v2/pages) with auto-generated procedure"
+      ]
+    },
+
+    "connector_architecture": {
+      "pattern": "Connector per platform (ServiceNowConnector, JiraConnector, ConfluenceConnector)",
+      "shared_interface": "All implement IOperationalSystemConnector {read(), write(), webhook_handler()}",
+      "config_per_customer": "Customer provides instance URL, credentials, field mappings (custom fields vary)",
+      "error_handling": "Retry with exponential backoff, log failures, alert NYQST admin"
+    },
+
+    "data_model_mapping": {
+      "approach": "NYQST canonical model + platform-specific adapters",
+      "example": {
+        "nyqst_incident": {
+          "id": "NYQST unique ID",
+          "external_id": "ServiceNow sys_id OR Jira key",
+          "platform": "servicenow|jira",
+          "title": "← short_description (SN) OR summary (Jira)",
+          "description": "← description (both)",
+          "priority": "← priority (both, but different scales: SN 1-5, Jira Highest-Lowest)",
+          "status": "← state (SN) OR status (Jira)",
+          "assignee": "← assigned_to (SN) OR assignee (Jira)",
+          "created_at": "← sys_created_on (SN) OR created (Jira)",
+          "updated_at": "← sys_updated_on (SN) OR updated (Jira)",
+          "related_ci": "← cmdb_ci (SN) OR affected_asset (Jira)",
+          "custom_fields": "JSON blob for platform-specific fields"
+        }
+      }
+    },
+
+    "webhook_infrastructure": {
+      "nyqst_webhook_receiver": "HTTPS endpoint (e.g., https://api.nyqst.com/webhooks/{platform}/{customer_id})",
+      "authentication": "HMAC signature verification (ServiceNow), Shared secret (Jira)",
+      "queueing": "Webhooks → message queue (Kafka/RabbitMQ) → async processing (avoid blocking webhook response)",
+      "idempotency": "Store webhook event IDs to avoid duplicate processing"
+    },
+
+    "api_best_practices": {
+      "rate_limiting": "Respect platform limits (ServiceNow: varies, Jira: ~5 req/sec), Implement token bucket algorithm",
+      "pagination": "Handle large result sets (ServiceNow: sysparm_limit/offset, Jira: startAt/maxResults)",
+      "field_filtering": "Request only needed fields to reduce payload size",
+      "caching": "Cache reference data (users, groups, CI types) to reduce API calls",
+      "monitoring": "Track API latency, error rates, quota usage per customer"
+    }
+  }
+}
