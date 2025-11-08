@@ -1,0 +1,1758 @@
+{
+  "project": {
+    "name": "OWASP Dependency-Track",
+    "repository": "https://github.com/DependencyTrack/dependency-track",
+    "organization": "OWASP Foundation",
+    "status": "OWASP Flagship Project",
+    "description": "An intelligent Component Analysis platform that allows organizations to identify and reduce risk in the software supply chain",
+    "version_analyzed": "4.14.0-SNAPSHOT",
+    "stars": 3400,
+    "forks": 687,
+    "contributors": "163+",
+    "primary_language": "Java",
+    "language_percentage": "99.8%"
+  },
+
+  "license": {
+    "type": "Apache License 2.0",
+    "spdx_identifier": "Apache-2.0",
+    "permissions": [
+      "Commercial use",
+      "Modification",
+      "Distribution",
+      "Patent use",
+      "Private use"
+    ],
+    "conditions": [
+      "License and copyright notice",
+      "State changes"
+    ],
+    "limitations": [
+      "Trademark use",
+      "Liability",
+      "Warranty"
+    ],
+    "reusability_assessment": {
+      "can_reuse": true,
+      "commercial_use": true,
+      "derivative_works": true,
+      "patent_grant": true,
+      "attribution_required": true,
+      "copyleft": false,
+      "notes": "Permissive license that allows for reuse in both open-source and commercial projects. Must include license and copyright notices. Patent grant includes termination clause for patent litigation."
+    }
+  },
+
+  "architecture": {
+    "style": "API-first, Event-driven, Microservices-ready",
+    "framework": "Alpine Framework 3.3.0",
+    "framework_description": "Thin Server Architecture framework providing REST API scaffolding, security-first design, and asynchronous event processing",
+    "deployment_models": [
+      {
+        "name": "API Server",
+        "format": "Executable WAR with embedded Jetty",
+        "status": "Recommended and supported",
+        "description": "Server-side functionality only, requires separate frontend deployment"
+      },
+      {
+        "name": "Frontend",
+        "format": "Single Page Application (SPA)",
+        "status": "Recommended and supported",
+        "description": "Independent deployment capable, communicates via REST API"
+      },
+      {
+        "name": "Bundled",
+        "format": "Combined WAR package",
+        "status": "Supported but deprecated",
+        "description": "API Server + Frontend combined in single deployment"
+      }
+    ],
+    "design_patterns": [
+      {
+        "pattern": "Event-Driven Architecture",
+        "implementation": "36 event types for asynchronous processing of vulnerability analysis, policy evaluation, data synchronization, and metrics updates",
+        "components": [
+          "EventSubsystemInitializer",
+          "VulnerabilityAnalysisEvent",
+          "PolicyEvaluationEvent",
+          "BomUploadEvent",
+          "NotificationEvent"
+        ]
+      },
+      {
+        "pattern": "Pluggable Analyzer Pattern",
+        "implementation": "Abstract base classes for extensible vulnerability analyzers and policy evaluators",
+        "components": [
+          "AbstractPolicyEvaluator",
+          "InternalAnalysisTask",
+          "OssIndexAnalysisTask",
+          "SnykAnalysisTask",
+          "TrivyAnalysisTask"
+        ]
+      },
+      {
+        "pattern": "Strategy Pattern",
+        "implementation": "Multiple parser implementations for different SBOM formats and vulnerability sources",
+        "components": [
+          "CycloneDX parsers (JSON/XML)",
+          "SPDX parsers",
+          "NVD parsers",
+          "GitHub Advisory parsers",
+          "OSV parsers"
+        ]
+      },
+      {
+        "pattern": "Repository Pattern",
+        "implementation": "Specialized query managers for domain-specific data access",
+        "components": [
+          "QueryManager (facade)",
+          "ProjectQueryManager",
+          "ComponentQueryManager",
+          "VulnerabilityQueryManager",
+          "FindingsQueryManager",
+          "MetricsQueryManager"
+        ]
+      },
+      {
+        "pattern": "Factory Pattern",
+        "implementation": "Dynamic instantiation of parsers, publishers, and evaluators based on configuration",
+        "components": [
+          "Parser factory for SBOM formats",
+          "NotificationPublisher factory",
+          "Integration point factory"
+        ]
+      },
+      {
+        "pattern": "Composite Pattern",
+        "implementation": "Policy conditions evaluated in combination with ALL/ANY operators",
+        "components": [
+          "Policy",
+          "PolicyCondition",
+          "PolicyEngine"
+        ]
+      },
+      {
+        "pattern": "Observer Pattern",
+        "implementation": "Notification system with rule-based routing to multiple publishers",
+        "components": [
+          "NotificationRouter",
+          "NotificationRule",
+          "NotificationPublisher"
+        ]
+      }
+    ]
+  },
+
+  "key_components": {
+    "sbom_management": {
+      "description": "Comprehensive SBOM processing with support for multiple formats and versions",
+      "supported_formats": {
+        "cyclonedx": {
+          "versions": ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6"],
+          "formats": ["JSON", "XML"],
+          "library_version": "11.0.0",
+          "capabilities": [
+            "BOM validation with schema enforcement",
+            "Component deduplication by identity",
+            "Dependency graph extraction",
+            "VEX (Vulnerability Exploitability Exchange) support",
+            "VDR (Vulnerability Disclosure Report) support",
+            "Bidirectional conversion to internal model"
+          ],
+          "validation": [
+            "Schema validation against CycloneDX specifications",
+            "Format detection (JSON/XML)",
+            "Version detection and compatibility checking",
+            "XXE attack prevention for XML",
+            "Secure parsing with external entities disabled"
+          ],
+          "extracted_data": [
+            "Component metadata (name, version, group, description, publisher)",
+            "Package URLs (PURL) with coordinate extraction",
+            "Multiple hash algorithms (MD5, SHA-1, SHA-256, SHA-384, SHA-512, SHA3-256/384/512, BLAKE2b, BLAKE3)",
+            "License information (IDs, names, expressions, URLs)",
+            "Component properties with namespaced taxonomy",
+            "External references",
+            "Contact information and authors",
+            "Dependency relationships",
+            "Vulnerability analysis (state, justification, response)"
+          ]
+        },
+        "spdx": {
+          "versions": "Multiple versions supported",
+          "formats": ["RDF", "JSON", "YAML"],
+          "capabilities": [
+            "SPDX document parsing",
+            "Package and file information extraction",
+            "License expression parsing"
+          ]
+        }
+      },
+      "processing_workflow": [
+        "BOM upload reception via REST API",
+        "Format detection and validation",
+        "Parsing to internal representation",
+        "Component deduplication within BOM",
+        "Identity-based matching against existing components",
+        "Selective property updates using applyIfChanged()",
+        "Cascade deletion of unmatched components",
+        "Dependency graph persistence as JSON",
+        "Event dispatching for vulnerability analysis",
+        "Metrics calculation and update"
+      ],
+      "key_files": [
+        "src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDxValidator.java",
+        "src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java",
+        "src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java",
+        "src/main/java/org/dependencytrack/resources/v1/BomResource.java"
+      ]
+    },
+
+    "vulnerability_database_integration": {
+      "description": "Multi-source vulnerability intelligence aggregation with internal matching engine",
+      "sources": [
+        {
+          "name": "National Vulnerability Database (NVD)",
+          "type": "Primary CVE source",
+          "integration": "NistMirrorEvent, NistApiMirrorEvent",
+          "capabilities": ["CVE data synchronization", "CVSS scoring", "CPE matching"],
+          "parser": "src/main/java/org/dependencytrack/parser/nvd/"
+        },
+        {
+          "name": "GitHub Advisories",
+          "type": "Open source vulnerability intelligence",
+          "integration": "GitHubAdvisoryMirrorEvent",
+          "capabilities": ["Advisory mirroring", "Ecosystem-specific advisories"],
+          "parser": "src/main/java/org/dependencytrack/parser/github/"
+        },
+        {
+          "name": "Sonatype OSS Index",
+          "type": "Component vulnerability scanning",
+          "integration": "OssIndexAnalysisEvent, OssIndexAnalysisTask",
+          "capabilities": [
+            "PURL-based component analysis",
+            "Vulnerability correlation",
+            "CVE aliasing",
+            "Batch processing with pagination",
+            "Caching with TTL"
+          ],
+          "authentication": "HTTP Basic Auth with encrypted credentials",
+          "resilience": "Exponential backoff retry with configurable parameters",
+          "parser": "src/main/java/org/dependencytrack/parser/ossindex/"
+        },
+        {
+          "name": "Snyk",
+          "type": "Developer security platform",
+          "integration": "SnykAnalysisEvent, SnykAnalysisTask",
+          "capabilities": ["Security scan integration"],
+          "parser": "src/main/java/org/dependencytrack/parser/snyk/"
+        },
+        {
+          "name": "Trivy",
+          "type": "Container and application scanning",
+          "integration": "TrivyAnalysisEvent, TrivyAnalysisTask",
+          "capabilities": ["Container image scanning", "Application dependency scanning"],
+          "parser": "src/main/java/org/dependencytrack/parser/trivy/"
+        },
+        {
+          "name": "OSV (Open Source Vulnerabilities)",
+          "type": "Distributed vulnerability database",
+          "integration": "OsvMirrorEvent",
+          "capabilities": ["Open source vulnerability aggregation"],
+          "parser": "src/main/java/org/dependencytrack/parser/osv/"
+        },
+        {
+          "name": "VulnDB",
+          "type": "Commercial vulnerability intelligence",
+          "integration": "VulnDbSyncEvent, VulnDbAnalysisEvent",
+          "capabilities": ["Commercial vulnerability data"],
+          "parser": "src/main/java/org/dependencytrack/parser/vulndb/"
+        },
+        {
+          "name": "EPSS (Exploit Prediction Scoring System)",
+          "type": "Exploit likelihood scoring",
+          "integration": "EpssMirrorEvent",
+          "capabilities": ["Exploit prediction scores and percentiles"],
+          "parser": "src/main/java/org/dependencytrack/parser/epss/"
+        }
+      ],
+      "internal_analysis": {
+        "description": "Internal vulnerability matching engine using component identifiers",
+        "matching_algorithm": {
+          "primary_strategy": "CPE and PURL-based matching",
+          "data_points": [
+            "CPE part (software/hardware/OS)",
+            "Vendor name",
+            "Product name",
+            "Version"
+          ],
+          "version_normalization": [
+            "Strip 'v' prefix from versions (e.g., v1.2.3 -> 1.2.3)",
+            "Normalize for NVD and GHSA compatibility"
+          ],
+          "fallback_strategy": "Fuzzy matching with FuzzyVulnerableSoftwareSearchManager",
+          "range_analysis": "Normalized version comparison against vulnerable version ranges"
+        },
+        "process_flow": [
+          "Component capability assessment (requires CPE or PURL)",
+          "Extract vendor and product names from identifiers",
+          "Query internal vulnerable software database",
+          "Apply version normalization",
+          "Perform range analysis",
+          "Optional fuzzy matching for edge cases",
+          "Link vulnerabilities to components via junction table"
+        ],
+        "key_file": "src/main/java/org/dependencytrack/tasks/scanners/InternalAnalysisTask.java"
+      },
+      "vulnerability_correlation": {
+        "description": "Vulnerability aliasing and de-duplication across sources",
+        "mechanisms": [
+          "CVE as canonical identifier",
+          "VulnerabilityAlias for alternative IDs",
+          "Source attribution tracking",
+          "Merge logic for multi-source vulnerabilities"
+        ]
+      }
+    },
+
+    "risk_scoring_and_impact_assessment": {
+      "description": "Multi-dimensional risk assessment using weighted severity and CVSS scoring",
+      "inherited_risk_score": {
+        "methodology": "Weighted severity model",
+        "weights": {
+          "CRITICAL": 10,
+          "HIGH": 5,
+          "MEDIUM": 3,
+          "LOW": 1,
+          "UNASSIGNED": 5,
+          "INFO": 0
+        },
+        "calculation": "Sum of (vulnerability_count * severity_weight) across all vulnerabilities",
+        "purpose": "Portfolio-level risk assessment and prioritization",
+        "storage": "Cached in DependencyMetrics table as lastInheritedRiskScore"
+      },
+      "severity_classification": {
+        "hierarchy": [
+          {"level": 5, "name": "CRITICAL", "description": "Highest risk"},
+          {"level": 4, "name": "HIGH", "description": "Significant risk"},
+          {"level": 3, "name": "MEDIUM", "description": "Moderate risk"},
+          {"level": 2, "name": "LOW", "description": "Minor risk"},
+          {"level": 1, "name": "INFO", "description": "Informational"},
+          {"level": 0, "name": "UNASSIGNED", "description": "Unknown/not assessed"}
+        ],
+        "usage": "Ordinal comparison and consistent categorization across system"
+      },
+      "vulnerability_scoring": {
+        "cvss_v2": {
+          "scores": ["baseScore", "impactSubScore", "exploitabilitySubScore"],
+          "vector": "CVSS v2 vector string",
+          "normalization": "Vector normalization logic included"
+        },
+        "cvss_v3": {
+          "scores": ["baseScore", "impactSubScore", "exploitabilitySubScore"],
+          "vector": "CVSS v3 vector string"
+        },
+        "owasp_risk_rating": {
+          "components": ["likelihood", "technicalImpact", "businessImpact"],
+          "vector": "OWASP Risk Rating vector"
+        },
+        "epss": {
+          "score": "Exploit prediction score (0.0-1.0)",
+          "percentile": "Percentile ranking among all vulnerabilities"
+        }
+      },
+      "vulnerable_component_ratio": {
+        "calculation": "total_vulnerabilities / vulnerable_components_count",
+        "default": "0 when no vulnerable components exist",
+        "purpose": "Identify vulnerability concentration vs. spread"
+      },
+      "metrics_tracking": {
+        "component_metrics": "ComponentMetricsUpdateEvent",
+        "project_metrics": "ProjectMetricsUpdateEvent",
+        "portfolio_metrics": "PortfolioMetricsUpdateEvent",
+        "vulnerability_metrics": "VulnerabilityMetricsUpdateEvent",
+        "exposure_tracking": [
+          "affectedProjectCount",
+          "affectedActiveProjectCount",
+          "affectedInactiveProjectCount"
+        ]
+      },
+      "impact_analysis": {
+        "description": "Blast radius assessment through dependency relationships",
+        "mechanisms": [
+          "Transitive dependency tracking",
+          "Project hierarchy analysis",
+          "Portfolio-wide vulnerability exposure",
+          "Component usage across projects"
+        ],
+        "findings_model": {
+          "structure": "Aggregation of Component + Vulnerability + Analysis + Attribution",
+          "relationship": "Many-to-many via COMPONENTS_VULNERABILITIES junction table",
+          "project_context": "Project-specific analysis and suppression states"
+        }
+      },
+      "key_files": [
+        "src/main/java/org/dependencytrack/metrics/Metrics.java",
+        "src/main/java/org/dependencytrack/model/Severity.java",
+        "src/main/java/org/dependencytrack/model/Vulnerability.java",
+        "src/main/java/org/dependencytrack/model/Finding.java"
+      ]
+    },
+
+    "policy_enforcement": {
+      "description": "Flexible policy engine with pluggable evaluators for security, license, and operational compliance",
+      "architecture": {
+        "pattern": "Pluggable evaluator pattern with composite condition evaluation",
+        "core_components": [
+          "PolicyEngine - Main orchestration component",
+          "AbstractPolicyEvaluator - Base class for evaluators",
+          "PolicyEvaluator - Interface definition",
+          "PolicyConditionViolation - Violation representation",
+          "Matcher - Matching logic utility"
+        ]
+      },
+      "policy_structure": {
+        "operator": {
+          "ANY": "Triggers if one or more conditions violated",
+          "ALL": "Triggers only if all conditions violated"
+        },
+        "violation_state": ["INFO", "WARN", "FAIL"],
+        "scope": [
+          "Global policies",
+          "Project-specific policies",
+          "Tag-based policies",
+          "Hierarchical (with includeChildren flag)"
+        ]
+      },
+      "policy_conditions": {
+        "subjects": [
+          "AGE",
+          "COORDINATES",
+          "CPE",
+          "LICENSE",
+          "LICENSE_GROUP",
+          "PACKAGE_URL",
+          "SEVERITY",
+          "SWID_TAGID",
+          "VERSION",
+          "COMPONENT_HASH",
+          "CWE",
+          "VULNERABILITY_ID",
+          "VERSION_DISTANCE",
+          "EPSS"
+        ],
+        "operators": {
+          "logical": ["IS", "IS_NOT", "MATCHES", "NO_MATCH"],
+          "numeric": [
+            "NUMERIC_GREATER_THAN",
+            "NUMERIC_LESS_THAN",
+            "NUMERIC_EQUAL",
+            "NUMERIC_NOT_EQUAL",
+            "NUMERIC_GREATER_THAN_OR_EQUAL",
+            "NUMERIC_LESSER_THAN_OR_EQUAL"
+          ],
+          "collection": ["CONTAINS_ALL", "CONTAINS_ANY"]
+        },
+        "value_constraints": "String data 1-255 characters, printable only"
+      },
+      "evaluator_types": [
+        {
+          "category": "Component-Based",
+          "evaluators": [
+            "ComponentAgePolicyEvaluator",
+            "ComponentHashPolicyEvaluator",
+            "CoordinatesPolicyEvaluator",
+            "PackageURLPolicyEvaluator",
+            "SwidTagIdPolicyEvaluator",
+            "VersionPolicyEvaluator",
+            "VersionDistancePolicyEvaluator"
+          ]
+        },
+        {
+          "category": "Security & Compliance",
+          "evaluators": [
+            "CpePolicyEvaluator",
+            "CwePolicyEvaluator",
+            "EpssPolicyEvaluator",
+            "SeverityPolicyEvaluator",
+            "VulnerabilityIdPolicyEvaluator"
+          ]
+        },
+        {
+          "category": "Licensing",
+          "evaluators": [
+            "LicensePolicyEvaluator",
+            "LicenseGroupPolicyEvaluator"
+          ]
+        }
+      ],
+      "evaluation_workflow": [
+        "Initialize 14 specialized evaluators",
+        "Iterate through components for analysis",
+        "Retrieve applicable policies (global, project, tag-based, hierarchical)",
+        "Evaluate conditions using appropriate evaluators",
+        "Apply operator logic (ANY/ALL)",
+        "Determine violation type (SECURITY/OPERATIONAL/LICENSE)",
+        "Reconcile against existing violations",
+        "Trigger notifications for new violations"
+      ],
+      "violation_tracking": {
+        "model": "PolicyViolation",
+        "analysis": "ViolationAnalysis - tracks human decisions and responses",
+        "reconciliation": "Automatic comparison with existing violations"
+      },
+      "key_files": [
+        "src/main/java/org/dependencytrack/policy/PolicyEngine.java",
+        "src/main/java/org/dependencytrack/policy/AbstractPolicyEvaluator.java",
+        "src/main/java/org/dependencytrack/model/Policy.java",
+        "src/main/java/org/dependencytrack/model/PolicyCondition.java",
+        "src/main/java/org/dependencytrack/model/PolicyViolation.java"
+      ]
+    },
+
+    "component_analysis": {
+      "description": "Comprehensive component tracking with cryptographic verification and metadata enrichment",
+      "component_model": {
+        "identification": [
+          "name (printable characters only)",
+          "version",
+          "group",
+          "classifier (APPLICATION, LIBRARY, FRAMEWORK, etc.)",
+          "UUID",
+          "project reference"
+        ],
+        "cryptographic_hashes": [
+          "MD5",
+          "SHA-1",
+          "SHA-256",
+          "SHA-384",
+          "SHA-512",
+          "SHA3-256",
+          "SHA3-384",
+          "SHA3-512",
+          "BLAKE2b",
+          "BLAKE3"
+        ],
+        "package_identifiers": [
+          "CPE (Common Platform Enumeration)",
+          "Package URL (PURL)",
+          "PURL coordinates (type, namespace, name, version only)"
+        ],
+        "licensing": [
+          "License text",
+          "License expression (SPDX format)",
+          "License URL",
+          "Resolved License object reference"
+        ],
+        "organizational_data": [
+          "Publisher",
+          "Supplier entity",
+          "Authors contact list"
+        ],
+        "metadata": [
+          "Description",
+          "Copyright",
+          "External references",
+          "ComponentProperty list (flexible key-value storage)"
+        ]
+      },
+      "vulnerability_linkage": {
+        "mechanism": "Many-to-many via COMPONENTS_VULNERABILITIES junction table",
+        "ordering": "By vulnerability ID ascending",
+        "transient_data": "RepositoryMetaComponent for external source info"
+      },
+      "dependency_relationships": {
+        "storage": "directDependencies as JSON string",
+        "hierarchy": "Parent-child relationships for component trees",
+        "ordering": "Children ordered by ID ascending"
+      },
+      "analysis_cache": {
+        "purpose": "ComponentAnalysisCache for performance optimization",
+        "clearing": "ClearComponentAnalysisCacheEvent for invalidation"
+      },
+      "repository_support": [
+        "Cargo",
+        "Composer",
+        "Maven",
+        "NPM",
+        "NuGet",
+        "PyPI",
+        "Others"
+      ],
+      "internal_component_identification": {
+        "event": "InternalComponentIdentificationEvent",
+        "purpose": "Classify and tag internal vs. external components"
+      },
+      "key_file": "src/main/java/org/dependencytrack/model/Component.java"
+    },
+
+    "dependency_graph": {
+      "description": "Dependency relationship modeling with latest version tracking",
+      "storage_model": {
+        "format": "JSON strings within parent entities",
+        "structure": "MultiValuedMap of UUID references",
+        "types": "Component dependencies and Service dependencies"
+      },
+      "api_endpoints": {
+        "project_dependencies": {
+          "endpoint": "GET /v1/dependencyGraph/project/{uuid}/directDependencies",
+          "returns": "Direct dependencies for specified project"
+        },
+        "component_dependencies": {
+          "endpoint": "GET /v1/dependencyGraph/component/{uuid}/directDependencies",
+          "returns": "Direct dependencies for specified component"
+        }
+      },
+      "exposed_information": [
+        "Component/Service UUIDs and names",
+        "Package URLs (PURLs)",
+        "Latest available versions from repository metadata",
+        "Repository type classification"
+      ],
+      "security": {
+        "permission": "VIEW_PORTFOLIO required",
+        "validation": "User access to parent project validated before disclosure"
+      },
+      "metadata_enrichment": {
+        "event": "RepositoryMetaEvent",
+        "purpose": "Fetch latest version information from package repositories"
+      },
+      "key_files": [
+        "src/main/java/org/dependencytrack/resources/v1/DependencyGraphResource.java",
+        "src/main/java/org/dependencytrack/model/Component.java (directDependencies field)"
+      ]
+    }
+  },
+
+  "data_models": {
+    "core_entities": {
+      "project": {
+        "description": "Primary organizational unit for component tracking",
+        "related_models": [
+          "ProjectVersion",
+          "ProjectMetadata",
+          "ProjectMetrics",
+          "ProjectProperty"
+        ],
+        "relationships": [
+          "One-to-many with Components",
+          "Hierarchical (parent-child projects)",
+          "Many-to-many with Tags",
+          "Many-to-many with Policies"
+        ]
+      },
+      "component": {
+        "description": "Software dependencies, packages, libraries, and applications",
+        "related_models": [
+          "ComponentIdentity",
+          "ComponentProperty",
+          "ComponentAnalysisCache",
+          "ServiceComponent"
+        ],
+        "relationships": [
+          "Many-to-one with Project",
+          "Many-to-many with Vulnerabilities",
+          "Hierarchical (parent-child components)",
+          "One-to-many with direct dependencies (JSON)"
+        ]
+      },
+      "vulnerability": {
+        "description": "Security issues and CVE data",
+        "related_models": [
+          "VulnerableSoftware",
+          "VulnerabilityAlias",
+          "FindingAttribution"
+        ],
+        "relationships": [
+          "Many-to-many with Components",
+          "Many-to-many with ServiceComponents",
+          "One-to-many with VulnerableSoftware",
+          "One-to-many with VulnerabilityAlias"
+        ],
+        "fields": [
+          "vulnId, source, title, description",
+          "CVSS v2/v3 scores and vectors",
+          "OWASP Risk Rating",
+          "EPSS score and percentile",
+          "CWE references",
+          "Temporal data (created, published, updated)"
+        ]
+      },
+      "finding": {
+        "description": "Read-only aggregation of Component + Vulnerability + Analysis + Attribution",
+        "structure": {
+          "component_map": "UUID, name, version, scope, PURL, CPE, project",
+          "vulnerability_map": "UUID, source, ID, title, CVSS, severity, CWEs, dates",
+          "analysis_map": "Suppression status, analysis state",
+          "attribution_map": "Analyzer, detection date, alternate IDs, references"
+        },
+        "relationship": "Derived from COMPONENTS_VULNERABILITIES junction table",
+        "usage": "Query-only, not updatable or deletable"
+      },
+      "analysis": {
+        "description": "Human auditing decisions for vulnerabilities",
+        "fields": [
+          "analysisState",
+          "analysisJustification",
+          "analysisResponse",
+          "analysisDetails",
+          "isSuppressed"
+        ],
+        "composite_key": "project + component + vulnerability",
+        "relationships": [
+          "One-to-many with AnalysisComments (ordered by timestamp)"
+        ]
+      },
+      "policy": {
+        "description": "Organizational compliance rules",
+        "related_models": [
+          "PolicyCondition",
+          "PolicyViolation"
+        ],
+        "fields": [
+          "operator (ALL/ANY)",
+          "violationState (INFO/WARN/FAIL)",
+          "includeChildren"
+        ],
+        "relationships": [
+          "Many-to-many with Projects",
+          "Many-to-many with Tags",
+          "One-to-many with PolicyConditions"
+        ]
+      },
+      "bom": {
+        "description": "Software Bill of Materials import records",
+        "fields": [
+          "BOM format and version",
+          "Import timestamp",
+          "Associated project"
+        ]
+      },
+      "license": {
+        "description": "Software license tracking",
+        "related_models": [
+          "LicenseGroup"
+        ]
+      }
+    },
+    "supporting_entities": {
+      "tag": "Categorization mechanism",
+      "notification_rule": "Alert configuration",
+      "notification_publisher": "Alert delivery channels",
+      "team": "Access control grouping",
+      "user": "User accounts",
+      "scope": "Dependency relationships",
+      "severity": "Risk classification enumeration"
+    }
+  },
+
+  "persistence_layer": {
+    "orm_framework": "JDO (Java Data Objects) with DataNucleus implementation",
+    "supported_databases": [
+      "MySQL 8.2.0",
+      "PostgreSQL 42.7.8",
+      "Microsoft SQL Server 13.2.1",
+      "H2 (development only)"
+    ],
+    "cloud_support": "Google Cloud SQL connectors for MySQL, PostgreSQL, MSSQL",
+    "patterns": {
+      "composition": "QueryManager facade delegating to specialized managers",
+      "lazy_initialization": "On-demand manager instantiation",
+      "access_control": "Team-based project authorization with SQL filtering",
+      "soft_delete": "Recursive deletion with optional index commits",
+      "event_driven_indexing": "IndexEvent dispatching for Lucene search updates",
+      "fetch_groups": "Performance optimization via relationship loading control"
+    },
+    "specialized_managers": [
+      "ProjectQueryManager",
+      "ComponentQueryManager",
+      "VulnerabilityQueryManager",
+      "FindingsQueryManager",
+      "MetricsQueryManager",
+      "NotificationQueryManager"
+    ],
+    "performance_optimizations": [
+      "Persistence-by-reachability disabling for bulk operations",
+      "Manual flushing to reduce database round-trips",
+      "Component analysis caching",
+      "Fetch group customization"
+    ],
+    "key_file": "src/main/java/org/dependencytrack/persistence/QueryManager.java"
+  },
+
+  "event_system": {
+    "description": "Asynchronous event-driven processing for decoupled operations",
+    "total_events": 36,
+    "categories": {
+      "vulnerability_analysis": [
+        "ComponentVulnerabilityAnalysisEvent",
+        "ProjectVulnerabilityAnalysisEvent",
+        "PortfolioVulnerabilityAnalysisEvent",
+        "NewVulnerableDependencyAnalysisEvent"
+      ],
+      "data_synchronization": [
+        "NistMirrorEvent",
+        "NistApiMirrorEvent",
+        "GitHubAdvisoryMirrorEvent",
+        "OsvMirrorEvent",
+        "EpssMirrorEvent",
+        "VulnDbSyncEvent"
+      ],
+      "security_integration": [
+        "OssIndexAnalysisEvent",
+        "SnykAnalysisEvent",
+        "TrivyAnalysisEvent",
+        "VulnDbAnalysisEvent"
+      ],
+      "external_reporting": [
+        "DefectDojoUploadEventAbstract",
+        "FortifySscUploadEventAbstract",
+        "KennaSecurityUploadEventAbstract"
+      ],
+      "project_management": [
+        "BomUploadEvent",
+        "VexUploadEvent",
+        "CloneProjectEvent",
+        "PolicyEvaluationEvent"
+      ],
+      "metrics_monitoring": [
+        "ComponentMetricsUpdateEvent",
+        "ProjectMetricsUpdateEvent",
+        "PortfolioMetricsUpdateEvent",
+        "VulnerabilityMetricsUpdateEvent"
+      ],
+      "operational": [
+        "IndexEvent",
+        "CallbackEvent",
+        "TelemetrySubmissionEvent",
+        "ScheduledNotificationDispatchEvent",
+        "ClearComponentAnalysisCacheEvent",
+        "InternalAnalysisEvent",
+        "InternalComponentIdentificationEvent",
+        "RepositoryMetaEvent"
+      ]
+    },
+    "base_classes": [
+      "EventSubsystemInitializer",
+      "AbstractVulnerabilityManagementUploadEvent"
+    ],
+    "benefits": [
+      "Decouples vulnerability scanning from API requests",
+      "Enables asynchronous policy evaluation",
+      "Separates reporting functions from core logic",
+      "Facilitates scalable background processing"
+    ]
+  },
+
+  "notification_system": {
+    "description": "Rule-based notification routing with multiple publisher types",
+    "components": {
+      "notification_router": {
+        "class": "NotificationRouter",
+        "responsibilities": [
+          "Match notifications to rules",
+          "Filter by project scope and tags",
+          "Route to appropriate publishers"
+        ]
+      },
+      "notification_rule": {
+        "filtering": [
+          "Scope (portfolio/project)",
+          "Notification group",
+          "Level hierarchy",
+          "Project constraints",
+          "Tag matching",
+          "Child project inclusion"
+        ]
+      },
+      "notification_publisher": {
+        "instantiation": "Dynamic class loading",
+        "configuration": "JSON-based with MIME type and templates",
+        "delivery": "inform() method invocation"
+      }
+    },
+    "notification_subjects": [
+      "Vulnerabilities discovered",
+      "Policy violations",
+      "BOM processing status",
+      "Analysis completion",
+      "System events"
+    ],
+    "routing_workflow": [
+      "Event triggers notification via inform()",
+      "Router matches against NotificationRule objects",
+      "Apply scope, group, and level filtering",
+      "Filter projects by constraints and tags",
+      "Instantiate configured publishers",
+      "Deliver notifications with templates",
+      "Handle errors and log failures"
+    ],
+    "key_file": "src/main/java/org/dependencytrack/notification/NotificationRouter.java"
+  },
+
+  "integration_capabilities": {
+    "external_platforms": [
+      {
+        "name": "DefectDojo",
+        "type": "Application security findings platform",
+        "direction": "Export findings",
+        "implementation": "src/main/java/org/dependencytrack/integrations/defectdojo/"
+      },
+      {
+        "name": "Fortify SSC",
+        "type": "Software Security Center vulnerability management",
+        "direction": "Export findings",
+        "implementation": "src/main/java/org/dependencytrack/integrations/fortifyssc/"
+      },
+      {
+        "name": "Kenna Security",
+        "type": "Risk management platform",
+        "direction": "Export findings",
+        "implementation": "src/main/java/org/dependencytrack/integrations/kenna/"
+      }
+    ],
+    "integration_pattern": "Abstract factory with FindingUploader implementations",
+    "base_classes": [
+      "AbstractIntegrationPoint",
+      "IntegrationPoint (interface)",
+      "FindingUploader",
+      "PortfolioFindingUploader",
+      "ProjectFindingUploader"
+    ],
+    "data_formats": "FindingPackagingFormat for standardized exports",
+    "purpose": "Synchronize dependency analysis with broader AppSec ecosystems"
+  },
+
+  "rest_api": {
+    "version": "v1",
+    "base_path": "/api/v1",
+    "security": "All resources secure by default, require authentication",
+    "resource_endpoints": {
+      "project_management": [
+        "ProjectResource",
+        "ProjectPropertyResource"
+      ],
+      "component_management": [
+        "ComponentResource",
+        "ComponentPropertyResource"
+      ],
+      "vulnerability_security": [
+        "VulnerabilityResource",
+        "AnalysisResource",
+        "FindingResource",
+        "PolicyViolationResource",
+        "ViolationAnalysisResource"
+      ],
+      "sbom": [
+        "BomResource",
+        "VexResource"
+      ],
+      "access_control": [
+        "AccessControlResource",
+        "PermissionResource",
+        "TeamResource",
+        "UserResource"
+      ],
+      "configuration": [
+        "NotificationPublisherResource",
+        "NotificationRuleResource",
+        "IntegrationResource",
+        "ConfigPropertyResource"
+      ],
+      "metadata": [
+        "MetricsResource",
+        "CweResource",
+        "LicenseResource",
+        "LicenseGroupResource",
+        "DependencyGraphResource"
+      ],
+      "operations": [
+        "SearchResource",
+        "BadgeResource",
+        "CalculatorResource",
+        "EventResource",
+        "TagResource",
+        "ServiceResource",
+        "RepositoryResource"
+      ]
+    },
+    "finding_api": {
+      "query_endpoints": {
+        "by_project": "GET /v1/finding/project/{uuid}",
+        "all_findings": "GET /v1/finding",
+        "grouped": "GET /v1/finding/grouped"
+      },
+      "export_formats": [
+        "JSON (default)",
+        "SARIF (application/sarif+json)",
+        "FPF (Finding Packaging Format)"
+      ],
+      "export_endpoint": "GET /v1/finding/project/{uuid}/export",
+      "on_demand_analysis": "POST /v1/finding/project/{uuid}/analyze",
+      "filtering": [
+        "Severity",
+        "Analysis status",
+        "CVSS scores",
+        "Date ranges",
+        "Suppression status",
+        "Vulnerability source"
+      ]
+    },
+    "permissions": {
+      "VIEW_PORTFOLIO": "View projects and components",
+      "VIEW_VULNERABILITY": "View vulnerability data",
+      "PORTFOLIO_MANAGEMENT": "Manage projects",
+      "Others": "Granular permission system"
+    }
+  },
+
+  "background_tasks": {
+    "scheduler": "TaskScheduler class orchestrating operations",
+    "execution_modes": [
+      "Scheduled at defined intervals",
+      "Event-driven async processing"
+    ],
+    "task_categories": {
+      "vulnerability_management": [
+        "Vulnerability analysis and CVE detection",
+        "NIST database mirroring",
+        "NIST API synchronization",
+        "OSV downloads",
+        "GitHub Advisory mirroring"
+      ],
+      "integration_reporting": [
+        "DefectDojo upload",
+        "Fortify SSC integration",
+        "Kenna Security upload",
+        "VM platform uploads"
+      ],
+      "processing_operations": [
+        "BOM upload processing",
+        "VEX document processing",
+        "Policy evaluation",
+        "Component analysis cache management"
+      ],
+      "administrative": [
+        "Project cloning",
+        "Internal component identification",
+        "Search indexing",
+        "Telemetry submission",
+        "Scheduled notification dispatching"
+      ],
+      "specialized_monitoring": [
+        "New vulnerable dependency detection",
+        "EPSS data mirroring",
+        "Callback task execution"
+      ]
+    },
+    "key_tasks": [
+      "BomUploadProcessingTask",
+      "InternalAnalysisTask",
+      "OssIndexAnalysisTask",
+      "PolicyEvaluationTask",
+      "VulnerabilityAnalysisTask"
+    ]
+  },
+
+  "dependencies": {
+    "build_system": "Maven",
+    "java_version": "21",
+    "core_dependencies": [
+      {
+        "name": "Alpine Framework",
+        "version": "3.3.0",
+        "purpose": "REST API scaffolding, security, async events",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "CycloneDX Java Library",
+        "version": "11.0.0",
+        "purpose": "SBOM parsing and generation",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "DataNucleus JDO",
+        "version": "Multiple modules",
+        "purpose": "ORM framework for persistence",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "Protocol Buffers",
+        "version": "4.33.0",
+        "purpose": "Binary serialization",
+        "license": "BSD-3-Clause"
+      },
+      {
+        "name": "Apache HttpComponents",
+        "version": "4.x and 5.x",
+        "purpose": "HTTP client for external integrations",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "AE Security",
+        "version": "0.147.0",
+        "purpose": "Security utilities",
+        "license": "Unknown"
+      }
+    ],
+    "database_drivers": [
+      {
+        "name": "MySQL Connector/J",
+        "version": "8.2.0",
+        "license": "GPL-2.0 with FOSS exception"
+      },
+      {
+        "name": "PostgreSQL JDBC",
+        "version": "42.7.8",
+        "license": "BSD-2-Clause"
+      },
+      {
+        "name": "SQL Server JDBC",
+        "version": "13.2.1",
+        "license": "MIT"
+      }
+    ],
+    "testing_frameworks": [
+      {
+        "name": "JUnit 5",
+        "version": "5.11.4",
+        "purpose": "Unit testing"
+      },
+      {
+        "name": "Mockito",
+        "version": "Not specified",
+        "purpose": "Mocking framework"
+      },
+      {
+        "name": "WireMock",
+        "version": "2.35.2",
+        "purpose": "HTTP mocking"
+      },
+      {
+        "name": "TestContainers",
+        "version": "2.0.1",
+        "purpose": "Integration testing with containers"
+      }
+    ],
+    "build_plugins": [
+      "Checkstyle (3.6.0)",
+      "Protocol Buffers Compiler",
+      "JaCoCo Code Coverage",
+      "CycloneDX BOM Generator",
+      "Jetty Maven Plugin (12.1.3)"
+    ],
+    "frontend": {
+      "version": "4.13.5",
+      "technology": "Single Page Application (separate repository)",
+      "integration": "REST API communication"
+    }
+  },
+
+  "complexity_assessment": {
+    "overall_complexity": "High - Enterprise-grade platform",
+    "codebase_size": "Large multi-module Java application",
+    "architectural_sophistication": "Advanced - event-driven, pluggable, extensible",
+    "domain_complexity": "High - vulnerability analysis, SBOM processing, policy evaluation",
+    "integration_complexity": "High - multiple external systems and data sources",
+    "learning_curve": {
+      "understanding_architecture": "Moderate - well-structured with clear separation of concerns",
+      "understanding_domain": "High - requires knowledge of CVE, CVSS, SBOM, CPE, PURL",
+      "extending_functionality": "Moderate - pluggable patterns facilitate extensions",
+      "deployment_operations": "Moderate - Docker/Kubernetes support simplifies deployment"
+    },
+    "complexity_factors": [
+      "Multi-source vulnerability aggregation and correlation",
+      "Version range matching and normalization",
+      "Flexible policy engine with 15+ condition types",
+      "SBOM format support (CycloneDX, SPDX) with multiple versions",
+      "Event-driven architecture with 36 event types",
+      "Multi-database support (MySQL, PostgreSQL, MSSQL)",
+      "Complex data model with many-to-many relationships",
+      "Security-first design with granular permissions",
+      "Background task scheduling and coordination",
+      "Notification routing with rule-based filtering"
+    ],
+    "code_quality_indicators": [
+      "Checkstyle enforcement for code standards",
+      "JaCoCo code coverage measurement",
+      "Comprehensive test suite (JUnit, Mockito, TestContainers)",
+      "Clear package organization by domain",
+      "Design patterns consistently applied",
+      "API-first architecture with OpenAPI documentation"
+    ]
+  },
+
+  "recommendations": {
+    "reusability": [
+      {
+        "component": "SBOM Processing (CycloneDX/SPDX)",
+        "recommendation": "Highly reusable - extract parser and validator modules",
+        "value": "Production-ready SBOM validation and conversion logic",
+        "complexity": "Low - well-isolated in parser package"
+      },
+      {
+        "component": "Vulnerability Matching Algorithm",
+        "recommendation": "Reusable with adaptation",
+        "value": "CPE/PURL-based matching with version normalization",
+        "complexity": "Moderate - requires VulnerableSoftware data model",
+        "considerations": [
+          "Version range comparison logic",
+          "Fuzzy matching capabilities",
+          "Multi-source correlation"
+        ]
+      },
+      {
+        "component": "Policy Engine Pattern",
+        "recommendation": "Excellent pattern to replicate",
+        "value": "Flexible, pluggable evaluator architecture",
+        "complexity": "Low - clean abstraction",
+        "applications": [
+          "Compliance checking",
+          "Quality gates",
+          "Custom business rules"
+        ]
+      },
+      {
+        "component": "Risk Scoring Methodology",
+        "recommendation": "Simple and effective - adapt weights as needed",
+        "value": "Weighted severity model for portfolio risk",
+        "complexity": "Very low - straightforward calculation",
+        "customization": "Easy to adjust weights for different risk profiles"
+      },
+      {
+        "component": "Event-Driven Architecture",
+        "recommendation": "Excellent for decoupled, scalable systems",
+        "value": "Asynchronous processing patterns",
+        "complexity": "Moderate - requires event infrastructure",
+        "benefits": [
+          "Decouples operations",
+          "Enables horizontal scaling",
+          "Improves responsiveness"
+        ]
+      },
+      {
+        "component": "Multi-Source Integration Pattern",
+        "recommendation": "Valuable for aggregating diverse data sources",
+        "value": "Abstract integration point with pluggable analyzers",
+        "complexity": "Moderate - requires careful data correlation",
+        "applications": [
+          "Multi-vendor security feeds",
+          "Compliance data aggregation",
+          "Quality metric collection"
+        ]
+      },
+      {
+        "component": "Finding Aggregation Model",
+        "recommendation": "Useful pattern for complex relationships",
+        "value": "Read-only view aggregating multiple entities",
+        "complexity": "Low - query-based derived data",
+        "benefits": [
+          "Simplified client queries",
+          "Performance optimization",
+          "Clean API surface"
+        ]
+      }
+    ],
+    "adoption_strategies": [
+      {
+        "approach": "Full Platform Adoption",
+        "suitability": "Large enterprises needing comprehensive SBOM/vulnerability management",
+        "effort": "High",
+        "considerations": [
+          "Infrastructure requirements (8GB RAM minimum)",
+          "Database setup and maintenance",
+          "Integration with existing tools",
+          "Staff training on SBOM concepts"
+        ]
+      },
+      {
+        "approach": "Selective Component Reuse",
+        "suitability": "Projects needing specific capabilities",
+        "effort": "Moderate",
+        "recommendations": [
+          "Extract SBOM parsers for validation",
+          "Adapt policy engine for custom rules",
+          "Replicate vulnerability matching logic",
+          "Use risk scoring methodology"
+        ]
+      },
+      {
+        "approach": "Pattern and Architecture Learning",
+        "suitability": "Building similar systems",
+        "effort": "Low",
+        "learnings": [
+          "Event-driven architecture design",
+          "Pluggable evaluator pattern",
+          "Multi-source data aggregation",
+          "SBOM processing workflows",
+          "API-first design principles"
+        ]
+      }
+    ],
+    "integration_recommendations": [
+      "Start with Docker Compose deployment for evaluation",
+      "Use API-first approach - deploy frontend separately",
+      "Integrate with CI/CD via BOM upload API",
+      "Configure external analyzers incrementally (OSS Index → Snyk → others)",
+      "Start with basic policies, expand as team gains experience",
+      "Leverage notification system for workflow automation",
+      "Use project hierarchy for organizational structure",
+      "Export findings to existing security platforms (DefectDojo, etc.)"
+    ],
+    "customization_opportunities": [
+      "Custom policy evaluators for domain-specific rules",
+      "Additional vulnerability sources via parser plugins",
+      "Custom notification publishers for internal systems",
+      "Extended component properties for metadata",
+      "Custom finding export formats",
+      "Additional repository integrations",
+      "Custom metrics and dashboards"
+    ]
+  },
+
+  "requirements": {
+    "system_requirements": {
+      "java_runtime": "Java 21 (LTS)",
+      "memory": "8GB RAM recommended for production",
+      "database": "MySQL 8+, PostgreSQL 12+, or MSSQL 2019+",
+      "storage": "Adequate for vulnerability database mirrors and BOM storage",
+      "network": "Internet access for vulnerability feed synchronization"
+    },
+    "deployment_requirements": {
+      "containerization": "Docker support with official images",
+      "orchestration": "Kubernetes support via Helm charts",
+      "embedded_server": "Jetty 12.1.3 (embedded in API server distribution)",
+      "reverse_proxy": "Optional for SSL termination and load balancing"
+    },
+    "operational_requirements": {
+      "monitoring": "Health check endpoints available",
+      "logging": "Comprehensive logging for troubleshooting",
+      "backup": "Database backup strategy required",
+      "updates": "Regular vulnerability feed synchronization",
+      "maintenance": "Periodic database cleanup and optimization"
+    },
+    "security_requirements": {
+      "authentication": "LDAP, API keys, JWT supported",
+      "authorization": "Team-based access control with granular permissions",
+      "encryption": "Database encryption recommended for sensitive data",
+      "secrets_management": "Encrypted configuration properties",
+      "api_security": "All endpoints secured by default"
+    },
+    "integration_requirements": {
+      "ci_cd": "API endpoints for BOM upload from build pipelines",
+      "vulnerability_sources": "API keys for OSS Index, Snyk, etc.",
+      "notification_targets": "SMTP, Slack, webhooks, etc.",
+      "external_platforms": "DefectDojo, Fortify, Kenna integrations"
+    },
+    "knowledge_requirements": {
+      "standards": [
+        "CycloneDX SBOM specification",
+        "SPDX specification",
+        "CVE/NVD data formats",
+        "CVSS scoring (v2 and v3)",
+        "CPE (Common Platform Enumeration)",
+        "Package URL (PURL) specification",
+        "EPSS (Exploit Prediction Scoring)",
+        "CWE (Common Weakness Enumeration)"
+      ],
+      "concepts": [
+        "Software Bill of Materials (SBOM)",
+        "Software Composition Analysis (SCA)",
+        "Supply chain security",
+        "Vulnerability management",
+        "Policy-based compliance",
+        "Dependency graphs"
+      ]
+    }
+  },
+
+  "special_attention_areas": {
+    "sbom_processing": {
+      "cyclonedx": {
+        "format_support": "JSON and XML for versions 1.0-1.6",
+        "validation": "Schema-based with security hardening (XXE prevention)",
+        "conversion": "Bidirectional mapping via ModelConverter",
+        "extracted_data": "Components, services, dependencies, licenses, hashes, external references",
+        "version_handling": "Version-specific namespace and field handling",
+        "notable_features": [
+          "VEX (Vulnerability Exploitability Exchange) support",
+          "VDR (Vulnerability Disclosure Report) support",
+          "Component deduplication by identity",
+          "Transitive dependency preservation"
+        ]
+      },
+      "spdx": {
+        "format_support": "RDF, JSON, YAML",
+        "capabilities": "Package/file extraction, license parsing",
+        "status": "Supported but less prevalent than CycloneDX in codebase"
+      },
+      "processing_pipeline": {
+        "steps": [
+          "Upload via REST API",
+          "Format detection and validation",
+          "Parsing to internal model",
+          "Component deduplication",
+          "Database synchronization",
+          "Dependency graph extraction",
+          "Event triggering for analysis"
+        ],
+        "performance": "Optimized for large BOMs with manual flushing and batching"
+      }
+    },
+
+    "vulnerability_matching_algorithms": {
+      "internal_matching": {
+        "approach": "CPE and PURL-based matching against VulnerableSoftware database",
+        "steps": [
+          "Extract CPE part, vendor, product from identifier",
+          "Query vulnerable software database for matches",
+          "Normalize version strings (strip 'v' prefix)",
+          "Perform version range analysis",
+          "Apply fuzzy matching if enabled and no exact matches"
+        ],
+        "version_normalization": "Critical for NVD/GHSA compatibility",
+        "range_comparison": "Vulnerable version range evaluation",
+        "fallback": "FuzzyVulnerableSoftwareSearchManager for edge cases"
+      },
+      "external_analyzers": {
+        "oss_index": {
+          "method": "PURL-based batch submission to Sonatype API",
+          "caching": "Component-level cache with TTL",
+          "pagination": "Respects OSSINDEX_REQUEST_MAX_PURL",
+          "workarounds": "Version prefix stripping for API bugs",
+          "correlation": "CVE-based matching with NVD records",
+          "resilience": "Exponential backoff retry logic"
+        },
+        "others": "Similar patterns for Snyk, Trivy, VulnDB integrations"
+      },
+      "correlation_strategy": {
+        "canonical_id": "CVE as primary identifier",
+        "aliasing": "VulnerabilityAlias for alternative IDs",
+        "deduplication": "Multi-source vulnerability merging",
+        "attribution": "FindingAttribution for discovery tracking"
+      }
+    },
+
+    "risk_scoring_methodologies": {
+      "inherited_risk_score": {
+        "formula": "Sum of (vulnerability_count * severity_weight)",
+        "weights": "CRITICAL=10, HIGH=5, MEDIUM=3, LOW=1, UNASSIGNED=5",
+        "scope": "Project and portfolio levels",
+        "caching": "Stored in metrics tables for performance",
+        "update_triggers": "Vulnerability discovery, policy violations, BOM updates"
+      },
+      "cvss_integration": {
+        "v2": "Base, impact, exploitability subscores plus vector",
+        "v3": "Same structure as v2 with updated algorithm",
+        "usage": "Severity classification and policy conditions",
+        "normalization": "Vector string normalization for consistency"
+      },
+      "owasp_risk_rating": {
+        "components": "Likelihood, technical impact, business impact",
+        "vector": "OWASP-specific vector notation",
+        "application": "Alternative to CVSS for custom risk assessments"
+      },
+      "epss_scoring": {
+        "score": "Exploit prediction probability (0.0-1.0)",
+        "percentile": "Relative ranking among all vulnerabilities",
+        "usage": "Prioritization and policy conditions",
+        "updates": "Regular EPSS data mirroring"
+      },
+      "composite_metrics": {
+        "vulnerable_component_ratio": "Vulnerabilities / vulnerable_components",
+        "project_impact": "Affected project counts (total, active, inactive)",
+        "portfolio_view": "Aggregated risk across all projects"
+      }
+    },
+
+    "impact_analysis_blast_radius": {
+      "dependency_graph": {
+        "storage": "JSON strings in component/project entities",
+        "structure": "Direct dependencies with UUID references",
+        "traversal": "Recursive analysis for transitive impacts",
+        "latest_versions": "Repository metadata enrichment for upgrade paths"
+      },
+      "project_hierarchy": {
+        "structure": "Parent-child project relationships",
+        "policy_inheritance": "includeChildren flag for cascading policies",
+        "aggregation": "Portfolio-level metrics and findings"
+      },
+      "finding_model": {
+        "aggregation": "Component + Vulnerability + Analysis + Attribution",
+        "project_context": "Per-project analysis and suppression",
+        "filtering": "Extensive filtering by severity, state, CVSS, dates",
+        "exports": "SARIF, JSON, FPF formats for external tools"
+      },
+      "exposure_tracking": {
+        "metrics": [
+          "affectedProjectCount",
+          "affectedActiveProjectCount",
+          "affectedInactiveProjectCount"
+        ],
+        "purpose": "Understand blast radius of vulnerabilities",
+        "visualization": "Via metrics API and dashboards"
+      },
+      "transitive_analysis": {
+        "mechanism": "Dependency graph traversal",
+        "use_cases": [
+          "Identifying downstream impacts",
+          "Upgrade planning",
+          "Risk prioritization"
+        ]
+      }
+    },
+
+    "dependency_graph_structure": {
+      "representation": {
+        "format": "JSON arrays of UUIDs",
+        "storage_location": "directDependencies field in Component/Project",
+        "parsing": "MultiValuedMap reconstruction on retrieval"
+      },
+      "api_access": {
+        "project_endpoint": "/v1/dependencyGraph/project/{uuid}/directDependencies",
+        "component_endpoint": "/v1/dependencyGraph/component/{uuid}/directDependencies",
+        "response_data": [
+          "UUID and name",
+          "Package URL (PURL)",
+          "Latest version from repository",
+          "Repository type"
+        ]
+      },
+      "security": {
+        "permission": "VIEW_PORTFOLIO required",
+        "validation": "Project access verified before disclosure"
+      },
+      "metadata_enrichment": {
+        "event": "RepositoryMetaEvent",
+        "purpose": "Fetch latest versions for upgrade recommendations",
+        "sources": "Cargo, Composer, Maven, NPM, NuGet, PyPI, etc."
+      },
+      "limitations": {
+        "scope": "Direct dependencies only (not transitive in single call)",
+        "traversal": "Client-side recursive calls needed for full tree"
+      }
+    },
+
+    "policy_based_automation": {
+      "architecture": {
+        "pattern": "Pluggable evaluator with composite conditions",
+        "extensibility": "New evaluators via AbstractPolicyEvaluator",
+        "flexibility": "15 condition subjects, 12 operators"
+      },
+      "evaluation_engine": {
+        "orchestration": "PolicyEngine coordinates 14+ evaluators",
+        "filtering": "Global, project-specific, tag-based, hierarchical",
+        "operators": "ANY (OR logic) vs ALL (AND logic)",
+        "outcomes": "INFO, WARN, FAIL violation states"
+      },
+      "condition_types": {
+        "component": "Age, hash, coordinates, PURL, SWID, version",
+        "security": "CPE, CWE, vulnerability ID, severity, EPSS",
+        "license": "License, license group",
+        "operational": "Version distance"
+      },
+      "automation_workflows": {
+        "triggers": [
+          "BOM upload",
+          "Component update",
+          "Vulnerability discovery",
+          "Scheduled evaluation"
+        ],
+        "actions": [
+          "Violation creation",
+          "Notification dispatch",
+          "Analysis state updates",
+          "Metrics recalculation"
+        ]
+      },
+      "violation_management": {
+        "tracking": "PolicyViolation with project+component+policy composite key",
+        "analysis": "ViolationAnalysis for human decisions",
+        "reconciliation": "Automatic comparison with existing violations",
+        "suppression": "Analysis state for accepted risks"
+      },
+      "use_cases": [
+        "License compliance gates",
+        "Security severity thresholds",
+        "Component age/EOL policies",
+        "EPSS-based prioritization",
+        "Version currency enforcement",
+        "Vulnerability count limits"
+      ]
+    },
+
+    "multi_project_organization": {
+      "hierarchy": {
+        "structure": "Parent-child project relationships",
+        "policy_inheritance": "Policies can include children",
+        "tag_based_grouping": "Projects tagged for policy targeting",
+        "access_control": "Team-based project authorization"
+      },
+      "portfolio_management": {
+        "aggregation": "Portfolio-level vulnerability analysis",
+        "metrics": "PortfolioMetricsUpdateEvent",
+        "findings": "Cross-project vulnerability tracking",
+        "notifications": "Portfolio-scoped alerts"
+      },
+      "project_properties": {
+        "flexibility": "Custom key-value properties per project",
+        "metadata": "ProjectMetadata for additional context",
+        "versioning": "ProjectVersion for temporal tracking"
+      },
+      "organizational_patterns": {
+        "by_application": "One project per application",
+        "by_version": "Project versions for release tracking",
+        "by_team": "Team-based access segregation",
+        "by_classification": "Tags for security levels, criticality"
+      },
+      "clone_functionality": {
+        "event": "CloneProjectEvent",
+        "purpose": "Duplicate configurations for new projects",
+        "includes": "Settings, policies, teams"
+      }
+    }
+  },
+
+  "key_source_files": {
+    "sbom_processing": [
+      "src/main/java/org/dependencytrack/parser/cyclonedx/CycloneDxValidator.java",
+      "src/main/java/org/dependencytrack/parser/cyclonedx/util/ModelConverter.java",
+      "src/main/java/org/dependencytrack/tasks/BomUploadProcessingTask.java",
+      "src/main/java/org/dependencytrack/resources/v1/BomResource.java",
+      "src/main/java/org/dependencytrack/resources/v1/VexResource.java"
+    ],
+    "vulnerability_analysis": [
+      "src/main/java/org/dependencytrack/tasks/scanners/InternalAnalysisTask.java",
+      "src/main/java/org/dependencytrack/tasks/scanners/OssIndexAnalysisTask.java",
+      "src/main/java/org/dependencytrack/model/Vulnerability.java",
+      "src/main/java/org/dependencytrack/model/VulnerableSoftware.java",
+      "src/main/java/org/dependencytrack/model/Finding.java"
+    ],
+    "policy_engine": [
+      "src/main/java/org/dependencytrack/policy/PolicyEngine.java",
+      "src/main/java/org/dependencytrack/policy/AbstractPolicyEvaluator.java",
+      "src/main/java/org/dependencytrack/model/Policy.java",
+      "src/main/java/org/dependencytrack/model/PolicyCondition.java"
+    ],
+    "risk_scoring": [
+      "src/main/java/org/dependencytrack/metrics/Metrics.java",
+      "src/main/java/org/dependencytrack/model/Severity.java"
+    ],
+    "data_models": [
+      "src/main/java/org/dependencytrack/model/Component.java",
+      "src/main/java/org/dependencytrack/model/Project.java",
+      "src/main/java/org/dependencytrack/model/Analysis.java"
+    ],
+    "persistence": [
+      "src/main/java/org/dependencytrack/persistence/QueryManager.java"
+    ],
+    "api_resources": [
+      "src/main/java/org/dependencytrack/resources/v1/FindingResource.java",
+      "src/main/java/org/dependencytrack/resources/v1/DependencyGraphResource.java"
+    ],
+    "notifications": [
+      "src/main/java/org/dependencytrack/notification/NotificationRouter.java"
+    ],
+    "integrations": [
+      "src/main/java/org/dependencytrack/integrations/AbstractIntegrationPoint.java"
+    ]
+  },
+
+  "build_configuration": {
+    "build_file": "pom.xml",
+    "artifact_id": "dependency-track",
+    "group_id": "org.dependencytrack",
+    "packaging": "WAR",
+    "profiles": [
+      {
+        "name": "quick",
+        "purpose": "Disable checks and tests for rapid builds"
+      },
+      {
+        "name": "embedded-jetty",
+        "purpose": "Enable embedded server functionality"
+      },
+      {
+        "name": "h2-console",
+        "purpose": "Add H2 database console for development"
+      },
+      {
+        "name": "bundle-ui",
+        "purpose": "Package frontend distribution automatically"
+      }
+    ],
+    "code_quality": {
+      "checkstyle": "Version 3.6.0 for code standards",
+      "jacoco": "Code coverage measurement",
+      "cyclonedx_bom": "Automatic SBOM generation for Dependency-Track itself"
+    }
+  },
+
+  "deployment_options": {
+    "docker": {
+      "images": "Official Docker images available",
+      "compose": "Docker Compose for simple deployment",
+      "swarm": "Docker Swarm for orchestration",
+      "manual": "Manual container with volume mounting"
+    },
+    "kubernetes": {
+      "helm_charts": "Available in separate repository",
+      "scalability": "Horizontal scaling supported",
+      "high_availability": "Multi-instance deployment possible"
+    },
+    "traditional": {
+      "servlet_container": "Unsupported - use embedded Jetty instead",
+      "standalone": "Executable WAR with embedded Jetty (recommended)"
+    },
+    "cloud": {
+      "google_cloud_sql": "Connectors for MySQL, PostgreSQL, MSSQL",
+      "containerized": "Cloud-agnostic via Docker/Kubernetes"
+    }
+  },
+
+  "community_and_support": {
+    "project_status": "OWASP Flagship Project",
+    "contributors": "163+",
+    "community_channels": {
+      "slack": "Active community support",
+      "youtube": "Video tutorials and presentations",
+      "groups_io": "Mailing list discussions",
+      "twitter": "Project updates"
+    },
+    "documentation": "docs.dependencytrack.org",
+    "release_cadence": "Active development with regular releases",
+    "issue_tracking": "GitHub Issues"
+  },
+
+  "analysis_metadata": {
+    "analyzed_by": "Claude Code (Sonnet 4.5)",
+    "analysis_date": "2025-11-08",
+    "repository_snapshot": "master branch",
+    "analysis_scope": [
+      "Architecture and design patterns",
+      "SBOM processing capabilities",
+      "Vulnerability matching algorithms",
+      "Risk scoring methodologies",
+      "Policy enforcement mechanisms",
+      "Dependency graph structure",
+      "API design and capabilities",
+      "Data models and persistence",
+      "Integration patterns",
+      "Deployment options"
+    ],
+    "sources_consulted": [
+      "GitHub repository structure",
+      "README.md",
+      "LICENSE.txt",
+      "pom.xml",
+      "Source code files (30+ files analyzed)",
+      "API resource implementations",
+      "Model classes",
+      "Parser implementations",
+      "Policy engine code",
+      "Task implementations"
+    ],
+    "analysis_depth": "Comprehensive - covered all major components and special attention areas",
+    "confidence": "High - based on direct source code analysis and documentation"
+  }
+}

@@ -143,12 +143,13 @@ Analyzed 4 repositories with full code reviews:
 
 ## 📊 Final Statistics
 
-### Repositories Analyzed: 13/13 ✅
+### Repositories Analyzed: 19/19 ✅
 - REGnosys: 4/4 ✅
 - FINOS: 1/1 ✅
 - Camunda: 2/2 ✅
 - Flowable: 2/2 ✅
 - Process Mining: 3/3 ✅ (PM4Py, Apromore Core, Celonis Kafka)
+- Specialized Modeling: 6/6 ✅ (Archi, DataHub, OpenMetadata, Eclipse Ditto, Eclipse BaSyx, OWASP Dependency-Track)
 - uml-codex: 1/1 ✅
 
 ### Issues Analyzed: ~350+
@@ -159,24 +160,24 @@ Analyzed 4 repositories with full code reviews:
 - Process Mining: 75+ issues (PM4Py, Apromore Core)
 - uml-codex: 0 issues (new repo)
 
-### Files Created: 40+
-- Code review JSONs: 13 (added PM4Py, Apromore, Celonis)
-- Issue analysis JSONs: 12 (added process mining)
-- Insight documents: 7 (added process mining insights + addendum)
+### Files Created: 50+
+- Code review JSONs: 19 (13 prior + 6 specialized modeling)
+- Issue analysis JSONs: 12 (process mining)
+- Insight documents: 9 (master + process mining + specialized modeling)
 - Schema files: 3
 - Component inventory: 1
 - License analysis: 2
 - Progress/summary docs: 3
-- Research docs: 1 (Celonis open source research)
+- Research docs: 2 (Celonis + specialized modeling research)
 
 ### Key Metrics
-- **Design Patterns Identified**: 120+
-- **Requirements Extracted**: 130+
+- **Design Patterns Identified**: 150+
+- **Requirements Extracted**: 150+
 - **Components Cataloged**: 28 (prioritized P0-P3)
-- **Insights Generated**: 80+
-- **Actionable Items**: 100+
-- **Pages of Documentation**: 300+
-- **Licenses Analyzed**: 8 (Apache-2.0, LGPL-3.0, AGPL-3.0, EPL-2.0, MIT, BSD-3-Clause, Community Spec, GPL w/exceptions)
+- **Insights Generated**: 100+
+- **Actionable Items**: 120+
+- **Pages of Documentation**: 400+
+- **Licenses Analyzed**: 9 (Apache-2.0, LGPL-3.0, AGPL-3.0, EPL-2.0, MIT, BSD-3-Clause, Community Spec, GPL w/exceptions, PostgreSQL License)
 
 ## 🎯 Next Immediate Steps
 

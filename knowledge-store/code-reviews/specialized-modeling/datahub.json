@@ -1,0 +1,1654 @@
+{
+  "project": {
+    "name": "DataHub",
+    "organization": "datahub-project (originally LinkedIn)",
+    "repository": "https://github.com/datahub-project/datahub",
+    "description": "The Data Discovery Platform for the Modern Data Stack - an open-source metadata platform and data catalog",
+    "license": {
+      "type": "Apache License 2.0",
+      "year": 2015,
+      "licensor": "LinkedIn Corp",
+      "reusability": "PERMISSIVE",
+      "commercial_use": true,
+      "modification_allowed": true,
+      "patent_grant": true,
+      "attribution_required": true,
+      "redistribution_requirements": [
+        "Provide copies of the license to recipients",
+        "Note any changes made to files",
+        "Retain original copyright and attribution notices",
+        "Include the NOTICE file if present"
+      ],
+      "assessment": "Code can be freely reused, modified, and incorporated into both open-source and proprietary projects. Apache 2.0 is highly permissive and enterprise-friendly."
+    },
+    "maturity": {
+      "stars": 11200,
+      "forks": 3300,
+      "contributors": 667,
+      "commits": 13188,
+      "production_users": [
+        "LinkedIn",
+        "Expedia Group",
+        "Coursera",
+        "Klarna",
+        "CVS Health",
+        "Udemy"
+      ],
+      "assessment": "Production-ready and battle-tested at scale. Active community and enterprise adoption."
+    },
+    "programming_languages": {
+      "java": "42.1% - Backend services and metadata service",
+      "python": "28.4% - Ingestion framework and connectors",
+      "typescript": "27.7% - Frontend React application",
+      "javascript": "Supporting frontend",
+      "shell": "Build and deployment scripts"
+    },
+    "websites": {
+      "official": "https://datahub.com",
+      "documentation": "https://docs.datahub.com",
+      "demo": "https://demo.datahub.com"
+    }
+  },
+  "architecture": {
+    "overview": "DataHub employs a distributed, event-driven architecture based on Generalized Metadata Architecture (GMA) principles. It uses stream-based real-time processing with schema-first metadata modeling.",
+    "design_principles": [
+      "Schema-first metadata modeling using Pegasus Data Language (PDL)",
+      "Stream-based real-time metadata processing (changes propagate within seconds)",
+      "Federated metadata serving (distributed ownership, centralized discovery)",
+      "Multi-technology backend strategy (optimized storage per use case)",
+      "Model-first development philosophy",
+      "Event-driven architecture via Kafka"
+    ],
+    "core_components": {
+      "datahub_gms": {
+        "name": "GraphQL Metadata Service",
+        "type": "Java-based backend service",
+        "port": 8080,
+        "responsibilities": [
+          "Central metadata management",
+          "GraphQL API (public-facing)",
+          "Rest.li API (internal persistence layer)",
+          "Metadata validation and storage",
+          "Event emission to Kafka"
+        ],
+        "description": "The heart of DataHub - manages all metadata operations and provides both public GraphQL and internal Rest.li APIs"
+      },
+      "datahub_frontend": {
+        "name": "Frontend React Application",
+        "type": "React 17 + TypeScript",
+        "port": 9002,
+        "responsibilities": [
+          "Web UI for data discovery",
+          "Entity browsing and search",
+          "Lineage visualization",
+          "User authentication proxy",
+          "GraphQL query orchestration"
+        ]
+      },
+      "metadata_ingestion": {
+        "name": "Ingestion Framework",
+        "type": "Python-based ETL framework",
+        "responsibilities": [
+          "Pull-based metadata extraction from 100+ sources",
+          "Push-based metadata emission APIs",
+          "Connector plugins for various data platforms",
+          "YAML-based recipe configuration",
+          "Transformation and enrichment"
+        ]
+      },
+      "mae_consumer": {
+        "name": "Metadata Audit Event Consumer",
+        "type": "Optional Java service",
+        "responsibilities": [
+          "Consumes Metadata Change Log (MCL) events from Kafka",
+          "Updates Elasticsearch search indices",
+          "Updates Neo4j graph database",
+          "Generates Platform Events for Actions framework"
+        ]
+      },
+      "mce_consumer": {
+        "name": "Metadata Change Event Consumer",
+        "type": "Optional Java service",
+        "responsibilities": [
+          "Processes Metadata Change Proposals (MCP)",
+          "Writes to primary metadata storage",
+          "Legacy ingestion pathway"
+        ]
+      },
+      "datahub_actions": {
+        "name": "Actions Framework",
+        "type": "Python-based reactive system",
+        "responsibilities": [
+          "Responds to metadata change events",
+          "Executes configured actions (Slack, webhooks, etc.)",
+          "Enables automated workflows",
+          "Supports filtering and transformation"
+        ]
+      },
+      "datahub_upgrade": {
+        "name": "Migration Service",
+        "type": "Initialization container",
+        "responsibilities": [
+          "Database schema migrations",
+          "System upgrades",
+          "Runs before GMS startup"
+        ]
+      }
+    },
+    "external_dependencies": {
+      "kafka": {
+        "purpose": "Event streaming backbone",
+        "port": 9092,
+        "usage": [
+          "Metadata Change Proposal (MCP) events",
+          "Metadata Change Log (MCL) events",
+          "Platform Events",
+          "Inter-service communication",
+          "Real-time metadata propagation"
+        ]
+      },
+      "elasticsearch": {
+        "purpose": "Search and indexing",
+        "port": 9200,
+        "version": "7.x recommended",
+        "usage": [
+          "Full-text search across metadata",
+          "Autocomplete functionality",
+          "Filtered queries and aggregations",
+          "Timeseries aspect storage",
+          "Optional graph index alternative to Neo4j"
+        ],
+        "index_strategy": "Separate indices per entity type (e.g., datasetindex_v2, dashboardindex_v2)"
+      },
+      "neo4j": {
+        "purpose": "Graph database for relationships",
+        "ports": {
+          "http": 7474,
+          "bolt": 7687
+        },
+        "usage": [
+          "Stores entity relationships",
+          "Lineage graph traversal",
+          "Bidirectional relationship queries",
+          "Current state representation (no versioning)"
+        ],
+        "note": "Can be replaced by Elasticsearch as graph index"
+      },
+      "mysql_postgres": {
+        "purpose": "Primary metadata storage",
+        "options": ["MySQL", "PostgreSQL", "MariaDB"],
+        "usage": [
+          "Versioned aspects storage",
+          "Entity key aspects",
+          "Change history",
+          "Relational metadata"
+        ]
+      },
+      "schema_registry": {
+        "purpose": "Avro schema management",
+        "port": 8081,
+        "usage": "Manages Avro schemas for Kafka event serialization"
+      },
+      "zookeeper": {
+        "purpose": "Kafka coordination",
+        "port": 2181,
+        "usage": "Kafka cluster management"
+      }
+    },
+    "data_flow": [
+      "1. Metadata ingestion via Python connectors or push APIs",
+      "2. Metadata Change Proposals (MCP) sent to GMS via Rest.li",
+      "3. GMS validates and writes to primary storage (MySQL/Postgres)",
+      "4. GMS emits Metadata Change Log (MCL) events to Kafka",
+      "5. MAE Consumer processes MCLs and updates Elasticsearch + Neo4j",
+      "6. Platform Events trigger Actions framework for automation",
+      "7. Frontend queries via GraphQL for display",
+      "8. Users interact with metadata through web UI"
+    ],
+    "scalability_features": [
+      "Federated metadata services for distributed teams (data mesh support)",
+      "Kafka-based event streaming for async processing",
+      "Separate read/write paths (GraphQL vs Rest.li)",
+      "Configurable consumer groups for parallel processing",
+      "Index-based search for fast queries",
+      "Graph database for efficient relationship traversal"
+    ]
+  },
+  "metadata_model": {
+    "modeling_language": {
+      "name": "Pegasus Data Language (PDL)",
+      "description": "LinkedIn's schema definition language, similar to Protocol Buffers or Avro IDL",
+      "serialization": "Serialization-agnostic, converts to Avro for Kafka and JSON for REST APIs",
+      "validation": "Strong typing from client to storage layer"
+    },
+    "core_abstractions": {
+      "entities": {
+        "definition": "Primary nodes in the metadata graph representing concrete items like datasets, users, dashboards, etc.",
+        "structure": [
+          "Entity Type (e.g., dataset, chart, dashboard)",
+          "Unique URN (Uniform Resource Name)",
+          "Collection of Aspects"
+        ],
+        "examples": [
+          "Dataset",
+          "Dashboard",
+          "Chart",
+          "DataFlow (pipelines)",
+          "DataJob (tasks)",
+          "MLModel",
+          "MLFeature",
+          "GlossaryTerm",
+          "Tag",
+          "CorpUser",
+          "CorpGroup",
+          "Domain",
+          "Container"
+        ],
+        "registry": "Entity Registry (entity-registry.yml) catalogs all entities and their associated aspects"
+      },
+      "aspects": {
+        "definition": "Smallest atomic units for writing metadata - collections of related attributes describing a specific facet of an entity",
+        "characteristics": [
+          "Immutable by design (changes create new versions)",
+          "Can be updated independently",
+          "Reusable across entity types",
+          "Stored as JSON blobs in primary storage"
+        ],
+        "types": {
+          "versioned_aspects": {
+            "description": "Carry numeric versions, stored in relational databases",
+            "storage": "MySQL/PostgreSQL",
+            "versioning": "Each field change creates new version with history",
+            "examples": ["Ownership", "GlobalTags", "GlossaryTerms", "Status", "DatasetProperties"]
+          },
+          "timeseries_aspects": {
+            "description": "Include timestamps for time-ordered events",
+            "storage": "Elasticsearch and Kafka only (not in primary DB)",
+            "use_cases": ["Dataset profiles", "Usage statistics", "Data quality metrics"],
+            "features": "Aggregatable via @TimeseriesField annotations for SQL-like group-by"
+          }
+        },
+        "common_aspects": [
+          "Ownership - who owns this entity",
+          "GlobalTags - tags applied to entity",
+          "GlossaryTerms - business glossary terms",
+          "Status - soft deletion state",
+          "InstitutionalMemory - documentation links",
+          "Deprecation - deprecation status",
+          "BrowsePaths - browse hierarchy paths",
+          "DataPlatformInstance - platform instance info"
+        ],
+        "benefits": [
+          "Performance - smaller payloads for reads/writes",
+          "Independent versioning - track changes per aspect type",
+          "Modular APIs - smaller, focused endpoints",
+          "Flexibility - aspects can vary greatly in complexity"
+        ]
+      },
+      "relationships": {
+        "definition": "Named associations between exactly two entities (source and destination), forming edges in the metadata graph",
+        "implementation": "Typically modeled as foreign key fields within aspects (URNs pointing to other entities)",
+        "directionality": "Directed edges with naming reflecting direction (e.g., HasMember vs IsMemberOf)",
+        "bidirectional_queries": "Graph databases enable efficient traversal in both directions regardless of storage direction",
+        "examples": [
+          "OwnedBy - links entities to users",
+          "Contains - hierarchical containment",
+          "ProducedBy - data lineage from job to dataset",
+          "Consumes - data lineage from job to dataset",
+          "DownstreamOf - dataset lineage relationships",
+          "HasMember - group membership"
+        ],
+        "features": [
+          "Entity-neutral design (same relationship type across different entities)",
+          "Embedded in aspects as URN arrays or single URN fields",
+          "Automatically indexed in Neo4j for graph queries",
+          "Support complex queries like 'all owners of this dataset'"
+        ]
+      },
+      "urns": {
+        "definition": "Uniform Resource Names - unique identifiers for entities in DataHub",
+        "format": "urn:<Namespace>:<Entity Type>:<ID>",
+        "namespace": "li (LinkedIn standard, customizable)",
+        "examples": {
+          "simple": "urn:li:corpuser:jdoe",
+          "complex": "urn:li:dataset:(urn:li:dataPlatform:kafka,PageViewEvent,PROD)",
+          "nested": "URNs can contain other URNs as ID fields"
+        },
+        "id_structure": {
+          "single_field": "urn:li:corpuser:username",
+          "multi_field": "urn:li:dataset:(platform_urn,dataset_name,fabric)",
+          "tuple_syntax": "Multiple fields use parentheses and comma separation"
+        },
+        "character_restrictions": [
+          "Avoid parentheses () anywhere",
+          "Avoid unicode unit separator ␟ (U+241F)",
+          "Avoid commas within tuple sections",
+          "Use URL encoding for prohibited characters"
+        ],
+        "key_aspects": "URNs are stringified representations of Key aspects (which uniquely identify entities)"
+      }
+    },
+    "query_mechanisms": [
+      "Primary key lookup via URN (direct entity retrieval)",
+      "Full-text search queries via Elasticsearch",
+      "Relationship traversal via graph database (Neo4j)",
+      "Browse paths for hierarchical navigation",
+      "GraphQL queries for complex data fetching"
+    ],
+    "schema_examples": {
+      "dataset_properties": {
+        "file": "metadata-models/src/main/pegasus/com/linkedin/dataset/DatasetProperties.pdl",
+        "fields": {
+          "name": "Display name with word-gram search, autocomplete, boost score 10.0",
+          "qualifiedName": "Fully-qualified identifier",
+          "description": "Documentation with text search",
+          "created": "Creation timestamp in source platform",
+          "lastModified": "Last modification timestamp",
+          "tags": "Legacy unstructured tags (deprecated)",
+          "customProperties": "Key-value pairs for platform-specific metadata",
+          "externalUrl": "Link to external system"
+        }
+      },
+      "upstream_lineage": {
+        "file": "metadata-models/src/main/pegasus/com/linkedin/dataset/UpstreamLineage.pdl",
+        "fields": {
+          "upstreams": "Array of Upstream objects for direct lineage",
+          "fineGrainedLineages": "Field-level lineage tracking"
+        },
+        "relationship": "DownstreamOf - links datasets bidirectionally",
+        "granularity": ["Dataset-level lineage", "Field-level (column) lineage"]
+      },
+      "schema_metadata": {
+        "file": "metadata-models/src/main/pegasus/com/linkedin/schema/SchemaMetadata.pdl",
+        "fields": {
+          "schemaName": "Name of the schema",
+          "platform": "URN of the data platform",
+          "version": "Schema version number",
+          "hash": "SHA1 hash of schema content",
+          "platformSchema": "Union type for platform-specific DDL (MySQL, Oracle, Kafka, etc.)",
+          "fields": "Array of SchemaField objects",
+          "primaryKeys": "Array of field paths for primary keys",
+          "foreignKeys": "Array of ForeignKeyConstraint objects"
+        }
+      }
+    }
+  },
+  "lineage_implementation": {
+    "overview": "DataHub tracks data lineage at multiple granularities through relationships between entities, supporting both manual and automated lineage capture.",
+    "lineage_types": {
+      "dataset_lineage": {
+        "description": "Tracks dependencies between datasets",
+        "implementation": "UpstreamLineage aspect with array of Upstream objects",
+        "relationship": "DownstreamOf relationship type",
+        "direction": "Bidirectional (can query upstream or downstream)",
+        "metadata": [
+          "Upstream dataset URN",
+          "Lineage type (COPY, TRANSFORMED, VIEW)",
+          "Audit stamps (created time, actor)"
+        ]
+      },
+      "field_lineage": {
+        "description": "Column-level lineage tracking which source fields map to which destination fields",
+        "implementation": "fineGrainedLineages array in UpstreamLineage aspect",
+        "granularity": "Individual schema field URNs",
+        "use_cases": [
+          "Impact analysis for column changes",
+          "Compliance tracking (PII propagation)",
+          "Data quality root cause analysis"
+        ]
+      },
+      "pipeline_lineage": {
+        "description": "Tracks DataFlow and DataJob entities (e.g., Airflow DAGs and tasks)",
+        "relationships": [
+          "DataJob Consumes Dataset",
+          "DataJob Produces Dataset",
+          "DataJob is part of DataFlow"
+        ],
+        "automatic_capture": "Push integrations with Airflow, Spark, dbt, etc."
+      }
+    },
+    "capture_methods": {
+      "push_based": {
+        "description": "Real-time emission from data systems when lineage changes",
+        "sources": [
+          "Airflow (via datahub-airflow plugin)",
+          "Spark (via datahub-spark-listener)",
+          "dbt (via dbt-datahub integration)",
+          "Great Expectations"
+        ],
+        "latency": "Low latency (seconds)",
+        "event_driven": true
+      },
+      "pull_based": {
+        "description": "Batch extraction via scheduled crawlers",
+        "sources": [
+          "BigQuery (via information schema queries)",
+          "Snowflake (via query history)",
+          "Tableau (via metadata API)",
+          "Looker (via LookML parsing)"
+        ],
+        "latency": "Scheduled intervals (minutes to hours)",
+        "batch_oriented": true
+      },
+      "manual_via_ui": {
+        "description": "Users can manually add lineage through the web UI",
+        "use_case": "Documenting lineage not automatically detectable"
+      },
+      "manual_via_api": {
+        "description": "Programmatic lineage ingestion via Rest.li or GraphQL",
+        "use_case": "Custom ingestion from proprietary systems"
+      }
+    },
+    "storage_and_propagation": {
+      "primary_storage": "UpstreamLineage aspect in MySQL/PostgreSQL",
+      "graph_index": "Neo4j stores relationships for fast traversal",
+      "event_stream": "Metadata Change Log events propagate lineage to graph",
+      "propagation_time": "Within seconds via Kafka and MAE consumer"
+    },
+    "visualization": {
+      "component": "LineageExplorer.tsx (React component)",
+      "library": "Reactflow for node-based graph rendering",
+      "features": [
+        "Interactive graph with expandable nodes",
+        "Upstream and downstream exploration",
+        "Time-based lineage filtering",
+        "Column-level lineage view (when available)",
+        "Entity details drawer",
+        "Center on entity navigation",
+        "Async entity loading for performance"
+      ],
+      "ui_patterns": [
+        "Node-edge graph visualization",
+        "Lazy loading of lineage branches",
+        "Entity preview on click",
+        "Breadcrumb navigation",
+        "Graph zoom and pan controls"
+      ]
+    },
+    "lineage_types_taxonomy": [
+      "COPY - direct copy of data",
+      "TRANSFORMED - data transformation applied",
+      "VIEW - virtual view over upstream data"
+    ],
+    "advanced_features": {
+      "impact_analysis": "Trace downstream effects of changes",
+      "root_cause_analysis": "Trace upstream sources of issues",
+      "sibling_datasets": "Datasets from same source with different processing",
+      "time_based_lineage": "Historical lineage at specific points in time (via MAE replay)"
+    }
+  },
+  "search_and_discovery": {
+    "search_engine": {
+      "technology": "Elasticsearch 7.x",
+      "port": 9200,
+      "index_strategy": "Separate indices per entity type with timestamp versioning (e.g., datasetindex_v2_1234567890)"
+    },
+    "indexing_process": {
+      "trigger": "MAE Consumer processes Metadata Change Log events",
+      "flow": [
+        "Entity aspect updated in primary storage",
+        "MCL event emitted to Kafka",
+        "MAE Consumer consumes MCL",
+        "Elasticsearch index updated with searchable fields",
+        "Index refresh makes data searchable"
+      ],
+      "latency": "Near real-time (seconds)",
+      "index_mapping": "Derived from PDL schema annotations"
+    },
+    "searchable_fields": {
+      "common_across_entities": [
+        "name (high boost score)",
+        "description",
+        "tags",
+        "glossary terms",
+        "owners",
+        "domain",
+        "platform",
+        "browse paths"
+      ],
+      "dataset_specific": [
+        "column names",
+        "column descriptions",
+        "column tags",
+        "schema metadata"
+      ],
+      "annotations": [
+        "@Searchable - marks fields for indexing",
+        "@SearchableField - field-level search config",
+        "boost scores - relevance weighting",
+        "tier rankings - search priority"
+      ]
+    },
+    "search_capabilities": {
+      "full_text_search": "Across all indexed fields",
+      "autocomplete": "Type-ahead suggestions",
+      "faceted_search": "Filter by platform, type, tags, owners, etc.",
+      "field_specific_search": "Advanced syntax like /q fieldPaths: latitude",
+      "pattern_matching": "Wildcard and regex support",
+      "logical_expressions": "AND, OR, NOT operators",
+      "aggregations": "Count by facets",
+      "fuzzy_search": "Via Fuse.js on frontend for client-side search"
+    },
+    "browse_functionality": {
+      "hierarchy": "Slash-delimited paths (e.g., /prod/hive/database/table)",
+      "browse_api": "REST endpoint for hierarchical exploration",
+      "browse_paths_aspect": "Aspect storing entity hierarchy locations",
+      "ui": "Hierarchical tree navigation in web interface"
+    },
+    "customization": {
+      "yaml_config": "Search behavior customizable via YAML",
+      "ranking_algorithms": "Configurable relevance scoring",
+      "filtering_rules": "Custom filter logic",
+      "query_rewriting": "Transform queries before execution"
+    },
+    "performance_optimizations": [
+      "Separate indices per entity type",
+      "Index versioning for zero-downtime upgrades",
+      "Client-side caching",
+      "Pagination and result limiting",
+      "Async search for large result sets"
+    ]
+  },
+  "apis": {
+    "graphql_api": {
+      "endpoint": "/api/graphql",
+      "description": "Public-facing API for metadata queries and mutations, recommended for external consumers",
+      "framework": "Apollo Server (GraphQL)",
+      "port": "9002 (via frontend proxy) or 8080 (direct to GMS)",
+      "schema_structure": {
+        "operations": {
+          "queries": "Read operations for fetching entities, relationships, search results",
+          "mutations": "Write operations for creating, updating, deleting metadata"
+        },
+        "types": [
+          "Objects - entity types",
+          "Input Objects - mutation inputs",
+          "Interfaces - shared entity behavior",
+          "Unions - polymorphic types",
+          "Enums - fixed value sets",
+          "Scalars - primitive types"
+        ]
+      },
+      "capabilities": [
+        "Hierarchical data fetching (reduce API calls)",
+        "Strongly typed with validation",
+        "Request only needed fields",
+        "Batching and caching support",
+        "Real-time subscriptions (limited)"
+      ],
+      "example_queries": {
+        "search": "Search entities with filters and pagination",
+        "get_entity": "Fetch entity by URN with aspects",
+        "get_lineage": "Retrieve upstream/downstream lineage",
+        "browse": "Navigate entity hierarchies",
+        "autocomplete": "Get suggestions for search"
+      },
+      "client_libraries": [
+        "Apollo Client (JavaScript/TypeScript)",
+        "Any GraphQL client (Python, Java, Go, etc.)"
+      ]
+    },
+    "restli_api": {
+      "endpoint": "/entities, /aspects, /relationships",
+      "description": "Internal persistence API exposing raw PDL models, used by ingestion framework and GMS internals",
+      "framework": "LinkedIn Rest.li",
+      "visibility": "System-internal (not recommended for external consumers)",
+      "core_endpoints": {
+        "ingest_proposal": {
+          "path": "/aspects?action=ingestProposal",
+          "method": "POST",
+          "description": "Modern ingestion endpoint for individual aspect proposals",
+          "payload": {
+            "entityType": "dataset",
+            "entityUrn": "urn:li:dataset:...",
+            "changeType": "UPSERT or DELETE",
+            "aspectName": "datasetProperties",
+            "aspect": {
+              "value": "JSON serialized aspect"
+            }
+          }
+        },
+        "get_entity": {
+          "path": "/entitiesV2/{urn}",
+          "method": "GET",
+          "description": "Fetch current aspects for an entity by URN"
+        },
+        "get_aspects": {
+          "path": "/aspects/{urn}",
+          "method": "GET",
+          "description": "Retrieve versioned or timeseries aspects with filtering"
+        },
+        "query_relationships": {
+          "path": "/relationships",
+          "method": "GET",
+          "description": "Query relationships by direction and type"
+        },
+        "browse": {
+          "path": "/browse",
+          "method": "GET",
+          "description": "Hierarchical entity exploration"
+        },
+        "search": {
+          "path": "/search",
+          "method": "POST",
+          "description": "Full-text search with filters"
+        }
+      },
+      "authentication": "Bearer token when METADATA_SERVICE_AUTH_ENABLED=true",
+      "documentation": "Interactive docs at /restli/docs"
+    },
+    "python_sdk": {
+      "package": "acryl-datahub",
+      "description": "Python client for metadata ingestion and API access",
+      "components": [
+        "DataHub emitter (push metadata)",
+        "DataHub graph client (query metadata)",
+        "CLI tools (datahub command)"
+      ]
+    },
+    "java_sdk": {
+      "package": "datahub-client",
+      "description": "Java client for metadata emission",
+      "use_cases": ["Spark integrations", "Custom Java applications"]
+    }
+  },
+  "frontend_architecture": {
+    "framework": "React 17 with TypeScript",
+    "build_tool": "Yarn + Webpack",
+    "port": 3000,
+    "proxy_port": 9002,
+    "directory_structure": {
+      "src/conf": "Global configuration flags and theme settings",
+      "src/app": "Core application components (auth, browse, search, entity views)",
+      "src/graphql": "GraphQL queries and generated TypeScript types",
+      "src/images": "Visual assets and logos",
+      "src/entity": "Entity-specific components (profile, preview)"
+    },
+    "key_libraries": {
+      "state_management": [
+        "Apollo Client 3.3.19 (GraphQL client and cache)",
+        "React Context (global state)"
+      ],
+      "ui_components": [
+        "Ant Design (antd) 4.24.7 - primary UI library",
+        "Material-UI (@mui) 5.15.21 - supplementary components",
+        "Phosphor Icons - icon system"
+      ],
+      "visualization": [
+        "Reactflow 11.10.1 - lineage graph visualization",
+        "Visx - D3-based charts and graphs",
+        "D3-scale 4.0.2 - data scaling for viz"
+      ],
+      "rich_text": [
+        "Remirror 2.0.23 - collaborative text editing",
+        "Monaco Editor 0.28.1 - code editor",
+        "Markdown Editor (@uiw) - markdown support"
+      ],
+      "utilities": [
+        "Styled-components 5.2.1 - CSS-in-JS",
+        "DOMPurify 3.2.4 - HTML sanitization",
+        "Fuse.js 7.0.0 - fuzzy search",
+        "React-window 1.8.10 - virtualized lists",
+        "dnd-kit - drag and drop"
+      ],
+      "analytics": [
+        "Analytics 0.8.9 - event tracking",
+        "Amplitude, Google Analytics, Mixpanel integrations"
+      ]
+    },
+    "architectural_patterns": {
+      "entity_registry": {
+        "description": "Abstraction layer for dynamic entity rendering",
+        "benefits": [
+          "No hardcoding of entity types",
+          "Easy addition of new entities",
+          "Consistent entity handling across app"
+        ],
+        "access": "Via React Context"
+      },
+      "code_generation": {
+        "source": "GraphQL schema",
+        "output": "TypeScript types and hooks",
+        "benefit": "Type-safe API calls"
+      },
+      "lazy_loading": "Route-based code splitting for performance",
+      "responsive_design": "Mobile-friendly layouts"
+    },
+    "development_workflow": {
+      "local_dev": "yarn install && yarn run start (port 3000)",
+      "mock_mode": "yarn start:mock (no backend required)",
+      "production_build": "yarn build",
+      "testing": "Jest and React Testing Library"
+    },
+    "customization_points": {
+      "theming": "src/conf/theme/themes.ts",
+      "logos": "Environment-based without rebuild",
+      "feature_flags": "src/conf - toggle features",
+      "entity_views": "Register custom entity components"
+    },
+    "key_components": {
+      "lineage_explorer": {
+        "file": "src/app/lineage/LineageExplorer.tsx",
+        "features": [
+          "Interactive graph with Reactflow",
+          "Async entity loading",
+          "Entity details drawer",
+          "Time-based filtering",
+          "Column-level lineage toggle"
+        ]
+      },
+      "entity_profile": "Detailed entity view with tabs",
+      "entity_preview": "Compact entity card",
+      "search_bar": "Global search with autocomplete",
+      "browse_sidebar": "Hierarchical navigation"
+    }
+  },
+  "connector_ingestion_framework": {
+    "architecture": {
+      "language": "Python 3.8+",
+      "package": "acryl-datahub",
+      "framework_pattern": "Source -> Sink with optional Transformers"
+    },
+    "integration_methods": {
+      "ui_based": "Web interface for configuring ingestion pipelines",
+      "cli_based": "YAML recipes executed via datahub ingest command",
+      "sdk_based": "Programmatic Python/Java emitters for custom integrations"
+    },
+    "integration_patterns": {
+      "pull_based": {
+        "description": "Scheduled crawlers that extract metadata",
+        "frequency": "Cron-based or ad-hoc",
+        "sources": "Data warehouses, databases, BI tools",
+        "examples": ["BigQuery", "Snowflake", "Tableau", "Looker"]
+      },
+      "push_based": {
+        "description": "Real-time emission from active systems",
+        "latency": "Seconds",
+        "sources": "Orchestrators, compute engines, data quality tools",
+        "examples": ["Airflow", "Spark", "dbt", "Great Expectations"]
+      }
+    },
+    "connector_structure": {
+      "base_class": "Source class (e.g., SQLAlchemySource, TwoTierSQLAlchemySource)",
+      "config_class": "Pydantic model for configuration validation",
+      "decorators": [
+        "@platform_name - identifies the source",
+        "@config_class - links configuration",
+        "@support_status - CERTIFIED, INCUBATING, etc.",
+        "@capability - declares supported features"
+      ],
+      "key_methods": [
+        "get_workunits() - yields metadata work units",
+        "get_report() - returns ingestion statistics",
+        "close() - cleanup resources"
+      ]
+    },
+    "connector_categories": {
+      "databases": {
+        "count": "25+",
+        "examples": [
+          "MySQL",
+          "PostgreSQL",
+          "Oracle",
+          "SQL Server",
+          "MongoDB",
+          "Cassandra",
+          "Elasticsearch",
+          "Neo4j"
+        ],
+        "capabilities": ["Schema extraction", "Table profiling", "Usage stats", "Query history"]
+      },
+      "data_warehouses": {
+        "count": "15+",
+        "examples": [
+          "Snowflake",
+          "BigQuery",
+          "Redshift",
+          "Databricks",
+          "Synapse",
+          "Teradata"
+        ],
+        "capabilities": ["Schema extraction", "View lineage", "Column lineage", "Usage analytics", "Cost metrics"]
+      },
+      "data_lakes": {
+        "count": "10+",
+        "examples": ["S3", "HDFS", "Azure Data Lake", "Delta Lake", "Apache Iceberg", "Apache Hudi"],
+        "capabilities": ["File structure", "Schema inference", "Partitioning info"]
+      },
+      "bi_tools": {
+        "count": "15+",
+        "examples": [
+          "Tableau",
+          "Looker",
+          "Power BI",
+          "Metabase",
+          "Superset",
+          "Mode",
+          "Redash"
+        ],
+        "capabilities": ["Dashboard metadata", "Chart lineage", "Report usage", "LookML parsing"]
+      },
+      "orchestrators": {
+        "count": "5+",
+        "examples": ["Airflow", "Prefect", "Dagster", "Azure Data Factory"],
+        "capabilities": ["Pipeline metadata", "Task lineage", "Run history", "Real-time updates"]
+      },
+      "ml_platforms": {
+        "count": "10+",
+        "examples": [
+          "MLflow",
+          "SageMaker",
+          "Vertex AI",
+          "Feast",
+          "Kubeflow"
+        ],
+        "capabilities": ["Model metadata", "Feature lineage", "Experiment tracking"]
+      },
+      "messaging": {
+        "count": "5+",
+        "examples": ["Kafka", "Pulsar", "Amazon MSK"],
+        "capabilities": ["Topic schemas", "Producer/consumer tracking"]
+      },
+      "data_quality": {
+        "count": "5+",
+        "examples": ["Great Expectations", "dbt tests", "Monte Carlo"],
+        "capabilities": ["Assertion results", "Test definitions", "Quality metrics"]
+      }
+    },
+    "recipe_configuration": {
+      "format": "YAML",
+      "structure": {
+        "source": {
+          "type": "source plugin name",
+          "config": "source-specific configuration (credentials, filters, etc.)"
+        },
+        "sink": {
+          "type": "datahub-rest or datahub-kafka",
+          "config": "DataHub connection details"
+        },
+        "transformers": "Optional metadata enrichment/filtering"
+      },
+      "example_sources": ["snowflake", "bigquery", "tableau", "mysql", "kafka"]
+    },
+    "capabilities_framework": {
+      "schema_metadata": "Extract table/collection schemas",
+      "lineage": "Capture upstream/downstream relationships",
+      "usage_stats": "Query counts, user activity",
+      "profiling": "Column statistics, null rates, value distributions",
+      "descriptions": "Table and column documentation",
+      "tags": "Extract platform-specific tags",
+      "ownership": "Extract owner information",
+      "domains": "Assign to data domains",
+      "container": "Organize into databases/folders"
+    },
+    "emission_formats": {
+      "rest": "HTTP POST to /aspects?action=ingestProposal",
+      "kafka": "Avro messages to MetadataChangeProposal_v1 topic",
+      "file": "MCE JSON files for offline processing"
+    },
+    "connector_development": {
+      "base_classes": [
+        "Source - base for all connectors",
+        "StatefulIngestionSourceBase - for incremental ingestion",
+        "SQLAlchemySource - for SQL databases",
+        "TwoTierSQLAlchemySource - for database + schema hierarchy"
+      ],
+      "testing": "Pytest with docker containers for integration tests",
+      "documentation": "Auto-generated from docstrings and config schemas"
+    }
+  },
+  "design_patterns": {
+    "metadata_management": {
+      "schema_first": "Define schemas in PDL before implementation",
+      "aspect_oriented": "Decompose metadata into cohesive aspects",
+      "versioned_metadata": "Track changes over time with versions",
+      "immutable_aspects": "New versions instead of in-place updates",
+      "event_sourcing": "Metadata changes as event stream (MCL)",
+      "cqrs": "Separate read (GraphQL/search) and write (Rest.li) paths"
+    },
+    "data_lineage": {
+      "graph_based": "Relationships as first-class graph edges",
+      "multi_granularity": "Dataset and field-level lineage",
+      "bidirectional": "Query upstream and downstream",
+      "push_and_pull": "Support both real-time and batch capture",
+      "automatic_indexing": "Lineage automatically appears in graph"
+    },
+    "search_discovery": {
+      "index_per_entity": "Separate Elasticsearch indices",
+      "annotation_driven": "Search config from PDL annotations",
+      "faceted_navigation": "Filter by multiple dimensions",
+      "autocomplete_first": "Type-ahead for better UX",
+      "relevance_tuning": "Boost scores and tier rankings"
+    },
+    "scalability": {
+      "federated_architecture": "Distributed ownership, centralized discovery",
+      "async_processing": "Kafka for decoupling",
+      "eventual_consistency": "Accept eventual consistency for scale",
+      "caching_layers": "Frontend and API caching",
+      "lazy_loading": "Load data on-demand in UI"
+    },
+    "extensibility": {
+      "plugin_architecture": "Connector plugins for sources",
+      "entity_registry": "Dynamic entity type registration",
+      "custom_aspects": "Add new aspects without core changes",
+      "actions_framework": "React to metadata changes",
+      "transformation_pipeline": "Enrich metadata during ingestion"
+    },
+    "integration": {
+      "api_first": "GraphQL and REST APIs for all operations",
+      "event_driven": "Kafka events for integrations",
+      "sdk_support": "Python and Java SDKs",
+      "openapi_compatible": "Standard API patterns"
+    }
+  },
+  "metadata_exchange_events": {
+    "overview": "DataHub uses Kafka events for all metadata operations, creating an event-driven architecture",
+    "event_types": {
+      "metadata_change_proposal_mcp": {
+        "description": "Request to change a specific aspect on an entity",
+        "direction": "Client → GMS",
+        "kafka_topic": "MetadataChangeProposal_v1",
+        "format": "Avro",
+        "fields": [
+          "entityType",
+          "entityUrn",
+          "changeType (UPSERT, DELETE, CREATE)",
+          "aspectName",
+          "aspect (JSON serialized)",
+          "systemMetadata"
+        ],
+        "use_case": "Ingestion framework sends MCPs to update metadata"
+      },
+      "metadata_change_log_mcl": {
+        "description": "Log of changes committed to metadata storage",
+        "direction": "GMS → Consumers",
+        "kafka_topic": "MetadataChangeLog_v1",
+        "format": "Avro",
+        "variants": {
+          "versioned": "Current state aspects",
+          "timeseries": "Time-bound events"
+        },
+        "consumers": [
+          "MAE Consumer (updates search and graph)",
+          "Actions Framework (triggers automations)",
+          "External systems (audit logs, data catalogs)"
+        ],
+        "use_case": "Propagate changes to derived indices and trigger reactions"
+      },
+      "platform_event_pe": {
+        "description": "Business-logic events derived from metadata changes",
+        "types": [
+          "Entity Change Event - entity created/updated/deleted",
+          "Entity Action Event - user actions on entities"
+        ],
+        "kafka_topic": "PlatformEvent_v1",
+        "consumers": "Actions Framework primarily",
+        "payload": "Dynamic based on event type"
+      },
+      "metadata_audit_event_mae": {
+        "description": "Legacy audit events (deprecated in favor of MCL)",
+        "status": "Being phased out"
+      }
+    },
+    "event_flow": {
+      "ingestion": [
+        "1. Connector creates MCP",
+        "2. Send to GMS via Rest.li or Kafka",
+        "3. GMS validates and stores aspect",
+        "4. GMS emits MCL to Kafka",
+        "5. Consumers process MCL"
+      ],
+      "propagation": [
+        "1. MCL consumed by MAE Consumer",
+        "2. Elasticsearch index updated",
+        "3. Neo4j graph updated",
+        "4. Platform Event emitted",
+        "5. Actions Framework processes event"
+      ]
+    },
+    "schema_definition": {
+      "source": "PDL files in metadata-models",
+      "compilation": "PDL → Avro schemas",
+      "registry": "Confluent Schema Registry manages versions"
+    }
+  },
+  "dependencies": {
+    "frontend": {
+      "react": "17.0.0",
+      "typescript": "4.x",
+      "apollo_client": "3.3.19",
+      "graphql": "15.5.0",
+      "antd": "4.24.7",
+      "mui": "5.15.21",
+      "reactflow": "11.10.1",
+      "visx": "Various visualization packages",
+      "styled_components": "5.2.1",
+      "monaco_editor": "0.28.1",
+      "dompurify": "3.2.4"
+    },
+    "backend_java": {
+      "language": "Java 11+",
+      "build_tool": "Gradle 7.x",
+      "frameworks": [
+        "Spring Boot",
+        "Rest.li (LinkedIn)",
+        "PlayFramework (frontend proxy)",
+        "Kafka Clients"
+      ],
+      "key_libraries": [
+        "Pegasus (PDL compiler)",
+        "Jackson (JSON)",
+        "Lombok",
+        "Guava",
+        "Elasticsearch Java client",
+        "Neo4j driver"
+      ]
+    },
+    "ingestion_python": {
+      "python_version": "3.8+",
+      "core_dependencies": {
+        "pydantic": "2.4.0+ (config validation)",
+        "click": "7.1.2+ (CLI)",
+        "avro": "1.11.3+ (serialization)",
+        "requests": "HTTP client",
+        "aiohttp": "Async HTTP",
+        "sqlalchemy": "Database abstraction",
+        "confluent_kafka": "2.10.1+ (Kafka producer)"
+      },
+      "connector_dependencies": {
+        "databases": [
+          "psycopg2-binary (PostgreSQL)",
+          "pymysql (MySQL)",
+          "oracledb (Oracle)",
+          "clickhouse-sqlalchemy (ClickHouse)"
+        ],
+        "warehouses": [
+          "google-cloud-bigquery (BigQuery)",
+          "snowflake-sqlalchemy (Snowflake)",
+          "databricks-sql-connector (Databricks)"
+        ],
+        "bi_tools": [
+          "looker-sdk (Looker)",
+          "tableauserverclient (Tableau)"
+        ],
+        "ml_platforms": [
+          "mlflow-skinny (MLflow)",
+          "google-cloud-aiplatform (Vertex AI)"
+        ],
+        "cloud": [
+          "boto3 (AWS)",
+          "azure-storage-blob (Azure)",
+          "s3fs (S3)"
+        ]
+      }
+    },
+    "infrastructure": {
+      "kafka": "2.8+ (Confluent recommended)",
+      "elasticsearch": "7.9+",
+      "neo4j": "4.x (optional, can use Elasticsearch)",
+      "mysql": "8.0+ (or PostgreSQL 12+, MariaDB 10.5+)",
+      "zookeeper": "3.x (for Kafka)",
+      "schema_registry": "Confluent Schema Registry 6.x+"
+    },
+    "deployment": {
+      "docker": "20.x+",
+      "kubernetes": "1.20+",
+      "helm": "3.x",
+      "jvm_memory": "2-8GB heap recommended for GMS",
+      "storage": "Persistent volumes for MySQL, Elasticsearch, Kafka, Neo4j"
+    }
+  },
+  "deployment_options": {
+    "docker_compose": {
+      "description": "Single-machine deployment for development and small production",
+      "file": "docker/docker-compose.yml",
+      "services": 7,
+      "containers": [
+        "datahub-gms",
+        "datahub-frontend-react",
+        "datahub-actions",
+        "elasticsearch",
+        "neo4j",
+        "kafka",
+        "mysql"
+      ],
+      "resource_requirements": "8GB+ RAM recommended",
+      "quickstart": "docker-compose up"
+    },
+    "kubernetes_helm": {
+      "description": "Production-grade orchestrated deployment",
+      "repository": "https://github.com/acryldata/datahub-helm",
+      "charts": [
+        "datahub - main application",
+        "datahub-prerequisites - external dependencies"
+      ],
+      "minimum_resources": "7GB+ RAM for cluster",
+      "managed_services_support": "Can use managed Kafka, Elasticsearch, RDS",
+      "deployment_steps": [
+        "Create k8s secrets for credentials",
+        "Deploy prerequisites chart",
+        "Deploy datahub chart",
+        "Port-forward frontend for access"
+      ]
+    },
+    "managed_service": {
+      "description": "Acryl DataHub Cloud - fully managed SaaS",
+      "benefits": [
+        "No infrastructure management",
+        "Automatic upgrades",
+        "Enterprise features",
+        "24/7 support"
+      ]
+    },
+    "bare_metal": {
+      "description": "Manual installation on VMs",
+      "requirements": [
+        "Java 11+ for GMS",
+        "Node.js for frontend",
+        "Python for ingestion",
+        "All external dependencies running"
+      ],
+      "complexity": "High - not recommended"
+    }
+  },
+  "authentication_authorization": {
+    "authentication": {
+      "architecture": "Two-layer authentication",
+      "layers": {
+        "frontend_proxy": {
+          "mechanism": "PLAY_SESSION cookie",
+          "methods": ["JAAS (username/password)", "OIDC (SSO)"],
+          "session": "Stateless JWT-based token"
+        },
+        "metadata_service": {
+          "mechanism": "Bearer token validation",
+          "token_types": [
+            "DataHub Access Token (embedded in session)",
+            "Personal Access Token (for APIs)"
+          ],
+          "header": "Authorization: Bearer <token>"
+        }
+      },
+      "configuration": {
+        "enable": "METADATA_SERVICE_AUTH_ENABLED=true",
+        "default": "Disabled (opt-in)",
+        "token_generation": "Via DataHub root user or UI"
+      }
+    },
+    "authorization": {
+      "model": "Role-Based Access Control (RBAC) + Policies",
+      "features": [
+        "Platform-level privileges (manage users, glossaries, etc.)",
+        "Resource-level policies (per dataset, domain, etc.)",
+        "Metadata policies (who can edit what aspects)",
+        "Custom roles and groups"
+      ]
+    }
+  },
+  "business_glossary": {
+    "description": "Standardized business vocabulary for data ecosystem",
+    "components": {
+      "terms": "Business definitions for words/phrases",
+      "term_groups": "Hierarchical organization of terms (folders)"
+    },
+    "features": [
+      "Documentation and ownership per term",
+      "Hierarchical nesting",
+      "Relationships: Contains and Inherits",
+      "Tag assets with glossary terms",
+      "Git-based management via CLI",
+      "Granular privileges"
+    ],
+    "use_cases": [
+      "Define business metrics",
+      "Standardize terminology",
+      "Improve data literacy",
+      "Cross-team alignment"
+    ]
+  },
+  "data_quality": {
+    "features": [
+      "Assertions - data quality rules and tests",
+      "Test results tracking",
+      "Quality metrics over time",
+      "Integration with Great Expectations, dbt tests"
+    ],
+    "assertion_types": [
+      "Field assertions (null checks, value ranges)",
+      "Schema assertions (column presence)",
+      "Volume assertions (row counts)",
+      "Freshness assertions (update recency)",
+      "Custom SQL assertions"
+    ],
+    "visualization": "Quality scores and trends in UI"
+  },
+  "actions_framework": {
+    "description": "Respond to real-time metadata changes with automated workflows",
+    "architecture": {
+      "pipeline": "Event Source → Filter → Transform → Action",
+      "configuration": "YAML files",
+      "execution": "datahub actions -c config.yml"
+    },
+    "event_sources": ["Kafka (MetadataChangeLog, Platform Events)", "DataHub Cloud Events"],
+    "built_in_actions": {
+      "hello_world": "Print events (debugging)",
+      "slack": "Send Slack notifications",
+      "executor": "Trigger DataHub ingestions",
+      "teams": "Microsoft Teams notifications",
+      "webhook": "HTTP POST to external systems"
+    },
+    "use_cases": [
+      "Alert on schema changes",
+      "Auto-tag PII columns",
+      "Propagate ownership changes",
+      "Trigger downstream processes",
+      "Compliance automation"
+    ],
+    "error_handling": "Configurable retry logic and failure modes"
+  },
+  "usage_analytics": {
+    "description": "Track how datasets, dashboards, and other assets are used",
+    "data_collected": [
+      "Query counts per dataset",
+      "Top queries",
+      "Top users",
+      "Column-level usage (source-dependent)",
+      "Dashboard/chart views"
+    ],
+    "sources": [
+      "BigQuery (via query logs)",
+      "Snowflake (via query history)",
+      "Redshift (via system tables)",
+      "Presto/Trino (via query logs)",
+      "Tableau (via usage stats API)"
+    ],
+    "ui_features": {
+      "queries_tab": "Top 5 queries for dataset",
+      "stats_tab": "Top 5 users by query count",
+      "usage_charts": "Trends over time"
+    }
+  },
+  "complexity_assessment": {
+    "overall_complexity": "HIGH",
+    "codebase_size": {
+      "lines_of_code": "500,000+ (estimated)",
+      "modules": "100+",
+      "languages": "3 primary (Java, Python, TypeScript)"
+    },
+    "architectural_complexity": {
+      "level": "High",
+      "reasons": [
+        "Distributed microservices architecture",
+        "Multiple storage systems (MySQL, Elasticsearch, Neo4j, Kafka)",
+        "Event-driven with complex event flows",
+        "Schema evolution management",
+        "Federated deployment support"
+      ]
+    },
+    "learning_curve": {
+      "steep_areas": [
+        "Pegasus Data Language (PDL) - LinkedIn-specific",
+        "Rest.li framework - not widely used outside LinkedIn",
+        "GMA architecture concepts",
+        "Aspect-oriented metadata modeling",
+        "Kafka-based event streaming"
+      ],
+      "moderate_areas": [
+        "GraphQL API usage",
+        "React frontend patterns",
+        "Python connector development",
+        "Docker/Kubernetes deployment"
+      ],
+      "accessible_areas": [
+        "Basic metadata ingestion via UI",
+        "Using pre-built connectors",
+        "Simple GraphQL queries",
+        "Frontend customization"
+      ]
+    },
+    "operational_complexity": {
+      "level": "Moderate to High",
+      "factors": [
+        "6+ infrastructure components to manage",
+        "Kafka cluster operations",
+        "Elasticsearch index management",
+        "Database migrations",
+        "Schema registry coordination",
+        "Consumer lag monitoring",
+        "Multi-service deployment orchestration"
+      ],
+      "managed_service_option": "Reduces operational burden significantly"
+    },
+    "integration_complexity": {
+      "connector_development": "Moderate - well-documented patterns",
+      "custom_entity_types": "High - requires PDL schema knowledge",
+      "frontend_customization": "Low to Moderate - standard React patterns",
+      "api_integration": "Low - GraphQL is developer-friendly"
+    }
+  },
+  "recommendations": {
+    "when_to_use_datahub": [
+      "Need enterprise-grade data catalog and lineage",
+      "Multiple heterogeneous data sources (10+ systems)",
+      "Real-time metadata updates required",
+      "Strong governance and compliance needs",
+      "Large organization with distributed data ownership",
+      "Investment in data mesh architecture",
+      "Need column-level lineage tracking",
+      "Complex data pipelines with multiple orchestrators",
+      "Already using LinkedIn technology stack"
+    ],
+    "when_to_consider_alternatives": [
+      "Small team with simple metadata needs (<5 sources)",
+      "Budget constraints (operational costs can be high)",
+      "Limited technical expertise to operate distributed systems",
+      "Need for simpler, lightweight solution",
+      "Primarily using cloud-native managed services (consider cloud-native catalogs)"
+    ],
+    "deployment_recommendations": {
+      "development_testing": "Docker Compose on local machine",
+      "small_production": "Docker Compose on EC2/VM with managed MySQL and Elasticsearch",
+      "medium_production": "Kubernetes with Helm, some managed services",
+      "large_production": "Kubernetes with Helm, all managed infrastructure, or DataHub Cloud",
+      "enterprise": "DataHub Cloud (managed service) for reduced operational burden"
+    },
+    "adoption_strategy": {
+      "phase_1": {
+        "focus": "Core infrastructure and 2-3 critical data sources",
+        "duration": "1-2 months",
+        "goals": [
+          "Deploy DataHub on Kubernetes or Docker",
+          "Connect top-priority data warehouse (e.g., Snowflake, BigQuery)",
+          "Connect primary BI tool (e.g., Tableau, Looker)",
+          "Train 5-10 power users",
+          "Establish governance processes"
+        ]
+      },
+      "phase_2": {
+        "focus": "Expand connectors and enable lineage",
+        "duration": "2-4 months",
+        "goals": [
+          "Add orchestrator integration (Airflow, dbt)",
+          "Enable column-level lineage",
+          "Connect databases and data lakes",
+          "Implement business glossary",
+          "Roll out to broader user base (50+ users)"
+        ]
+      },
+      "phase_3": {
+        "focus": "Advanced features and automation",
+        "duration": "3-6 months",
+        "goals": [
+          "Deploy Actions framework for automation",
+          "Custom connectors for proprietary systems",
+          "Data quality integration",
+          "Usage analytics and insights",
+          "Self-service metadata management"
+        ]
+      }
+    },
+    "team_requirements": {
+      "minimum": {
+        "devops_engineer": "1 FTE - infrastructure and deployment",
+        "data_engineer": "0.5 FTE - connector configuration and lineage",
+        "data_governance_lead": "0.5 FTE - business glossary, policies, training"
+      },
+      "recommended": {
+        "devops_sre": "1-2 FTE - operations, monitoring, scaling",
+        "data_platform_engineer": "1-2 FTE - integrations, custom connectors, automation",
+        "data_governance": "1 FTE - governance, training, user support",
+        "frontend_developer": "0.5 FTE - UI customization (optional)"
+      }
+    },
+    "cost_considerations": {
+      "infrastructure": [
+        "Compute: 4-8 vCPUs for GMS, 4 vCPUs for frontend",
+        "Memory: 8-16GB for GMS, 4GB for frontend",
+        "Storage: 100GB+ for MySQL, 500GB+ for Elasticsearch, 100GB+ for Kafka",
+        "Elasticsearch cluster: Significant cost driver (3-5 nodes recommended)",
+        "Kafka cluster: Medium cost (3 brokers + ZK recommended)",
+        "Network: Cross-AZ traffic costs"
+      ],
+      "managed_services": "Can reduce costs via managed Kafka, Elasticsearch, RDS",
+      "personnel": "1-4 FTE for operations and governance",
+      "datahub_cloud": "Eliminates infrastructure and reduces personnel, but has SaaS fees"
+    },
+    "key_design_patterns_to_adopt": {
+      "aspect_oriented_metadata": {
+        "pattern": "Decompose metadata into small, cohesive aspects",
+        "benefits": [
+          "Independent versioning",
+          "Smaller payloads",
+          "Modular updates",
+          "Better performance"
+        ],
+        "application": "When designing custom metadata models"
+      },
+      "event_driven_propagation": {
+        "pattern": "Use event streams to propagate metadata changes",
+        "benefits": [
+          "Real-time updates",
+          "Decoupled systems",
+          "Audit trail",
+          "Reactive workflows"
+        ],
+        "application": "Integration with downstream systems, automation"
+      },
+      "schema_first_modeling": {
+        "pattern": "Define schemas before implementation",
+        "benefits": [
+          "Strong typing",
+          "Validation",
+          "Documentation",
+          "Code generation"
+        ],
+        "application": "Custom entity types, extending metadata model"
+      },
+      "federated_ownership": {
+        "pattern": "Distributed metadata services with central aggregation",
+        "benefits": [
+          "Team autonomy",
+          "Scalability",
+          "Domain-driven design",
+          "Data mesh alignment"
+        ],
+        "application": "Large organizations, data mesh architectures"
+      },
+      "multi_granularity_lineage": {
+        "pattern": "Track lineage at dataset and column levels",
+        "benefits": [
+          "Fine-grained impact analysis",
+          "Compliance tracking",
+          "Root cause analysis"
+        ],
+        "application": "Complex data transformations, regulatory compliance"
+      }
+    }
+  },
+  "reusable_components": {
+    "metadata_model_patterns": {
+      "entity_aspect_relationship": "Core abstraction for metadata modeling",
+      "versioned_metadata": "Temporal tracking of changes",
+      "timeseries_events": "Time-based metric collection",
+      "urn_based_references": "Globally unique entity identifiers"
+    },
+    "connector_framework": {
+      "sql_alchemy_base": "Reusable SQL database connector pattern",
+      "two_tier_hierarchy": "Database → Schema → Table pattern",
+      "configuration_validation": "Pydantic-based config models",
+      "work_unit_pattern": "Streaming metadata extraction"
+    },
+    "lineage_capture": {
+      "upstream_lineage_aspect": "Standard lineage representation",
+      "fine_grained_lineage": "Column-level dependencies",
+      "lineage_types": "COPY, TRANSFORMED, VIEW taxonomy"
+    },
+    "search_indexing": {
+      "annotation_driven_indexing": "PDL annotations control search behavior",
+      "entity_specific_indices": "Separate index per type",
+      "faceted_search": "Multi-dimensional filtering"
+    },
+    "ui_patterns": {
+      "entity_registry": "Dynamic entity type system",
+      "lineage_visualization": "Reactflow-based graph rendering",
+      "entity_profile_tabs": "Consistent entity detail views"
+    }
+  },
+  "requirements": {
+    "system_requirements": {
+      "minimum": {
+        "cpu": "4 cores",
+        "ram": "8 GB",
+        "storage": "50 GB",
+        "use_case": "Development and testing"
+      },
+      "recommended": {
+        "cpu": "16+ cores",
+        "ram": "32+ GB",
+        "storage": "500 GB+",
+        "use_case": "Production with moderate load"
+      },
+      "production": {
+        "cpu": "Distributed across multiple nodes",
+        "ram": "64+ GB total",
+        "storage": "1+ TB for Elasticsearch, 100+ GB for MySQL",
+        "network": "Low-latency for Kafka and Elasticsearch cluster"
+      }
+    },
+    "software_requirements": {
+      "backend": [
+        "Java 11 or 17",
+        "Gradle 7.x (for building)",
+        "Docker 20+ (for deployment)"
+      ],
+      "frontend": [
+        "Node.js 16+",
+        "Yarn 1.x",
+        "Modern browser (Chrome, Firefox, Safari, Edge)"
+      ],
+      "ingestion": [
+        "Python 3.8-3.11",
+        "pip or poetry",
+        "Connector-specific dependencies (see dependencies.ingestion_python)"
+      ],
+      "infrastructure": [
+        "Kafka 2.8+",
+        "Elasticsearch 7.9+",
+        "MySQL 8.0+ or PostgreSQL 12+",
+        "Neo4j 4.x (optional)",
+        "Kubernetes 1.20+ (for k8s deployment)",
+        "Helm 3.x (for k8s deployment)"
+      ]
+    },
+    "network_requirements": {
+      "ports": {
+        "datahub_gms": 8080,
+        "datahub_frontend": 9002,
+        "elasticsearch": 9200,
+        "neo4j_http": 7474,
+        "neo4j_bolt": 7687,
+        "kafka": 9092,
+        "schema_registry": 8081,
+        "zookeeper": 2181,
+        "mysql": 3306
+      },
+      "connectivity": [
+        "GMS → MySQL/PostgreSQL",
+        "GMS → Kafka",
+        "GMS → Elasticsearch",
+        "GMS → Neo4j (if used)",
+        "MAE Consumer → Kafka",
+        "MAE Consumer → Elasticsearch",
+        "MAE Consumer → Neo4j",
+        "Frontend → GMS",
+        "Users → Frontend",
+        "Ingestion → GMS (or Kafka)"
+      ]
+    },
+    "user_requirements": {
+      "technical_skills": [
+        "Basic SQL for database connectors",
+        "YAML for recipe configuration",
+        "Command line proficiency",
+        "Understanding of data modeling concepts"
+      ],
+      "governance_skills": [
+        "Data governance principles",
+        "Metadata management concepts",
+        "Business glossary creation",
+        "Policy definition"
+      ],
+      "end_users": [
+        "Data discovery via web UI (non-technical)",
+        "Understanding of lineage concepts"
+      ]
+    }
+  },
+  "key_files_and_directories": {
+    "metadata_models": "PDL schema definitions for entities and aspects",
+    "metadata_service": "GMS Java backend implementation",
+    "metadata_ingestion": "Python ingestion framework and connectors",
+    "datahub_web_react": "React frontend application",
+    "datahub_graphql_core": "GraphQL API implementation",
+    "datahub_actions": "Actions framework for reactive workflows",
+    "docker": "Docker Compose and container configurations",
+    "datahub_helm": "Kubernetes Helm charts (separate repo)",
+    "docs": "Project documentation",
+    "entity_registry_yml": "Entity registry configuration"
+  },
+  "conclusion": {
+    "strengths": [
+      "Comprehensive metadata model with entities, aspects, relationships",
+      "Real-time metadata propagation via Kafka events",
+      "100+ pre-built connectors for data sources",
+      "Column-level lineage tracking",
+      "Powerful search and discovery with Elasticsearch",
+      "GraphQL API for flexible querying",
+      "Modern React UI with interactive lineage visualization",
+      "Extensible architecture for custom entities and connectors",
+      "Strong community and enterprise adoption",
+      "Apache 2.0 license (permissive, reusable)",
+      "Federated architecture for data mesh use cases",
+      "Actions framework for automation"
+    ],
+    "challenges": [
+      "High operational complexity with 6+ infrastructure components",
+      "Steep learning curve for PDL and Rest.li (LinkedIn-specific)",
+      "Significant resource requirements (CPU, memory, storage)",
+      "Complex deployment and configuration",
+      "Kafka expertise required for production operations",
+      "Schema evolution can be tricky",
+      "Documentation gaps in some areas"
+    ],
+    "ideal_use_cases": [
+      "Enterprise data cataloging and governance",
+      "Complex data ecosystems with many sources",
+      "Organizations needing real-time metadata",
+      "Data mesh architectures with federated ownership",
+      "Compliance and auditing requirements",
+      "Column-level lineage for impact analysis",
+      "Large data teams (50+ users)"
+    ],
+    "code_reuse_potential": {
+      "high": [
+        "Metadata model design (entities, aspects, relationships)",
+        "Connector framework patterns",
+        "GraphQL API structure",
+        "Lineage visualization components",
+        "Event-driven metadata propagation",
+        "Search indexing strategies"
+      ],
+      "medium": [
+        "React entity registry pattern",
+        "PDL schema definitions",
+        "Aspect versioning approach",
+        "URN identifier system"
+      ],
+      "low": [
+        "Rest.li API layer (LinkedIn-specific framework)",
+        "GMA infrastructure (tightly coupled to DataHub)"
+      ]
+    },
+    "final_assessment": "DataHub is a production-ready, enterprise-grade data catalog and lineage platform with excellent metadata modeling patterns. The Apache 2.0 license allows free reuse. Its aspect-oriented metadata model, event-driven architecture, and multi-granularity lineage tracking are particularly noteworthy design patterns. However, the operational complexity is high, and the learning curve is steep due to LinkedIn-specific technologies (PDL, Rest.li). Best suited for large organizations with complex data ecosystems and dedicated platform teams. For smaller teams or simpler use cases, consider lighter alternatives or the managed DataHub Cloud service."
+  }
+}

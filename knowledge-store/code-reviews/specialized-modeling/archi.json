@@ -1,0 +1,1989 @@
+{
+  "repository": {
+    "name": "archi",
+    "url": "https://github.com/archimatetool/archi",
+    "description": "Archi: Open Source ArchiMate Modelling - A free, open source, cross-platform tool and editor for creating ArchiMate models",
+    "status": "active",
+    "main_branch": "master",
+    "stars": 1100,
+    "forks": 309,
+    "inception_year": "2013",
+    "organization": "Archi (Phillip Beauvoir, Jean-Baptiste Sarrodie, The Open Group)",
+    "website": "https://www.archimatetool.com",
+    "primary_language": "Java",
+    "language_percentage": "94.2%"
+  },
+  "license": {
+    "type": "MIT License",
+    "spdx_id": "MIT",
+    "copyright_holders": [
+      "Phillip Beauvoir",
+      "Jean-Baptiste Sarrodie",
+      "The Open Group (2013-2025)"
+    ],
+    "reusable": true,
+    "commercial_use": true,
+    "modification": true,
+    "distribution": true,
+    "patent_grant": false,
+    "conditions": [
+      "Include original license and copyright notices in all copies or substantial portions",
+      "THE SOFTWARE IS PROVIDED AS IS without warranty"
+    ],
+    "limitations": [
+      "No warranty provided of any kind",
+      "No liability for damages or claims",
+      "Authors not responsible for misuse or errors"
+    ],
+    "assessment": "Extremely permissive open source license - one of the most liberal licenses available. Allows unrestricted commercial use, modification, and distribution with minimal obligations. Only requires preserving copyright notices. Ideal for learning from and reusing code patterns, metamodel designs, and architectural approaches in UML-Codex.",
+    "reuse_category": "CAN_LIFT",
+    "reuse_notes": "MIT license permits direct code reuse, adaptation, and learning from implementation patterns. Can study EMF metamodel patterns, GEF visual editor architecture, plugin extensibility mechanisms, and XML persistence approaches. Particularly valuable for understanding Eclipse RCP architecture and enterprise modeling tool design patterns."
+  },
+  "maven_coordinates": {
+    "groupId": "com.archimatetool",
+    "artifactId": "archi",
+    "version": "5.8.0-SNAPSHOT",
+    "packaging": "pom"
+  },
+  "build_technology": {
+    "build_system": "Eclipse Tycho",
+    "tycho_version": "4.0.10",
+    "maven_version": "3.0.0+",
+    "encoding": "UTF-8",
+    "java_version": "JavaSE-21",
+    "platforms": [
+      "Windows x86_64",
+      "Linux GTK x86_64",
+      "macOS Cocoa x86_64",
+      "macOS Cocoa ARM64/aarch64"
+    ],
+    "packaging": "Eclipse RCP application with OSGi bundles"
+  },
+  "dependencies": {
+    "eclipse_platform": [
+      {
+        "name": "Eclipse 2024-06 Release",
+        "repository": "https://download.eclipse.org/releases/2024-06",
+        "type": "P2 repository",
+        "description": "Base Eclipse platform and RCP components"
+      },
+      {
+        "name": "org.eclipse.core.runtime",
+        "scope": "required",
+        "description": "Eclipse core runtime and plugin infrastructure",
+        "license": "EPL-2.0"
+      },
+      {
+        "name": "org.eclipse.ui",
+        "scope": "required",
+        "description": "Eclipse UI framework for workbench, views, and editors",
+        "license": "EPL-2.0"
+      },
+      {
+        "name": "org.eclipse.ui.forms",
+        "scope": "required",
+        "description": "Forms-based UI components",
+        "license": "EPL-2.0"
+      },
+      {
+        "name": "org.eclipse.e4.core.services",
+        "scope": "required",
+        "description": "Eclipse 4 core services and dependency injection",
+        "license": "EPL-2.0"
+      },
+      {
+        "name": "org.eclipse.e4.ui.css.swt.theme",
+        "scope": "required",
+        "description": "CSS-based theming for Eclipse 4",
+        "license": "EPL-2.0"
+      }
+    ],
+    "emf_framework": [
+      {
+        "name": "org.eclipse.emf.ecore",
+        "version": "2.0.0+",
+        "scope": "required",
+        "reexport": true,
+        "description": "Eclipse Modeling Framework - Core metamodel implementation",
+        "license": "EPL-2.0",
+        "purpose": "Provides EMF-based metamodel for ArchiMate elements, relationships, and diagrams"
+      },
+      {
+        "name": "org.eclipse.emf.ecore.xmi",
+        "version": "2.0.0+",
+        "scope": "required",
+        "reexport": true,
+        "description": "EMF XMI persistence framework",
+        "license": "EPL-2.0",
+        "purpose": "XML/XMI serialization and deserialization of ArchiMate models"
+      }
+    ],
+    "graphical_editing": [
+      {
+        "name": "org.eclipse.gef",
+        "version": "3.11.100+",
+        "scope": "required",
+        "description": "Graphical Editing Framework - Visual editor foundation",
+        "license": "EPL-2.0",
+        "purpose": "Provides MVC-based diagram editor with edit parts, figures, and commands"
+      },
+      {
+        "name": "org.eclipse.draw2d",
+        "scope": "required",
+        "description": "2D graphics rendering framework",
+        "license": "EPL-2.0",
+        "purpose": "Rendering visual figures, shapes, and connections in diagrams",
+        "bundled": true
+      },
+      {
+        "name": "org.eclipse.zest.core",
+        "scope": "required",
+        "description": "Graph visualization components",
+        "license": "EPL-2.0",
+        "purpose": "Automatic layout algorithms for graph-based diagrams",
+        "bundled": true
+      },
+      {
+        "name": "org.eclipse.zest.layouts",
+        "scope": "required",
+        "description": "Layout algorithms for graph visualization",
+        "license": "EPL-2.0",
+        "bundled": true
+      }
+    ],
+    "reporting": [
+      {
+        "name": "net.sf.jasperreports",
+        "version": "6.12.2",
+        "scope": "optional",
+        "description": "JasperReports reporting engine",
+        "license": "LGPL-3.0",
+        "purpose": "Generate professional PDF reports from ArchiMate models",
+        "module": "com.archimatetool.jasperreports"
+      },
+      {
+        "name": "com.fasterxml.jackson.core",
+        "version": "2.18.2",
+        "scope": "optional",
+        "description": "Jackson JSON processor",
+        "license": "Apache-2.0",
+        "purpose": "JSON serialization for reports",
+        "module": "com.archimatetool.jasperreports"
+      },
+      {
+        "name": "com.github.librepdf.openpdf",
+        "version": "2.0.3",
+        "scope": "optional",
+        "description": "OpenPDF library for PDF generation",
+        "license": "LGPL/MPL",
+        "purpose": "PDF document rendering in reports",
+        "module": "com.archimatetool.jasperreports"
+      },
+      {
+        "name": "org.apache.commons.beanutils",
+        "version": "1.9.4",
+        "scope": "optional",
+        "license": "Apache-2.0",
+        "module": "com.archimatetool.jasperreports"
+      },
+      {
+        "name": "org.apache.commons.collections4",
+        "version": "4.4.0",
+        "scope": "optional",
+        "license": "Apache-2.0",
+        "module": "com.archimatetool.jasperreports"
+      }
+    ],
+    "provisioning": [
+      {
+        "name": "org.eclipse.equinox.p2.core",
+        "scope": "required",
+        "description": "P2 provisioning platform core",
+        "license": "EPL-2.0",
+        "purpose": "Plugin update and provisioning system"
+      },
+      {
+        "name": "org.eclipse.equinox.p2.engine",
+        "scope": "required",
+        "description": "P2 provisioning engine",
+        "license": "EPL-2.0"
+      },
+      {
+        "name": "org.eclipse.equinox.p2.metadata",
+        "scope": "required",
+        "description": "P2 metadata management",
+        "license": "EPL-2.0"
+      },
+      {
+        "name": "org.eclipse.equinox.p2.repository",
+        "scope": "required",
+        "description": "P2 repository access",
+        "license": "EPL-2.0"
+      },
+      {
+        "name": "org.eclipse.equinox.p2.garbagecollector",
+        "scope": "required",
+        "description": "P2 cleanup operations",
+        "license": "EPL-2.0"
+      },
+      {
+        "name": "org.eclipse.equinox.security",
+        "scope": "required",
+        "description": "Security infrastructure for P2",
+        "license": "EPL-2.0"
+      }
+    ],
+    "internal_modules": [
+      {
+        "name": "com.archimatetool.model",
+        "description": "Core ArchiMate metamodel (EMF-based)",
+        "exports": [
+          "com.archimatetool.model",
+          "com.archimatetool.model.impl",
+          "com.archimatetool.model.util",
+          "com.archimatetool.model.viewpoints"
+        ]
+      },
+      {
+        "name": "com.archimatetool.editor",
+        "description": "Main editor application and workbench",
+        "exports": [
+          "60+ packages covering diagram editing, UI, preferences, properties"
+        ]
+      },
+      {
+        "name": "com.archimatetool.jdom",
+        "description": "Custom JDOM integration for XML handling"
+      },
+      {
+        "name": "com.archimatetool.widgets",
+        "description": "Custom UI widgets and components"
+      },
+      {
+        "name": "com.archimatetool.canvas",
+        "description": "Canvas diagram support"
+      },
+      {
+        "name": "com.archimatetool.csv",
+        "description": "CSV import/export functionality"
+      },
+      {
+        "name": "com.archimatetool.export.svg",
+        "description": "SVG export capability"
+      },
+      {
+        "name": "com.archimatetool.reports",
+        "description": "HTML reporting framework"
+      },
+      {
+        "name": "com.archimatetool.templates",
+        "description": "Model template management"
+      },
+      {
+        "name": "com.archimatetool.help",
+        "description": "Integrated help documentation"
+      },
+      {
+        "name": "org.opengroup.archimate.xmlexchange",
+        "description": "Open Exchange XML format support (official ArchiMate exchange format)"
+      }
+    ]
+  },
+  "architecture": {
+    "paradigm": "Eclipse RCP with EMF-based metamodel and GEF visual editing",
+    "layers": [
+      {
+        "name": "Metamodel Layer (EMF)",
+        "description": "Core ArchiMate metamodel defined in Ecore",
+        "components": [
+          "IArchimatePackage - EMF package descriptor (494KB generated)",
+          "IArchimateFactory - Object creation factory",
+          "Element interfaces (ArchimateElement, ArchimateRelationship, etc.)",
+          "Implementation classes (generated from .ecore model)",
+          "Viewpoint definitions and filtering"
+        ],
+        "technology": "Eclipse Modeling Framework (EMF)",
+        "patterns": [
+          "Ecore metamodel with code generation",
+          "Factory pattern for object creation",
+          "Adapter pattern for extensibility",
+          "Type Object pattern for runtime metamodel access"
+        ]
+      },
+      {
+        "name": "Model Layer",
+        "description": "ArchiMate model structure and organization",
+        "components": [
+          "IArchimateModel - Root model container",
+          "IFolder - Hierarchical organization by layer",
+          "Element classes for all ArchiMate types",
+          "Relationship classes with source/target",
+          "Properties and metadata management",
+          "Profile support for specialization"
+        ],
+        "organization": [
+          "Strategy layer elements",
+          "Business layer elements",
+          "Application layer elements",
+          "Technology & Physical layer elements",
+          "Motivation elements",
+          "Implementation & Migration elements",
+          "Relationships (structural, dependency, dynamic, other)"
+        ]
+      },
+      {
+        "name": "Diagram Model Layer",
+        "description": "Visual representation separate from semantic model",
+        "components": [
+          "IDiagramModel - Abstract base for all diagrams",
+          "IDiagramModelArchimateObject - Visual element representation",
+          "IDiagramModelArchimateConnection - Visual relationship representation",
+          "IDiagramModelNote, IDiagramModelGroup - Annotations and grouping",
+          "IBounds - Position and size (x, y, width, height)",
+          "Style attributes (line, font, fill, border)"
+        ],
+        "separation": "Model-view separation - semantic elements can appear in multiple diagrams with different visual properties"
+      },
+      {
+        "name": "Visual Editor Layer (GEF)",
+        "description": "Eclipse GEF-based diagram editing framework",
+        "components": [
+          "AbstractDiagramEditor - Base editor functionality",
+          "ArchimateDiagramEditor - ArchiMate-specific implementation",
+          "Edit Parts (MVC controllers for diagram elements)",
+          "Figures (Draw2D visual representations)",
+          "Edit Policies (interaction behavior)",
+          "Commands (undoable edit operations)",
+          "Palette (tool selection)",
+          "Context menus and action contributions"
+        ],
+        "patterns": [
+          "Model-View-Controller (GEF architecture)",
+          "Command pattern for undo/redo",
+          "Strategy pattern for edit policies",
+          "Factory pattern for edit parts and figures"
+        ]
+      },
+      {
+        "name": "Workbench Layer (Eclipse RCP)",
+        "description": "Application shell and UI framework",
+        "components": [
+          "Application.java - Entry point",
+          "ArchiPlugin - Plugin lifecycle management",
+          "Workbench/Window advisors - UI configuration",
+          "Views (model tree, properties, outline, navigator)",
+          "Editors (diagram, canvas, sketch)",
+          "Perspectives and layouts",
+          "Preferences and settings",
+          "Menus, toolbars, keybindings"
+        ],
+        "technology": "Eclipse RCP with E4 services and CSS theming"
+      },
+      {
+        "name": "Persistence Layer",
+        "description": "Model serialization and storage",
+        "components": [
+          "EMF XMI serialization (primary format .archimate)",
+          "Open Exchange XML format support (official interoperability)",
+          "CSV import/export for bulk operations",
+          "Template save/load",
+          "Version migration (Archi4Migrator)"
+        ],
+        "formats": [
+          ".archimate - Native EMF XMI format",
+          ".xml - Open Exchange Format (official ArchiMate standard)",
+          ".csv - Element and relationship export/import",
+          ".svg - Diagram export",
+          ".pdf - Report generation"
+        ]
+      },
+      {
+        "name": "Extension Layer",
+        "description": "Plugin architecture for extensibility",
+        "extension_points": [
+          "exportHandler - Custom export formats",
+          "importHandler - Custom import formats",
+          "objectUIProvider - UI representations for model objects",
+          "diagramEditorFactory - Custom diagram types",
+          "compatibilityHandler - Version migration handlers",
+          "imageExportProvider - Image export formats"
+        ],
+        "extensibility": "Full Eclipse plugin ecosystem - third-party plugins can extend all aspects"
+      },
+      {
+        "name": "Reporting Layer",
+        "description": "Report generation and export",
+        "components": [
+          "HTML reports with customizable templates",
+          "JasperReports integration for PDF generation",
+          "SQL query support in HTML reports",
+          "Image export (PNG, BMP, SVG)",
+          "Custom report templates"
+        ]
+      }
+    ],
+    "core_abstractions": [
+      {
+        "name": "IIdentifier",
+        "description": "Provides unique ID for all model elements",
+        "pattern": "Interface segregation - base capability"
+      },
+      {
+        "name": "INameable",
+        "description": "Elements that can be named",
+        "pattern": "Interface segregation"
+      },
+      {
+        "name": "IDocumentable",
+        "description": "Elements that can have documentation",
+        "pattern": "Interface segregation"
+      },
+      {
+        "name": "IProperties",
+        "description": "Key-value property management",
+        "pattern": "Property pattern for extensibility"
+      },
+      {
+        "name": "IAdapter",
+        "description": "Runtime adaptation to different types",
+        "pattern": "Adapter pattern for flexibility"
+      },
+      {
+        "name": "ICloneable",
+        "description": "Model copying support via getCopy()",
+        "pattern": "Prototype pattern"
+      },
+      {
+        "name": "IArchimateConcept",
+        "description": "Base for all ArchiMate elements and relationships",
+        "hierarchy": "Elements and Relationships both extend Concept"
+      },
+      {
+        "name": "IArchimateElement",
+        "description": "Base for all ArchiMate elements",
+        "categories": [
+          "Strategy elements",
+          "Business elements",
+          "Application elements",
+          "Technology & Physical elements",
+          "Motivation elements",
+          "Implementation & Migration elements"
+        ]
+      },
+      {
+        "name": "IArchimateRelationship",
+        "description": "Base for all relationships with source and target",
+        "categories": [
+          "Structural (Composition, Aggregation, Assignment, Realization)",
+          "Dependency (Serving, Access, Influence, Association)",
+          "Dynamic (Flow, Triggering)",
+          "Other (Specialization, Junction)"
+        ]
+      },
+      {
+        "name": "IDiagramModel",
+        "description": "Container for visual diagrams",
+        "types": [
+          "ArchiMate diagram views",
+          "Canvas diagrams",
+          "Sketch diagrams"
+        ]
+      }
+    ],
+    "model_view_separation": {
+      "approach": "Semantic model completely separate from visual representation",
+      "semantic_model": "IArchimateModel contains elements and relationships",
+      "visual_model": "IDiagramModel contains visual representations (shapes, connections, bounds, styles)",
+      "relationship": "One semantic element can appear in multiple diagrams with different visual properties",
+      "benefits": [
+        "Same element can be shown in multiple viewpoints",
+        "Visual changes don't affect semantic model",
+        "Supports ArchiMate viewpoint filtering",
+        "Enables model reuse across diagrams"
+      ]
+    },
+    "viewpoint_architecture": {
+      "purpose": "Filter diagrams to show only relevant elements for specific stakeholders",
+      "components": [
+        "IViewpoint interface",
+        "Viewpoint implementation class",
+        "ViewpointManager for lifecycle management"
+      ],
+      "archimate_viewpoints": [
+        "Organization viewpoint",
+        "Application Platform viewpoint",
+        "Information Structure viewpoint",
+        "Technology viewpoint",
+        "Layered viewpoint",
+        "Service Realization viewpoint",
+        "Implementation and Migration viewpoint",
+        "Project viewpoint",
+        "And many more standard ArchiMate viewpoints"
+      ],
+      "filtering": "Viewpoints define which element and relationship types are visible in a diagram"
+    }
+  },
+  "design_patterns": {
+    "emf_metamodel_patterns": [
+      {
+        "pattern": "Ecore Metamodel with Code Generation",
+        "description": "ArchiMate metamodel defined in archimate.ecore file, EMF generates Java interfaces and implementation classes",
+        "benefits": [
+          "Model-driven development - metamodel is source of truth",
+          "Automatic generation of factory, package, and implementation",
+          "XMI serialization provided by EMF framework",
+          "Reflective API for runtime introspection",
+          "Notification framework for model changes"
+        ],
+        "implementation": "archimate.ecore defines all element types, attributes, references, and containment relationships",
+        "generated_artifacts": [
+          "Interfaces for all model elements (I* prefix)",
+          "Implementation classes (*Impl suffix)",
+          "Factory class (IArchimateFactory)",
+          "Package descriptor (IArchimatePackage)",
+          "Switch and AdapterFactory utilities"
+        ]
+      },
+      {
+        "pattern": "EMF Notification and Observation",
+        "description": "EMF provides automatic change notification when model is modified",
+        "benefits": [
+          "UI automatically updates when model changes",
+          "Enables undo/redo tracking",
+          "Supports model validation",
+          "Allows multiple observers of same model"
+        ],
+        "usage": "GEF edit parts listen to EMF notifications to refresh visual representations"
+      },
+      {
+        "pattern": "EMF Resource Framework",
+        "description": "Models stored in EMF Resources with URI-based loading",
+        "formats": [
+          "XMI (default EMF serialization)",
+          "Custom formats via ResourceFactory"
+        ],
+        "benefits": [
+          "Lazy loading of large models",
+          "Cross-reference resolution",
+          "Resource lifecycle management"
+        ]
+      }
+    ],
+    "gef_visual_editing_patterns": [
+      {
+        "pattern": "Model-View-Controller (GEF EditParts)",
+        "description": "GEF implements MVC where EditPart is controller, Figure is view, and EMF model is model",
+        "components": {
+          "Model": "EMF-based ArchiMate elements (IDiagramModelObject, IDiagramModelConnection)",
+          "View": "Draw2D figures (shapes, connections, labels)",
+          "Controller": "EditParts connect model to view and handle user interaction"
+        },
+        "benefits": [
+          "Clean separation of concerns",
+          "Multiple views of same model",
+          "Testable without UI",
+          "Pluggable visual representations"
+        ],
+        "implementation": "Each diagram element type has corresponding EditPart and Figure classes"
+      },
+      {
+        "pattern": "EditPolicy Strategy Pattern",
+        "description": "EditPolicies define interaction behavior (selection, drag, resize, connect, etc.) as pluggable strategies",
+        "policy_types": [
+          "SelectionEditPolicy - How selection is shown",
+          "LayoutEditPolicy - How children are arranged",
+          "ConnectionEditPolicy - How connections are created",
+          "ComponentEditPolicy - Delete behavior",
+          "DirectEditPolicy - In-place text editing"
+        ],
+        "benefits": [
+          "Behavior can be mixed and matched",
+          "Easy to customize interaction",
+          "Separation of concerns",
+          "Reusable across element types"
+        ]
+      },
+      {
+        "pattern": "Command Pattern for Undo/Redo",
+        "description": "All model modifications wrapped in undoable Command objects",
+        "characteristics": [
+          "Commands encapsulate both execute() and undo() logic",
+          "CommandStack manages command history",
+          "Dirty state tracked automatically",
+          "Commands can be composed for complex operations"
+        ],
+        "benefits": [
+          "Full undo/redo support",
+          "Transactional model changes",
+          "Easy to test operations",
+          "Macro command composition"
+        ]
+      },
+      {
+        "pattern": "Factory Pattern for EditParts",
+        "description": "EditPartFactory creates appropriate EditPart for each model element type",
+        "implementation": "Switch on model element type to instantiate correct EditPart class",
+        "benefits": [
+          "Centralized creation logic",
+          "Easy to add new element types",
+          "Supports polymorphism"
+        ]
+      },
+      {
+        "pattern": "Request/Response Protocol",
+        "description": "User gestures converted to Request objects, EditPolicies return Command responses",
+        "flow": [
+          "User action creates Request",
+          "Request routed to EditPart",
+          "EditPolicies evaluate Request",
+          "Policy returns Command or null",
+          "Command executed via CommandStack"
+        ],
+        "benefits": [
+          "Decouples UI from business logic",
+          "Testable without UI events",
+          "Flexible routing and handling"
+        ]
+      }
+    ],
+    "eclipse_rcp_patterns": [
+      {
+        "pattern": "Extension Point Architecture",
+        "description": "Eclipse plugin system allows third-party extensions without modifying core code",
+        "archi_extension_points": [
+          "exportHandler - Add new export formats",
+          "importHandler - Add new import formats",
+          "objectUIProvider - Customize element visualization",
+          "diagramEditorFactory - Add new diagram types",
+          "compatibilityHandler - Handle version migration",
+          "imageExportProvider - Add image export formats"
+        ],
+        "benefits": [
+          "Open-closed principle - open for extension, closed for modification",
+          "Third-party plugin ecosystem",
+          "Version-independent extensions",
+          "Declarative configuration (plugin.xml)"
+        ]
+      },
+      {
+        "pattern": "Dependency Injection (Eclipse E4)",
+        "description": "Eclipse E4 provides dependency injection for services and context",
+        "usage": "@Inject annotations for service injection",
+        "benefits": [
+          "Loose coupling between components",
+          "Testability via mock injection",
+          "Lifecycle management by framework"
+        ]
+      },
+      {
+        "pattern": "Workbench Advisor Pattern",
+        "description": "Advisors customize application startup, window creation, and lifecycle",
+        "advisors": [
+          "WorkbenchAdvisor - Application-level configuration",
+          "WorkbenchWindowAdvisor - Window-level setup",
+          "ActionBarAdvisor - Menu and toolbar configuration"
+        ],
+        "customization": "Archi provides custom advisors to configure workbench appearance and behavior"
+      },
+      {
+        "pattern": "Tabbed Properties Framework",
+        "description": "Property sheets organized into tabs with filtered sections",
+        "implementation": [
+          "Property tabs (Appearance, Main, Label, Figure, etc.)",
+          "Property sections filtered by selection type",
+          "Contribution via extension points"
+        ],
+        "benefits": [
+          "Organized property editing",
+          "Context-sensitive UI",
+          "Extensible by plugins"
+        ]
+      }
+    ],
+    "persistence_patterns": [
+      {
+        "pattern": "Multiple Serialization Formats",
+        "description": "Support for both proprietary and standard exchange formats",
+        "formats": [
+          {
+            "format": ".archimate (EMF XMI)",
+            "purpose": "Native format with full fidelity",
+            "technology": "EMF XMI serialization",
+            "advantages": "Preserves all Archi-specific features"
+          },
+          {
+            "format": "Open Exchange XML",
+            "purpose": "Standard ArchiMate exchange format",
+            "technology": "Custom XML with XSD schema",
+            "advantages": "Interoperability with other ArchiMate tools",
+            "module": "org.opengroup.archimate.xmlexchange"
+          },
+          {
+            "format": "CSV",
+            "purpose": "Bulk import/export of elements and relationships",
+            "advantages": "Excel integration, batch operations"
+          }
+        ]
+      },
+      {
+        "pattern": "Version Migration Framework",
+        "description": "Compatibility handlers migrate models from older versions",
+        "implementation": "Archi4Migrator handles migration from Archi 4.x to 5.x formats",
+        "extensibility": "compatibilityHandler extension point allows plugins to add migration logic"
+      }
+    ],
+    "ui_patterns": [
+      {
+        "pattern": "Object UI Provider Registry",
+        "description": "70+ objectUIProvider extensions map model objects to UI representations",
+        "responsibilities": [
+          "Provide icon for element type",
+          "Provide label text",
+          "Provide default figure",
+          "Provide property sections"
+        ],
+        "benefits": [
+          "Decoupled UI from model",
+          "Easy to customize appearance",
+          "Consistent rendering across views"
+        ]
+      },
+      {
+        "pattern": "CSS Theming (Eclipse E4)",
+        "description": "Application appearance controlled by CSS stylesheets",
+        "capabilities": [
+          "Theme switching at runtime",
+          "Custom colors, fonts, spacing",
+          "Platform-specific theming"
+        ],
+        "module": "com.archimatetool.editor.themes"
+      }
+    ]
+  },
+  "key_components": {
+    "metamodel": {
+      "definition_file": "com.archimatetool.model/model/archimate.ecore",
+      "size": "494KB Ecore model",
+      "namespace": "http://www.archimatetool.com/archimate",
+      "element_count": "40+ element types, 20+ relationship types",
+      "packages": {
+        "com.archimatetool.model": "Metamodel interfaces (generated from Ecore)",
+        "com.archimatetool.model.impl": "Implementation classes (generated from Ecore)",
+        "com.archimatetool.model.util": "Utility classes (switches, adapters)",
+        "com.archimatetool.model.viewpoints": "Viewpoint definitions and filtering"
+      },
+      "key_interfaces": {
+        "IArchimateModel": "Root model container with folders and diagrams",
+        "IArchimateFactory": "Factory for creating all model elements",
+        "IArchimatePackage": "EMF package descriptor with metamodel metadata",
+        "IArchimateConcept": "Base for elements and relationships",
+        "IArchimateElement": "Base for all semantic elements",
+        "IArchimateRelationship": "Base for all relationships",
+        "IDiagramModel": "Container for visual diagrams",
+        "IDiagramModelArchimateObject": "Visual representation of element",
+        "IDiagramModelArchimateConnection": "Visual representation of relationship"
+      },
+      "element_categories": {
+        "strategy": [
+          "ICapability",
+          "ICourseOfAction",
+          "IResource (strategic)",
+          "IValueStream"
+        ],
+        "business": [
+          "IBusinessActor",
+          "IBusinessRole",
+          "IBusinessCollaboration",
+          "IBusinessInterface",
+          "IBusinessProcess",
+          "IBusinessFunction",
+          "IBusinessInteraction",
+          "IBusinessEvent",
+          "IBusinessService",
+          "IBusinessObject",
+          "IContract",
+          "IRepresentation",
+          "IProduct"
+        ],
+        "application": [
+          "IApplicationComponent",
+          "IApplicationCollaboration",
+          "IApplicationInterface",
+          "IApplicationFunction",
+          "IApplicationProcess",
+          "IApplicationInteraction",
+          "IApplicationEvent",
+          "IApplicationService",
+          "IDataObject"
+        ],
+        "technology": [
+          "INode",
+          "IDevice",
+          "ISystemSoftware",
+          "ITechnologyCollaboration",
+          "ITechnologyInterface",
+          "IPath",
+          "ICommunicationNetwork",
+          "ITechnologyFunction",
+          "ITechnologyProcess",
+          "ITechnologyInteraction",
+          "ITechnologyEvent",
+          "ITechnologyService",
+          "IArtifact"
+        ],
+        "physical": [
+          "IEquipment",
+          "IFacility",
+          "IDistributionNetwork",
+          "IMaterial"
+        ],
+        "motivation": [
+          "IStakeholder",
+          "IDriver",
+          "IAssessment",
+          "IGoal",
+          "IOutcome",
+          "IPrinciple",
+          "IRequirement",
+          "IConstraint",
+          "IMeaning",
+          "IValue"
+        ],
+        "implementation_migration": [
+          "IWorkPackage",
+          "IDeliverable",
+          "IImplementationEvent",
+          "IPlateau",
+          "IGap"
+        ]
+      },
+      "relationship_types": {
+        "structural": [
+          "ICompositionRelationship - whole-part aggregation",
+          "IAggregationRelationship - loose aggregation",
+          "IAssignmentRelationship - responsibility assignment",
+          "IRealizationRelationship - implementation of specification"
+        ],
+        "dependency": [
+          "IServingRelationship - service provision",
+          "IAccessRelationship - data/object access (read/write)",
+          "IInfluenceRelationship - impact on motivation elements",
+          "IAssociationRelationship - generic relationship"
+        ],
+        "dynamic": [
+          "IFlowRelationship - transfer of information/value",
+          "ITriggeringRelationship - temporal or causal dependency"
+        ],
+        "other": [
+          "ISpecializationRelationship - generalization/specialization",
+          "IJunction - AND/OR junction for relationship routing"
+        ]
+      }
+    },
+    "visual_editor": {
+      "framework": "Eclipse GEF 3.11.100+",
+      "architecture": "Model-View-Controller with Command pattern",
+      "main_editor": "com.archimatetool.editor.diagram.ArchimateDiagramEditor",
+      "base_editor": "com.archimatetool.editor.diagram.AbstractDiagramEditor",
+      "components": {
+        "edit_parts": {
+          "purpose": "Controllers connecting model to view",
+          "location": "com.archimatetool.editor.diagram.editparts",
+          "examples": [
+            "DiagramConnectionEditPart - Controls connection figures",
+            "DiagramImageEditPart - Controls image figures",
+            "ArchimateElementEditPart - Controls element figures",
+            "GroupEditPart - Controls group containers"
+          ]
+        },
+        "figures": {
+          "purpose": "Visual representations (Draw2D)",
+          "location": "com.archimatetool.editor.diagram.figures",
+          "framework": "org.eclipse.draw2d",
+          "types": [
+            "Element figures (rectangles, rounded rectangles, ellipses)",
+            "Connection figures (lines with decorators)",
+            "Container figures (groups, folders)",
+            "Label figures (text rendering)"
+          ]
+        },
+        "policies": {
+          "purpose": "Define interaction behavior",
+          "location": "com.archimatetool.editor.diagram.policies",
+          "types": [
+            "Selection policies - Visual feedback",
+            "Layout policies - Child arrangement",
+            "Connection policies - Connection creation",
+            "Component policies - Delete behavior",
+            "Direct edit policies - In-place editing"
+          ]
+        },
+        "commands": {
+          "purpose": "Undoable model modifications",
+          "location": "com.archimatetool.editor.diagram.commands",
+          "pattern": "Command pattern with execute() and undo()",
+          "examples": [
+            "CreateElementCommand",
+            "DeleteElementCommand",
+            "MoveObjectCommand",
+            "ReconnectConnectionCommand",
+            "SetPropertyCommand"
+          ]
+        },
+        "palette": {
+          "purpose": "Tool selection for creating elements",
+          "main_class": "ArchimateDiagramEditorPalette",
+          "organization": [
+            "Selection and marquee tools",
+            "Connection creation tools",
+            "Element creation tools by layer (Strategy, Business, Application, Technology)",
+            "Relationship creation tools",
+            "Annotation tools (notes, groups)"
+          ],
+          "extensibility": "FloatingPalette allows detached palette window"
+        },
+        "factories": {
+          "ArchimateDiagramModelFactory": "Creates diagram model elements",
+          "EditPartFactory": "Creates appropriate EditPart for model element",
+          "FigureFactory": "Creates appropriate Figure for element type"
+        }
+      },
+      "rendering": {
+        "framework": "Eclipse Draw2D",
+        "graphics": "2D graphics with anti-aliasing support",
+        "layout": [
+          "Manual layout (user-positioned)",
+          "Automatic layout via Zest algorithms",
+          "Grid layout for alignment",
+          "Connection routing (Manhattan, shortest path)"
+        ],
+        "styling": [
+          "Fill colors",
+          "Line styles and colors",
+          "Font attributes",
+          "Border types",
+          "Gradient fills",
+          "Alpha transparency"
+        ]
+      }
+    },
+    "workbench": {
+      "entry_point": "com.archimatetool.editor.Application",
+      "plugin_class": "com.archimatetool.editor.ArchiPlugin",
+      "advisors": {
+        "ArchiWorkbenchAdvisor": "Application-level configuration",
+        "ArchiWorkbenchWindowAdvisor": "Window setup and lifecycle"
+      },
+      "views": {
+        "model_tree": "Hierarchical view of model elements organized in folders",
+        "properties": "Tabbed properties for selected elements",
+        "outline": "Miniature diagram overview with navigation",
+        "navigator": "File system navigation",
+        "palette": "Tool palette for diagram editing",
+        "hints": "Contextual help and tips"
+      },
+      "editors": {
+        "diagram_editor": "Visual ArchiMate diagram editing",
+        "canvas_editor": "Freeform canvas diagrams",
+        "sketch_editor": "Sketch-style diagrams"
+      },
+      "perspectives": {
+        "main_perspective": "Default layout with model tree, editor, properties, and outline"
+      },
+      "menus_and_toolbars": {
+        "file_menu": "New, Open, Save, Import, Export",
+        "edit_menu": "Undo, Redo, Cut, Copy, Paste, Delete",
+        "view_menu": "View management",
+        "diagram_menu": "Diagram operations, viewpoints",
+        "tools_menu": "Preferences, validation, reports"
+      }
+    },
+    "persistence": {
+      "native_format": {
+        "extension": ".archimate",
+        "technology": "EMF XMI",
+        "structure": "XML with EMF namespace and type information",
+        "fidelity": "Complete - all Archi features preserved",
+        "versioning": "Model version attribute for migration"
+      },
+      "open_exchange_format": {
+        "extension": ".xml",
+        "module": "org.opengroup.archimate.xmlexchange",
+        "schema": "XSD schemas in xsd/ directory",
+        "standard": "Official Open Group ArchiMate Exchange Format",
+        "purpose": "Interoperability with other ArchiMate tools",
+        "support": "Import and export via dedicated module"
+      },
+      "csv_format": {
+        "module": "com.archimatetool.csv",
+        "capabilities": [
+          "Export elements to CSV",
+          "Export relationships to CSV",
+          "Import elements from CSV",
+          "Import relationships from CSV",
+          "Bulk operations"
+        ],
+        "use_cases": [
+          "Excel integration",
+          "Bulk model creation",
+          "Data analysis",
+          "Model comparison"
+        ]
+      },
+      "image_export": {
+        "formats": [
+          "PNG - Raster export",
+          "BMP - Bitmap export",
+          "SVG - Vector export (com.archimatetool.export.svg module)"
+        ],
+        "scope": "Single diagram or all diagrams",
+        "extensibility": "imageExportProvider extension point"
+      }
+    },
+    "reporting": {
+      "html_reports": {
+        "module": "com.archimatetool.reports",
+        "technology": "HTML/CSS/JavaScript",
+        "templates": "Customizable HTML templates",
+        "features": [
+          "Model structure report",
+          "Element listings",
+          "Relationship tables",
+          "Diagram embedding",
+          "SQL query support for data extraction",
+          "Custom styling via CSS"
+        ]
+      },
+      "jasper_reports": {
+        "module": "com.archimatetool.jasperreports",
+        "technology": "JasperReports 6.12.2",
+        "output": "PDF documents",
+        "customization": "JasperReports template design",
+        "dependencies": [
+          "JasperReports engine",
+          "OpenPDF for PDF rendering",
+          "Jackson for JSON",
+          "Apache Commons utilities"
+        ]
+      }
+    },
+    "extensibility": {
+      "plugin_system": "Eclipse OSGi plugins",
+      "extension_points": [
+        {
+          "id": "exportHandler",
+          "schema": "Plugins can add custom export formats",
+          "usage": "Implement export logic and register via plugin.xml"
+        },
+        {
+          "id": "importHandler",
+          "schema": "Plugins can add custom import formats",
+          "usage": "Implement import logic and register via plugin.xml"
+        },
+        {
+          "id": "objectUIProvider",
+          "schema": "Customize UI representation of model objects",
+          "usage": "70+ built-in providers, extensible for custom elements"
+        },
+        {
+          "id": "diagramEditorFactory",
+          "schema": "Add new diagram editor types",
+          "usage": "Beyond ArchiMate diagrams (Canvas, Sketch already use this)"
+        },
+        {
+          "id": "compatibilityHandler",
+          "schema": "Handle model version migration",
+          "usage": "Convert older model formats to current version"
+        },
+        {
+          "id": "imageExportProvider",
+          "schema": "Add new image export formats",
+          "usage": "Implement image rendering and register"
+        }
+      ],
+      "plugin_development": {
+        "documentation": "GitHub wiki with developer guides",
+        "guides": [
+          "How to develop import/export plugins",
+          "How to create custom themes",
+          "How to create custom reports"
+        ]
+      }
+    },
+    "viewpoints": {
+      "manager": "ViewpointManager",
+      "interface": "IViewpoint",
+      "implementation": "Viewpoint class",
+      "purpose": "Filter diagram elements based on ArchiMate viewpoints",
+      "standard_viewpoints": [
+        "Organization Viewpoint",
+        "Application Platform Viewpoint",
+        "Information Structure Viewpoint",
+        "Technology Viewpoint",
+        "Layered Viewpoint",
+        "Service Realization Viewpoint",
+        "Implementation and Migration Viewpoint",
+        "Project Viewpoint",
+        "And many others per ArchiMate specification"
+      ],
+      "functionality": [
+        "Define allowed element types per viewpoint",
+        "Define allowed relationship types per viewpoint",
+        "Filter palette to show only relevant tools",
+        "Validate diagram against viewpoint rules"
+      ]
+    }
+  },
+  "metamodel_structure": {
+    "definition_approach": "EMF Ecore model with code generation",
+    "ecore_file": "com.archimatetool.model/model/archimate.ecore",
+    "generation": {
+      "tool": "EMF Code Generator (genmodel)",
+      "inputs": "archimate.ecore metamodel definition",
+      "outputs": [
+        "Model interfaces (I* prefix)",
+        "Implementation classes (*Impl suffix)",
+        "Factory (IArchimateFactory)",
+        "Package descriptor (IArchimatePackage)",
+        "Switch utility class",
+        "AdapterFactory class"
+      ],
+      "regeneration": "Model code regenerated when .ecore changes"
+    },
+    "inheritance_hierarchy": {
+      "root_interfaces": [
+        "IIdentifier - Unique ID",
+        "IAdapter - Runtime adaptation",
+        "INameable - Name property",
+        "IDocumentable - Documentation",
+        "ICloneable - Cloning support",
+        "IProperties - Key-value properties"
+      ],
+      "concept_hierarchy": {
+        "IArchimateConcept": {
+          "IArchimateElement": {
+            "IStrategyElement": [
+              "Behavioral: ICapability, ICourseOfAction",
+              "Structural: IResource, IValueStream"
+            ],
+            "IBusinessElement": [
+              "Behavioral: IBusinessProcess, IBusinessFunction, IBusinessInteraction, IBusinessEvent, IBusinessService",
+              "Structural: IBusinessActor, IBusinessRole, IBusinessCollaboration, IBusinessInterface, IBusinessObject, IContract, IRepresentation, IProduct"
+            ],
+            "IApplicationElement": [
+              "Behavioral: IApplicationFunction, IApplicationProcess, IApplicationInteraction, IApplicationEvent, IApplicationService",
+              "Structural: IApplicationComponent, IApplicationCollaboration, IApplicationInterface, IDataObject"
+            ],
+            "ITechnologyElement": [
+              "Behavioral: ITechnologyFunction, ITechnologyProcess, ITechnologyInteraction, ITechnologyEvent, ITechnologyService",
+              "Structural: INode, IDevice, ISystemSoftware, ITechnologyCollaboration, ITechnologyInterface, IPath, ICommunicationNetwork, IArtifact"
+            ],
+            "IPhysicalElement": [
+              "IEquipment, IFacility, IDistributionNetwork, IMaterial"
+            ],
+            "IMotivationElement": [
+              "IStakeholder, IDriver, IAssessment, IGoal, IOutcome, IPrinciple, IRequirement, IConstraint, IMeaning, IValue"
+            ],
+            "IImplementationMigrationElement": [
+              "IWorkPackage, IDeliverable, IImplementationEvent, IPlateau, IGap"
+            ]
+          },
+          "IArchimateRelationship": {
+            "IStructuralRelationship": [
+              "ICompositionRelationship",
+              "IAggregationRelationship",
+              "IAssignmentRelationship",
+              "IRealizationRelationship"
+            ],
+            "IDependencyRelationship": [
+              "IServingRelationship",
+              "IAccessRelationship",
+              "IInfluenceRelationship",
+              "IAssociationRelationship"
+            ],
+            "IDynamicRelationship": [
+              "IFlowRelationship",
+              "ITriggeringRelationship"
+            ],
+            "IOtherRelationship": [
+              "ISpecializationRelationship",
+              "IJunction"
+            ]
+          }
+        }
+      },
+      "diagram_hierarchy": {
+        "IDiagramModel": [
+          "IArchimateDiagramModel - Standard ArchiMate diagrams",
+          "ICanvasDiagramModel - Canvas diagrams",
+          "ISketchDiagramModel - Sketch diagrams"
+        ],
+        "IDiagramModelComponent": {
+          "IDiagramModelObject": [
+            "IDiagramModelArchimateObject - Visual representation of element",
+            "IDiagramModelNote - Text annotations",
+            "IDiagramModelGroup - Grouping container",
+            "IDiagramModelImage - Embedded images",
+            "IDiagramModelReference - Reference to another diagram"
+          ],
+          "IDiagramModelConnection": [
+            "IDiagramModelArchimateConnection - Visual representation of relationship",
+            "IDiagramModelLineConnection - Generic line connection"
+          ]
+        }
+      }
+    },
+    "attributes_and_references": {
+      "attributes": [
+        "id (EString) - Unique identifier",
+        "name (EString) - Display name",
+        "documentation (EString) - Element documentation",
+        "type (EString/EEnum) - Element or relationship type",
+        "accessType (EEnum) - Read/Write for access relationships",
+        "influenceStrength (EString) - Strength modifier for influence"
+      ],
+      "references": [
+        "source (EReference) - Relationship source element",
+        "target (EReference) - Relationship target element",
+        "children (EReference containment, many) - Child elements",
+        "properties (EReference containment, many) - Property list",
+        "features (EReference) - Feature list",
+        "folders (EReference containment, many) - Model organization"
+      ],
+      "containment": [
+        "IArchimateModel contains IFolders",
+        "IFolder contains elements and sub-folders",
+        "IArchimateModel contains IDiagramModels",
+        "IDiagramModel contains IDiagramModelObjects and connections",
+        "IDiagramModelObject can contain child objects (nesting)"
+      ]
+    },
+    "factory_pattern": {
+      "factory_interface": "IArchimateFactory",
+      "singleton": "IArchimateFactory.eINSTANCE",
+      "methods": [
+        "createBusinessActor()",
+        "createBusinessProcess()",
+        "createApplicationComponent()",
+        "createCompositionRelationship()",
+        "createArchimateDiagramModel()",
+        "create<ElementType>() for all element and relationship types"
+      ],
+      "usage": "IArchimateFactory.eINSTANCE.createBusinessActor()"
+    },
+    "package_descriptor": {
+      "interface": "IArchimatePackage",
+      "singleton": "IArchimatePackage.eINSTANCE",
+      "provides": [
+        "EClass instances for all metamodel types",
+        "EAttribute descriptors for all attributes",
+        "EReference descriptors for all references",
+        "Metamodel introspection at runtime"
+      ],
+      "usage": "Reflective EMF operations, type checking, generic editors"
+    }
+  },
+  "xml_schema_mapping": {
+    "approach": "EMF XMI serialization for native format, custom XML for Open Exchange",
+    "native_format": {
+      "technology": "EMF XMI",
+      "namespace": "http://www.archimatetool.com/archimate",
+      "structure": [
+        "Root <archimate:model> element",
+        "Nested <folders> for organization",
+        "Element definitions with xmi:type attributes",
+        "Relationship elements with source/target references",
+        "Diagram models with visual information"
+      ],
+      "id_management": "xmi:id for object identification, href for cross-references",
+      "benefits": [
+        "Automatic serialization by EMF",
+        "Full metamodel fidelity",
+        "Efficient parsing",
+        "Cross-reference resolution"
+      ]
+    },
+    "open_exchange_format": {
+      "module": "org.opengroup.archimate.xmlexchange",
+      "schema": "XSD schemas in module xsd/ directory",
+      "standard": "ArchiMate Model Exchange File Format (Open Group)",
+      "structure": [
+        "Root <model> element",
+        "Separate <elements> and <relationships> sections",
+        "View definitions for diagrams",
+        "Organization hierarchy"
+      ],
+      "purpose": "Interoperability between ArchiMate tools",
+      "implementation": "Custom import/export handlers, not EMF-based"
+    }
+  },
+  "code_generation": {
+    "assessment": "Extensive code generation via EMF",
+    "evidence": [
+      "494KB archimate.ecore file defines complete metamodel",
+      "All model interfaces and implementation classes generated",
+      "Factory and package descriptor generated",
+      "Switch and adapter factory utilities generated",
+      "Generated code in com.archimatetool.model.impl package"
+    ],
+    "approach": "Model-driven development with EMF",
+    "generation_tool": "EMF GenModel and code generator",
+    "regeneration": "Triggered when .ecore metamodel changes",
+    "customization": [
+      "Generated code marked with @generated tag",
+      "Custom code can be added in @generated NOT sections",
+      "Regeneration preserves manual customizations"
+    ],
+    "trade_offs": {
+      "pros": [
+        "Consistent implementation from single source of truth",
+        "Automatic XMI serialization",
+        "Built-in notification framework",
+        "Reflective API for generic operations",
+        "Reduced manual coding errors",
+        "Fast to update when metamodel changes"
+      ],
+      "cons": [
+        "Learning curve for EMF",
+        "Generated code can be verbose",
+        "Dependency on EMF framework",
+        "Less control over implementation details",
+        "Debugging through generated code"
+      ]
+    },
+    "comparison_to_manual": "Unlike Camunda BPMN model (manual implementation), Archi uses EMF code generation which provides more automation but requires EMF dependency"
+  },
+  "complexity_assessment": {
+    "overall_complexity": "High",
+    "factors": [
+      {
+        "aspect": "Metamodel Coverage",
+        "level": "Very High",
+        "details": "Complete ArchiMate 3.x specification with 40+ element types, 20+ relationship types, full diagram support"
+      },
+      {
+        "aspect": "Architecture Layers",
+        "level": "High",
+        "details": "Multi-layer architecture: EMF metamodel, model layer, diagram layer, GEF editor, Eclipse RCP workbench, persistence, reporting, extensibility"
+      },
+      {
+        "aspect": "Eclipse RCP Integration",
+        "level": "Very High",
+        "details": "Full Eclipse RCP application with workbench, views, editors, perspectives, preferences, menus, commands, extension points"
+      },
+      {
+        "aspect": "GEF Visual Editor",
+        "level": "High",
+        "details": "Complex MVC architecture with edit parts, figures, policies, commands, requests. Requires understanding of GEF patterns"
+      },
+      {
+        "aspect": "EMF Framework",
+        "level": "Medium-High",
+        "details": "EMF provides automation but requires learning Ecore modeling, code generation, notification framework, resource management"
+      },
+      {
+        "aspect": "Persistence Layer",
+        "level": "Medium",
+        "details": "Multiple formats (XMI, Open Exchange XML, CSV) with different technologies"
+      },
+      {
+        "aspect": "Plugin Architecture",
+        "level": "Medium-High",
+        "details": "Eclipse extension point system, OSGi bundles, P2 provisioning"
+      },
+      {
+        "aspect": "Code Generation",
+        "level": "Medium",
+        "details": "EMF code generation is powerful but requires understanding of genmodel configuration and regeneration workflow"
+      }
+    ],
+    "learning_curve": {
+      "using_application": "Low-Medium - Well-designed UI, comprehensive help",
+      "understanding_codebase": "Very High - Requires knowledge of EMF, GEF, Eclipse RCP, OSGi, design patterns",
+      "extending": "High - Plugin development requires Eclipse RCP and OSGi expertise",
+      "metamodel_modification": "Medium-High - EMF makes changes easier but requires understanding Ecore and code generation"
+    },
+    "code_quality": {
+      "organization": "Excellent - Modular OSGi bundles with clear separation of concerns",
+      "documentation": "Good - JavaDoc present, wiki with developer guides, but could use more inline comments",
+      "consistency": "Excellent - Consistent use of EMF and GEF patterns throughout",
+      "testability": "Good - Separation of model from UI aids testing, test suite included"
+    },
+    "maintenance_burden": {
+      "specification_updates": "Medium - EMF code generation makes metamodel changes easier than manual approach",
+      "platform_updates": "Medium - Dependent on Eclipse platform releases, requires migration for new Eclipse versions",
+      "backward_compatibility": "Good - Version migration framework handles model format changes",
+      "extension": "Medium - Well-defined extension points but requires Eclipse plugin expertise"
+    },
+    "technology_stack_depth": {
+      "java_platform": "Java 21",
+      "eclipse_version": "2024-06 release",
+      "emf_complexity": "Medium-High - Core EMF concepts are straightforward but advanced features are complex",
+      "gef_complexity": "High - GEF has steep learning curve due to MVC pattern and policy system",
+      "rcp_complexity": "High - Eclipse RCP is comprehensive but complex framework",
+      "osgi_complexity": "Medium - OSGi bundles and services add deployment complexity"
+    }
+  },
+  "strengths": [
+    "Complete ArchiMate 3.x specification implementation",
+    "EMF-based metamodel enables model-driven development with code generation",
+    "Excellent model-view separation between semantic model and visual diagrams",
+    "GEF provides professional diagram editing with undo/redo, policies, and commands",
+    "Eclipse RCP delivers rich desktop application with views, editors, and perspectives",
+    "Robust plugin architecture via Eclipse extension points - highly extensible",
+    "Multiple export/import formats: native XMI, Open Exchange XML, CSV, SVG, PDF",
+    "ArchiMate viewpoint support with filtering",
+    "Advanced reporting: HTML with templates, JasperReports for PDF",
+    "Cross-platform support (Windows, Linux, macOS including ARM)",
+    "P2 provisioning for automatic updates and plugin installation",
+    "Version migration framework for backward compatibility",
+    "MIT license - extremely permissive for learning and reuse",
+    "Active project with 1.1k stars and regular updates",
+    "Comprehensive developer documentation on GitHub wiki",
+    "Modular OSGi architecture with 27+ bundles",
+    "Professional UI with theming support (CSS-based)",
+    "Proven architecture for enterprise modeling tools"
+  ],
+  "weaknesses": [
+    "Very high complexity - requires expertise in EMF, GEF, Eclipse RCP, and OSGi",
+    "Steep learning curve for developers new to Eclipse ecosystem",
+    "Large dependency footprint - full Eclipse RCP platform required",
+    "Limited to Java/Eclipse technology stack",
+    "EMF dependency may be overkill for simpler use cases",
+    "GEF 3.x is older technology (GEF4/GEF5 are newer but incompatible)",
+    "Eclipse RCP has declining popularity vs. web-based solutions",
+    "OSGi bundle system adds deployment complexity",
+    "Desktop-only - no web or mobile support",
+    "Tight coupling to Eclipse platform versions",
+    "Generated code can be difficult to debug and customize",
+    "No REST API or headless operation (command-line tools are limited)",
+    "Reporting module uses LGPL dependencies (JasperReports)",
+    "Zest and Draw2D are bundled forks (maintenance burden)",
+    "Large download size due to Eclipse RCP dependencies",
+    "UI feels dated compared to modern web applications"
+  ],
+  "recommendations": {
+    "for_uml_codex": [
+      {
+        "recommendation": "Study EMF metamodel pattern but consider alternatives",
+        "rationale": "EMF provides excellent metamodel framework with code generation, but dependency on Eclipse ecosystem may be limiting for UML-Codex. Consider MOF-compliant alternatives or custom metamodel with code generation",
+        "applicability": "High - UML metamodel complexity similar to ArchiMate, but may want platform independence",
+        "action": "Evaluate EMF vs. custom Ecore-like metamodel, research MOF implementations (Eclipse UML2, MagicDraw)"
+      },
+      {
+        "recommendation": "Learn from model-view separation architecture",
+        "rationale": "Archi's separation of semantic model (elements/relationships) from visual model (diagrams/shapes/styles) is exemplary. One element can appear in multiple diagrams with different visual properties",
+        "applicability": "Very High - UML has same requirements (class appears in multiple diagrams)",
+        "action": "Design separate metamodel layers: semantic UML metamodel, diagram/notation metamodel, style metamodel"
+      },
+      {
+        "recommendation": "Study viewpoint filtering mechanism",
+        "rationale": "Viewpoint system filters available elements and relationships per ArchiMate viewpoints. UML has similar needs (class diagrams show classes, sequence diagrams show interactions)",
+        "applicability": "High - UML diagram types are analogous to ArchiMate viewpoints",
+        "action": "Design diagram type system that defines valid elements and relationships per UML diagram type"
+      },
+      {
+        "recommendation": "Avoid Eclipse RCP for UML-Codex",
+        "rationale": "Eclipse RCP is powerful but heavy, desktop-only, and declining in popularity. Modern alternatives: web-based (Theia, VS Code), JavaFX, or multi-platform frameworks",
+        "applicability": "High - Unless desktop-only Eclipse integration is required",
+        "action": "Consider web-based architecture (React/TypeScript), VS Code extension, or JavaFX for desktop"
+      },
+      {
+        "recommendation": "Consider GEF patterns but not implementation",
+        "rationale": "GEF's MVC pattern (EditParts), Command pattern for undo/redo, and EditPolicy system are excellent designs. But GEF 3.x is legacy, and GEF itself is Eclipse-specific",
+        "applicability": "Medium-High - Patterns are valuable, but implementation is Eclipse-tied",
+        "action": "Study GEF patterns, implement similar MVC architecture in chosen UI framework (web canvas, JavaFX)"
+      },
+      {
+        "recommendation": "Adopt extension point architecture pattern",
+        "rationale": "Archi's extension points (importHandler, exportHandler, etc.) enable ecosystem growth. UML-Codex should be similarly extensible",
+        "applicability": "Very High - Extensibility is critical for adoption",
+        "action": "Design plugin API with extension points for: importers, exporters, diagram renderers, validators, code generators, profile support"
+      },
+      {
+        "recommendation": "Support multiple serialization formats",
+        "rationale": "Archi supports native XMI, standard Open Exchange, and CSV. UML should support XMI 2.x (standard), JSON (modern), and potentially CSV for bulk operations",
+        "applicability": "Very High - Interoperability is essential",
+        "action": "Implement XMI 2.5.1 (UML standard), JSON (developer-friendly), possibly YAML. Support import/export extension points"
+      },
+      {
+        "recommendation": "Implement version migration framework early",
+        "rationale": "Archi's compatibility handler extension point enables smooth migration across versions. UML metamodel will evolve, migration support is essential",
+        "applicability": "High - Plan for metamodel evolution",
+        "action": "Design versioning system in file format, implement migration framework, provide migration plugin API"
+      },
+      {
+        "recommendation": "Learn from factory pattern and object creation",
+        "rationale": "IArchimateFactory provides centralized, type-safe object creation. UML factory should similarly create all metamodel elements",
+        "applicability": "Very High - Essential metamodel pattern",
+        "action": "Generate factory from UML metamodel, provide builder pattern for complex objects (similar to Camunda builders)"
+      },
+      {
+        "recommendation": "Study property management system",
+        "rationale": "Archi's IProperties interface allows key-value pairs on any element. Useful for tool-specific metadata without polluting metamodel",
+        "applicability": "High - UML profiles and tagged values serve similar purpose",
+        "action": "Implement property system, map to UML tagged values, allow tool-specific properties"
+      },
+      {
+        "recommendation": "Avoid JasperReports for licensing reasons",
+        "rationale": "JasperReports is LGPL which has copyleft requirements. Use Apache-licensed alternatives or custom reporting",
+        "applicability": "Medium - If reporting is needed",
+        "action": "Consider Apache FOP for PDF, HTML/CSS for reports, or modern libraries like iText (AGPL, check license)"
+      },
+      {
+        "recommendation": "Evaluate code generation approach carefully",
+        "rationale": "Archi uses EMF code generation (model-driven). Camunda uses manual implementation (code-driven). Each has trade-offs",
+        "applicability": "Very High - Critical architecture decision",
+        "action": "For UML metamodel size, code generation is likely beneficial. Options: EMF (if Eclipse OK), custom generator from Ecore/XMI, Rosetta-style DSL"
+      }
+    ],
+    "architecture_lessons": [
+      {
+        "lesson": "Model-View Separation is Critical",
+        "description": "Semantic model completely independent of visual representation. Enables one element in multiple diagrams with different styling",
+        "apply_to_uml": "UML has same requirement. Design separate: UML metamodel (classes, operations), Diagram metamodel (shapes, positions), Style metamodel (colors, fonts)"
+      },
+      {
+        "lesson": "EMF Provides Powerful Metamodel Foundation",
+        "description": "Ecore metamodel with code generation provides: factory, package descriptor, notification, XMI serialization, reflective API",
+        "apply_to_uml": "UML metamodel is larger than ArchiMate. Code generation is highly valuable. EMF is proven but consider alternatives if Eclipse dependency is concern"
+      },
+      {
+        "lesson": "Viewpoint/Diagram Type Filtering",
+        "description": "Viewpoints define which elements and relationships are allowed in each diagram type. Guides users and validates models",
+        "apply_to_uml": "UML diagram types (class, sequence, activity, etc.) have specific element types. Implement similar filtering and validation"
+      },
+      {
+        "lesson": "Extension Points Enable Ecosystem",
+        "description": "Well-defined extension points allow third-party plugins without core modifications. Archi has 6 extension points covering import, export, UI, migration",
+        "apply_to_uml": "UML-Codex should plan for extensibility from start. Define plugin API for code generators, validators, importers, exporters, diagram renderers"
+      },
+      {
+        "lesson": "Command Pattern for Undo/Redo",
+        "description": "All modifications wrapped in Command objects with execute() and undo(). CommandStack manages history. Essential for professional editor",
+        "apply_to_uml": "Implement command pattern for all model modifications. Critical for user experience"
+      },
+      {
+        "lesson": "Multiple Serialization Formats",
+        "description": "Support both proprietary format (full fidelity) and standard format (interoperability). Archi has native XMI and Open Exchange XML",
+        "apply_to_uml": "UML standard is XMI 2.5.1 (interoperability). Consider JSON for developer friendliness. Support both"
+      },
+      {
+        "lesson": "Version Migration Framework",
+        "description": "Metamodel will evolve. Plan for migration from start with compatibility handlers",
+        "apply_to_uml": "Include version in file format, implement migration framework, test migrations thoroughly"
+      },
+      {
+        "lesson": "Eclipse RCP is Powerful but Heavy",
+        "description": "RCP provides comprehensive desktop application framework but has steep learning curve, large footprint, platform lock-in",
+        "apply_to_uml": "Consider modern alternatives unless Eclipse integration is requirement: web-based (Theia, React), VS Code, JavaFX"
+      },
+      {
+        "lesson": "GEF MVC Patterns are Sound",
+        "description": "EditPart (controller), Figure (view), Model (EMF) separation is clean. EditPolicy strategy pattern for behavior. Command pattern for operations",
+        "apply_to_uml": "These patterns are framework-agnostic. Apply MVC, strategy, command patterns in chosen UI technology"
+      },
+      {
+        "lesson": "Modular Architecture via OSGi",
+        "description": "27 OSGi bundles with clear dependencies enable modularity, optional features, plugin ecosystem",
+        "apply_to_uml": "Even without OSGi, design modular architecture: core, diagram types, importers/exporters, code generators, UI as separate modules"
+      }
+    ],
+    "implementation_guidance": [
+      {
+        "area": "Metamodel Definition",
+        "archi_approach": "Ecore model with EMF code generation",
+        "for_uml": "UML metamodel is standardized (OMG UML 2.5.1). Options: (1) Use Eclipse UML2 project (EMF-based), (2) Generate from UML metamodel XMI, (3) Custom Ecore model + generation, (4) Manual with code generator (Rosetta-style DSL). Recommend evaluation of Eclipse UML2 first, then custom generation if needed"
+      },
+      {
+        "area": "Model-View Separation",
+        "archi_approach": "IArchimateModel (semantic) separate from IDiagramModel (visual). Diagram elements reference semantic elements",
+        "for_uml": "Implement similar separation: UML metamodel (core), UML Diagram metamodel (notation), Style metamodel (visual properties). Aligns with OMG UML Diagrams standard (ISO/IEC 19505-2)"
+      },
+      {
+        "area": "Diagram Editing",
+        "archi_approach": "Eclipse GEF 3.x with MVC pattern, edit parts, policies, commands",
+        "for_uml": "If web-based: HTML Canvas or SVG with TypeScript/React, implement MVC pattern with command history. If desktop: JavaFX with similar architecture. Study GEF patterns but don't use GEF directly unless Eclipse RCP is chosen"
+      },
+      {
+        "area": "Persistence",
+        "archi_approach": "EMF XMI (native), Open Exchange XML (standard), CSV (bulk operations)",
+        "for_uml": "Implement XMI 2.5.1 (UML standard for interoperability), JSON (developer-friendly), consider YAML. Ensure round-trip fidelity. Support import/export plugins"
+      },
+      {
+        "area": "Extension Mechanism",
+        "archi_approach": "Eclipse extension points with plugin.xml declarations",
+        "for_uml": "Design plugin API with well-defined extension points. If web-based, consider NPM packages or dynamic loading. If desktop, Java SPI or custom plugin framework. Define: importer API, exporter API, validator API, code generator API, diagram renderer API"
+      },
+      {
+        "area": "Viewpoint/Diagram Type Filtering",
+        "archi_approach": "IViewpoint with allowed element/relationship types, ViewpointManager for filtering",
+        "for_uml": "Define diagram type system: ClassDiagram, SequenceDiagram, etc. Each type specifies: allowed elements, allowed relationships, visual rules, validation rules. Use for palette filtering and model validation"
+      },
+      {
+        "area": "Object Creation",
+        "archi_approach": "IArchimateFactory with create*() methods for all types",
+        "for_uml": "Generate UML factory from metamodel. Consider builder pattern (like Camunda) for complex elements with many attributes. Ensure factory creates objects in valid state"
+      },
+      {
+        "area": "Versioning and Migration",
+        "archi_approach": "Version attribute in model, Archi4Migrator for 4.x→5.x, compatibilityHandler extension point",
+        "for_uml": "Include metamodel version in file format. Implement migration framework early. Provide migration plugin API. Maintain migration chain (v1→v2→v3)"
+      },
+      {
+        "area": "Validation",
+        "archi_approach": "EMF validation framework, custom validators can be added",
+        "for_uml": "Implement multi-layer validation: (1) Syntactic (XMI/JSON schema), (2) Metamodel constraints (multiplicities, types), (3) Well-formedness (UML spec constraints), (4) Custom validators via plugin API. Consider OCL for constraint language"
+      },
+      {
+        "area": "Code Generation",
+        "archi_approach": "EMF generates model code from Ecore. No code generation from models (Archi is modeling tool, not code generator)",
+        "for_uml": "For UML-Codex, code generation FROM models is likely goal. Design code generator plugin API. Study Rosetta code generators, Camunda code generation, Eclipse Acceleo. Support multiple target languages via plugins"
+      }
+    ],
+    "risks_and_mitigations": [
+      {
+        "risk": "Eclipse RCP dependency limits platform reach and developer pool",
+        "mitigation": "Evaluate modern alternatives: web-based (Theia, React), VS Code extension, or JavaFX. Eclipse RCP only if desktop Eclipse integration is requirement",
+        "impact": "High"
+      },
+      {
+        "risk": "EMF dependency ties to Eclipse ecosystem",
+        "mitigation": "EMF core has minimal dependencies and can be used standalone. Or implement custom metamodel framework inspired by EMF. Or use Eclipse UML2 project which already implements UML metamodel",
+        "impact": "Medium"
+      },
+      {
+        "risk": "GEF 3.x is legacy technology",
+        "mitigation": "Don't use GEF directly unless Eclipse RCP is chosen. Learn from GEF patterns (MVC, policies, commands) and implement in modern framework",
+        "impact": "Low (if not using Eclipse RCP)"
+      },
+      {
+        "risk": "UML metamodel is much larger than ArchiMate",
+        "mitigation": "Start with UML subset (Classes, Packages, basic diagrams). Use code generation to manage complexity. Incrementally add UML concepts. Learn from Eclipse UML2 project",
+        "impact": "High"
+      },
+      {
+        "risk": "XMI 2.5.1 is complex serialization format",
+        "mitigation": "Use EMF XMI support (if using EMF) or existing XMI libraries. Provide simpler JSON format for developers. Study Eclipse UML2 XMI implementation. Consider YAML for human-readability",
+        "impact": "Medium-High"
+      },
+      {
+        "risk": "Undo/redo implementation is complex",
+        "mitigation": "Use command pattern from start (learn from GEF). Consider EMF command framework. Many UI frameworks provide command stack utilities",
+        "impact": "Medium"
+      },
+      {
+        "risk": "Building professional diagram editor is very complex",
+        "mitigation": "Start with basic rendering and editing. Incrementally add features. Consider existing libraries: JointJS (web), yFiles (commercial), or build on SVG/Canvas. Study Archi's GEF implementation for patterns, not code",
+        "impact": "Very High"
+      },
+      {
+        "risk": "Plugin architecture adds complexity",
+        "mitigation": "Design plugin API from start but implement core features first. Add plugin loading later. Keep plugin API minimal and stable",
+        "impact": "Medium"
+      },
+      {
+        "risk": "License compliance with dependencies",
+        "mitigation": "Avoid LGPL (JasperReports) and GPL. Prefer MIT, Apache-2.0, BSD. Document all dependencies and licenses. Use license scanning tools",
+        "impact": "Medium"
+      }
+    ]
+  },
+  "requirements_extraction": {
+    "functional_requirements": [
+      {
+        "id": "FR-METAMODEL-001",
+        "category": "Metamodel",
+        "requirement": "System shall provide complete implementation of ArchiMate 3.x metamodel with all element types, relationship types, and constraints",
+        "source": "Archi core model",
+        "priority": "Essential for UML",
+        "uml_analog": "Complete UML 2.5.1 metamodel implementation with all diagrams, elements, and relationships"
+      },
+      {
+        "id": "FR-METAMODEL-002",
+        "category": "Metamodel",
+        "requirement": "System shall separate semantic model from visual representation, allowing one element to appear in multiple diagrams with different visual properties",
+        "source": "Archi model-view architecture",
+        "priority": "Essential",
+        "uml_analog": "UML Class can appear in multiple class diagrams with different positions, colors, shown attributes"
+      },
+      {
+        "id": "FR-DIAGRAM-001",
+        "category": "Diagrams",
+        "requirement": "System shall support multiple diagram types with type-specific element and relationship filtering",
+        "source": "Archi viewpoint system",
+        "priority": "Essential",
+        "uml_analog": "UML diagram types (class, sequence, activity, use case, etc.) with appropriate element filtering"
+      },
+      {
+        "id": "FR-DIAGRAM-002",
+        "category": "Diagrams",
+        "requirement": "System shall provide visual diagram editor with drag-and-drop, connection creation, selection, move, resize, delete operations",
+        "source": "Archi GEF editor",
+        "priority": "Essential",
+        "uml_analog": "Visual UML diagram editing with full CRUD operations"
+      },
+      {
+        "id": "FR-DIAGRAM-003",
+        "category": "Diagrams",
+        "requirement": "System shall provide undo/redo for all model modifications",
+        "source": "GEF command stack",
+        "priority": "Essential",
+        "uml_analog": "Full undo/redo support in UML editor"
+      },
+      {
+        "id": "FR-PERSIST-001",
+        "category": "Persistence",
+        "requirement": "System shall save and load models in standard exchange format",
+        "source": "Open Exchange XML support",
+        "priority": "Essential",
+        "uml_analog": "XMI 2.5.1 support for UML model interchange"
+      },
+      {
+        "id": "FR-PERSIST-002",
+        "category": "Persistence",
+        "requirement": "System shall support bulk import/export of elements and relationships",
+        "source": "CSV import/export module",
+        "priority": "Useful",
+        "uml_analog": "CSV or JSON bulk operations for UML elements"
+      },
+      {
+        "id": "FR-EXPORT-001",
+        "category": "Export",
+        "requirement": "System shall export diagrams as images (PNG, SVG)",
+        "source": "Image export providers",
+        "priority": "Essential",
+        "uml_analog": "Export UML diagrams as PNG, SVG, PDF"
+      },
+      {
+        "id": "FR-REPORT-001",
+        "category": "Reporting",
+        "requirement": "System shall generate reports from models in HTML and PDF formats",
+        "source": "Reporting and JasperReports modules",
+        "priority": "Useful",
+        "uml_analog": "Generate UML model reports and documentation"
+      },
+      {
+        "id": "FR-EXTEND-001",
+        "category": "Extensibility",
+        "requirement": "System shall provide plugin API for custom import/export formats",
+        "source": "importHandler and exportHandler extension points",
+        "priority": "Important",
+        "uml_analog": "Plugin API for UML importers/exporters (XMI, JSON, etc.)"
+      },
+      {
+        "id": "FR-EXTEND-002",
+        "category": "Extensibility",
+        "requirement": "System shall support version migration when metamodel evolves",
+        "source": "compatibilityHandler extension point",
+        "priority": "Important",
+        "uml_analog": "Migrate UML models across metamodel versions"
+      },
+      {
+        "id": "FR-VALIDATE-001",
+        "category": "Validation",
+        "requirement": "System shall validate models against metamodel constraints and diagram type rules",
+        "source": "Viewpoint validation",
+        "priority": "Important",
+        "uml_analog": "Validate UML models against well-formedness rules and diagram constraints"
+      },
+      {
+        "id": "FR-UI-001",
+        "category": "User Interface",
+        "requirement": "System shall provide model tree view with hierarchical organization",
+        "source": "Archi model tree view",
+        "priority": "Essential",
+        "uml_analog": "UML model browser showing packages, classes, diagrams in hierarchy"
+      },
+      {
+        "id": "FR-UI-002",
+        "category": "User Interface",
+        "requirement": "System shall provide properties panel for editing element attributes",
+        "source": "Tabbed properties framework",
+        "priority": "Essential",
+        "uml_analog": "Properties view for UML element attributes, stereotypes, tagged values"
+      },
+      {
+        "id": "FR-UI-003",
+        "category": "User Interface",
+        "requirement": "System shall provide outline/navigator view showing diagram overview",
+        "source": "Outline view",
+        "priority": "Useful",
+        "uml_analog": "Minimap showing diagram overview with navigation"
+      },
+      {
+        "id": "FR-STYLE-001",
+        "category": "Styling",
+        "requirement": "System shall support customization of element visual properties (colors, fonts, line styles)",
+        "source": "Diagram style attributes",
+        "priority": "Important",
+        "uml_analog": "Customize UML element appearance per diagram"
+      },
+      {
+        "id": "FR-TEMPLATE-001",
+        "category": "Templates",
+        "requirement": "System shall support model templates for common patterns",
+        "source": "Template management module",
+        "priority": "Useful",
+        "uml_analog": "UML design pattern templates, framework models"
+      }
+    ],
+    "non_functional_requirements": [
+      {
+        "id": "NFR-PLATFORM-001",
+        "category": "Platform",
+        "requirement": "System shall support Windows, Linux, and macOS operating systems",
+        "source": "Archi cross-platform builds",
+        "priority": "Important for UML",
+        "uml_consideration": "Web-based would provide even broader platform support"
+      },
+      {
+        "id": "NFR-PERF-001",
+        "category": "Performance",
+        "requirement": "System shall handle large models with thousands of elements efficiently",
+        "source": "EMF lazy loading",
+        "priority": "Important",
+        "uml_consideration": "UML models can be very large (enterprise frameworks). Consider lazy loading, pagination, virtualization"
+      },
+      {
+        "id": "NFR-EXTEND-001",
+        "category": "Extensibility",
+        "requirement": "System shall provide stable plugin API that minimizes breaking changes",
+        "source": "Eclipse extension points",
+        "priority": "Important",
+        "uml_consideration": "Design plugin API to be stable and backward compatible"
+      },
+      {
+        "id": "NFR-INTEROP-001",
+        "category": "Interoperability",
+        "requirement": "System shall support standard exchange formats for tool interoperability",
+        "source": "Open Exchange XML",
+        "priority": "Essential",
+        "uml_consideration": "XMI 2.5.1 is standard for UML interchange"
+      },
+      {
+        "id": "NFR-LICENSE-001",
+        "category": "Licensing",
+        "requirement": "System should use permissive licenses (MIT, Apache-2.0) for dependencies to enable commercial use",
+        "source": "Archi MIT license",
+        "priority": "Important",
+        "uml_consideration": "Avoid GPL/LGPL if possible. MIT or Apache-2.0 preferred"
+      },
+      {
+        "id": "NFR-UPDATE-001",
+        "category": "Updates",
+        "requirement": "System should support automatic updates and plugin installation",
+        "source": "P2 provisioning",
+        "priority": "Useful",
+        "uml_consideration": "Update mechanism for application and plugins"
+      },
+      {
+        "id": "NFR-DOC-001",
+        "category": "Documentation",
+        "requirement": "System shall provide comprehensive user and developer documentation",
+        "source": "Archi help module and wiki",
+        "priority": "Important",
+        "uml_consideration": "User guide, API documentation, developer tutorials"
+      }
+    ],
+    "architectural_requirements": [
+      {
+        "id": "AR-METAMODEL-001",
+        "category": "Metamodel Architecture",
+        "requirement": "Metamodel shall be defined declaratively with code generation for consistency",
+        "source": "EMF Ecore with code generation",
+        "rationale": "Reduces manual coding errors, ensures consistency, provides reflection capabilities",
+        "uml_consideration": "Use EMF, Eclipse UML2, or custom generator. Manual implementation not recommended for UML's size"
+      },
+      {
+        "id": "AR-SEPARATION-001",
+        "category": "Architectural Pattern",
+        "requirement": "Architecture shall separate semantic model, visual model, and presentation layers",
+        "source": "Archi 3-layer architecture",
+        "rationale": "Enables multiple views of same model, supports different diagram types, allows headless operation",
+        "uml_consideration": "Critical for UML - same class in multiple diagrams, different visual representations"
+      },
+      {
+        "id": "AR-COMMAND-001",
+        "category": "Modification Pattern",
+        "requirement": "All model modifications shall use Command pattern for undo/redo support",
+        "source": "GEF command pattern",
+        "rationale": "Essential for professional editing experience",
+        "uml_consideration": "Implement command pattern from start, consider EMF command framework"
+      },
+      {
+        "id": "AR-FACTORY-001",
+        "category": "Creation Pattern",
+        "requirement": "Model element creation shall use Factory pattern for consistency and initialization",
+        "source": "IArchimateFactory",
+        "rationale": "Centralized creation logic, ensures valid initial state, supports polymorphism",
+        "uml_consideration": "Generate factory from metamodel, ensure proper initialization"
+      },
+      {
+        "id": "AR-PLUGIN-001",
+        "category": "Extensibility Architecture",
+        "requirement": "Architecture shall support plugin extensions without core modifications",
+        "source": "Eclipse extension points",
+        "rationale": "Enables ecosystem growth, third-party contributions, customization",
+        "uml_consideration": "Design extension points for: importers, exporters, validators, code generators, diagram renderers"
+      },
+      {
+        "id": "AR-SERIALIZE-001",
+        "category": "Persistence Architecture",
+        "requirement": "Persistence layer shall support multiple serialization formats through pluggable handlers",
+        "source": "Multiple format support in Archi",
+        "rationale": "Standard format for interoperability, proprietary format for fidelity, bulk format for operations",
+        "uml_consideration": "XMI 2.5.1 (standard), JSON (developer-friendly), possibly CSV/YAML"
+      },
+      {
+        "id": "AR-VERSION-001",
+        "category": "Evolution Architecture",
+        "requirement": "Architecture shall include version migration framework for metamodel evolution",
+        "source": "Archi compatibility handlers",
+        "rationale": "Metamodel will evolve, must support model migration across versions",
+        "uml_consideration": "Include version in file format, implement migration pipeline, test thoroughly"
+      }
+    ]
+  },
+  "analysis_metadata": {
+    "analysis_date": "2025-11-08",
+    "repository_commit": "master branch as of 2025-11-08",
+    "version_analyzed": "5.8.0-SNAPSHOT",
+    "sources_examined": [
+      "GitHub repository structure and README",
+      "License.txt (MIT License)",
+      "pom.xml (Maven configuration with Tycho)",
+      "com.archimatetool.model bundle manifest and package structure",
+      "com.archimatetool.editor bundle manifest and package structure",
+      "archimate.ecore metamodel definition",
+      "ArchiMate element and relationship implementations",
+      "GEF diagram editor architecture",
+      "Extension point definitions in plugin.xml",
+      "CSV, SVG, JasperReports, and Open Exchange modules",
+      "Viewpoint system implementation",
+      "EMF code generation artifacts",
+      "OSGi bundle dependencies and exports"
+    ],
+    "analysis_depth": "Deep - Examined metamodel structure, architecture layers, design patterns, dependencies, extension mechanisms, and implementation approaches",
+    "confidence": "High - Comprehensive analysis of metamodel, architecture, patterns, and extensibility based on repository structure, manifests, and Ecore model",
+    "limitations": [
+      "Could not examine all implementation details without cloning repository",
+      "Some internal patterns inferred from structure rather than code inspection",
+      "GEF and Eclipse RCP patterns based on framework knowledge and manifest analysis",
+      "Specific algorithm details (layout, routing) not examined",
+      "Test coverage and quality metrics not analyzed"
+    ],
+    "key_insights": [
+      "Archi demonstrates successful EMF-based metamodel approach for enterprise modeling language",
+      "Model-view separation is exemplary - one element in multiple diagrams with different visual properties",
+      "Eclipse RCP provides comprehensive application framework but has steep learning curve and platform lock-in",
+      "GEF patterns (MVC, command, policy) are valuable regardless of framework choice",
+      "Extension point architecture enables ecosystem growth without core modifications",
+      "Multiple serialization formats balance interoperability (Open Exchange) vs. fidelity (native XMI)",
+      "Version migration framework is essential for long-term maintenance",
+      "MIT license enables unrestricted learning and pattern reuse",
+      "ArchiMate metamodel complexity (40+ elements, 20+ relationships) is smaller than UML but architectural patterns scale",
+      "Code generation from Ecore metamodel is proven approach for large metamodels"
+    ]
+  }
+}

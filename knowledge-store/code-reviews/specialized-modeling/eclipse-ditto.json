@@ -1,0 +1,1057 @@
+{
+  "project": {
+    "name": "Eclipse Ditto",
+    "repository": "https://github.com/eclipse-ditto/ditto",
+    "description": "Eclipse Ditto is a mature IoT framework implementing the 'digital twins' pattern, providing virtual cloud-based representations of real-world physical devices and systems like sensors, connected vehicles, smart grids, and EV charging stations.",
+    "version_analyzed": "3.8.0+",
+    "analysis_date": "2025-11-08",
+    "maturity": "production-ready",
+    "first_release": "2017",
+    "maintainer": "Eclipse Foundation",
+    "documentation": "https://www.eclipse.dev/ditto/",
+    "live_demo": "https://eclipse-ditto.github.io/ditto/"
+  },
+  "license": {
+    "type": "EPL-2.0",
+    "name": "Eclipse Public License 2.0",
+    "classification": "weak-copyleft",
+    "commercial_use": "permitted",
+    "modification": "permitted",
+    "distribution": "permitted",
+    "patent_grant": "yes",
+    "reusability_assessment": {
+      "can_reuse": true,
+      "considerations": [
+        "EPL-2.0 is a weak copyleft license (similar to LGPL)",
+        "Modifications to Ditto code must be released under EPL-2.0",
+        "Larger works using Ditto as a library can be under different licenses",
+        "Patent license included with non-exclusive, worldwide, royalty-free terms",
+        "Commercial distribution requires indemnification of other contributors",
+        "Source code must be made available when distributed",
+        "Patent litigation against the Program terminates patent rights",
+        "Secondary licensing option available (e.g., GPLv2+) under specific conditions"
+      ],
+      "recommendations": [
+        "Suitable for commercial and open-source projects",
+        "Can be used as a dependency or service without copyleft obligations on your code",
+        "If modifying Ditto core code, modifications must be released under EPL-2.0",
+        "Ensure contribution agreement is signed if contributing upstream",
+        "Review patent grant clauses if patent concerns exist"
+      ]
+    }
+  },
+  "digital_twin_model": {
+    "core_entities": {
+      "thing": {
+        "description": "A generic entity serving as a handle for multiple Features belonging to this Thing. Can model physical devices, virtual devices, transactional entities, master data, or other manageable IoT assets.",
+        "structure": {
+          "thingId": {
+            "format": "namespace:name",
+            "example": "org.eclipse.ditto:smart-coffee-1",
+            "constraints": {
+              "max_length": 256,
+              "namespace_pattern": "starts with a-z or A-Z, may include dots, dashes, underscores, and numbers",
+              "name_constraints": "cannot be empty, cannot contain forward slashes, must avoid control characters"
+            }
+          },
+          "policyId": {
+            "description": "References the Policy governing read/write permissions for authenticated subjects at hierarchical levels",
+            "type": "string"
+          },
+          "definition": {
+            "description": "Optional field linking the Thing to a model description (URL or namespace:name:version)",
+            "purpose": "Describes Thing capabilities, supports W3C WoT Thing Models",
+            "validation": "Since v3.6.0, Ditto validates modifications against linked Thing Models"
+          },
+          "attributes": {
+            "description": "Describe the Thing in more detail, can be of any JSON type",
+            "purpose": "Model relatively static properties at the Thing level",
+            "type": "arbitrary JSON object"
+          },
+          "features": {
+            "description": "Zero or more Features - the primary mechanism for modeling dynamic capabilities",
+            "type": "map of Feature objects"
+          },
+          "lifecycle": {
+            "description": "Tracks Thing state (e.g., active, deleted)",
+            "type": "enum"
+          },
+          "metadata": {
+            "description": "Optional semantic information attached to attributes and features",
+            "purpose": "Provides context without being part of twin's value (timestamps, units, change tracking)",
+            "structure": "_metadata object that mirrors the thing's hierarchical structure"
+          },
+          "revision": {
+            "description": "Monotonically increasing version number",
+            "purpose": "Optimistic locking, change tracking"
+          },
+          "created": "ISO-8601 timestamp",
+          "modified": "ISO-8601 timestamp"
+        },
+        "json_example": {
+          "thingId": "org.eclipse.ditto:Device-123",
+          "policyId": "org.eclipse.ditto:policy-123",
+          "definition": "org.eclipse.ditto:Device:2.1.0",
+          "attributes": {
+            "location": "living-room",
+            "manufacturer": "ACME"
+          },
+          "features": {
+            "temperature": {
+              "properties": {
+                "value": 23.5,
+                "unit": "celsius"
+              }
+            }
+          }
+        },
+        "builder_pattern": "Fluent API with newBuilder() and toBuilder() methods for immutable construction"
+      },
+      "feature": {
+        "description": "Container for organizing related data and functionality within a Thing. Used to manage all data that can be clustered in an outlined technical context.",
+        "structure": {
+          "featureId": {
+            "description": "Unique identifier within parent Thing",
+            "constraints": "URI-compliant characters, wildcard '*' prohibited"
+          },
+          "definition": {
+            "description": "Optional reference to model description",
+            "formats": [
+              "HTTP/HTTPS URLs (particularly W3C WoT Thing Models)",
+              "namespace:name:version identifiers"
+            ],
+            "validation": "Definitions serve as semantic documentation, not enforced constraints (unless WoT validation enabled)"
+          },
+          "properties": {
+            "description": "Feature data as JSON object",
+            "type": "arbitrary JSON - can be simple/scalar or complex nested objects"
+          },
+          "desiredProperties": {
+            "description": "Target state representation (added v1.5.0)",
+            "purpose": "Stores desired state, searchable and indexed",
+            "note": "Currently treated as persistent storage rather than actively processed"
+          }
+        },
+        "json_example": {
+          "lamp": {
+            "definition": ["org.eclipse.ditto:Lamp:1.0.0"],
+            "properties": {
+              "on": true,
+              "color": {
+                "r": 255,
+                "g": 128,
+                "b": 0
+              }
+            },
+            "desiredProperties": {
+              "on": false
+            }
+          }
+        },
+        "builder_pattern": "Fluent API with newBuilder() and toBuilder() methods",
+        "wot_integration": "Supports W3C Web of Things Thing Models in JSON-LD format"
+      },
+      "policy": {
+        "description": "Defines fine-grained access control specifying 'who gets permissions on what resources'",
+        "structure": {
+          "policyId": "Unique identifier for the policy",
+          "entries": {
+            "description": "Map of policy entries defining subjects, resources, and permissions",
+            "structure": {
+              "subjects": {
+                "format": "issuer:identifier",
+                "examples": [
+                  "nginx:username",
+                  "google:user-id",
+                  "custom-oidc-provider:user-id"
+                ],
+                "expiring_subjects": "Automatically remove access after ISO-8601 timestamps with hourly granularity"
+              },
+              "resources": {
+                "types": [
+                  "policy:/ - The policy structure itself",
+                  "thing:/ - Things, attributes, features, properties",
+                  "message:/ - Inbox/outbox message access"
+                ],
+                "granularity": "Hierarchical paths like thing:/features/X/properties/Y"
+              },
+              "permissions": {
+                "types": ["READ", "WRITE", "EXECUTE"],
+                "note": "write does not imply read - both must be granted independently",
+                "hierarchical_flow": "Permissions flow downward through nested paths unless explicitly revoked"
+              }
+            }
+          },
+          "imports": {
+            "description": "Reuse entries from referenced policies",
+            "modes": ["implicit (default)", "explicit", "never"]
+          }
+        },
+        "advanced_features": [
+          "Policy imports for reusing entries",
+          "Expiring subjects with configurable granularity",
+          "Subject deletion announcements",
+          "Hierarchical permission flow with revocation"
+        ]
+      }
+    },
+    "modeling_patterns": {
+      "attributes_vs_properties": {
+        "attributes": "Relatively static Thing-level properties (e.g., manufacturer, location, serial number)",
+        "feature_properties": "Frequently-changing dynamic data clustered by technical context (e.g., temperature readings, lamp state)",
+        "desired_properties": "Target state for device configuration management"
+      },
+      "multi_tenant_support": {
+        "mechanism": "Namespace-based isolation",
+        "pattern": "Different organizations use distinct namespace prefixes (e.g., com.acme vs org.competitor)",
+        "filtering": "Search and subscriptions can filter by namespace for performance"
+      },
+      "wot_integration": {
+        "thing_models": "Templates defining interaction contracts (like interfaces in OOP)",
+        "thing_descriptions": "Instance-specific implementations",
+        "mapping": {
+          "WoT_Properties": "Thing attributes or Feature properties",
+          "WoT_Actions": "Inbox messages (directable commands)",
+          "WoT_Events": "Outbox messages (emitted notifications)",
+          "WoT_Composition": "Feature aspects of Things"
+        },
+        "validation": "Since v3.6.0, validates modifications against linked Thing Models",
+        "skeleton_generation": "Auto-generates initial JSON structures from Thing Model definitions",
+        "td_generation": "Generates W3C Thing Descriptions from referenced Thing Models"
+      },
+      "metadata_usage": {
+        "audit_trails": "Track changes with timestamps and user information",
+        "data_semantics": "Store unit information or property descriptions",
+        "change_history": "Record modification context without altering primary values",
+        "structure": "Hierarchical _metadata object mirroring thing structure"
+      }
+    }
+  },
+  "state_synchronization": {
+    "twin_vs_live_channels": {
+      "twin_channel": {
+        "purpose": "Persisted digital state",
+        "use_cases": ["Historical data", "State synchronization", "Offline device representation"],
+        "characteristics": "Always available, eventually consistent with physical device"
+      },
+      "live_channel": {
+        "purpose": "Real-time device interaction",
+        "use_cases": ["Direct commands", "Immediate responses", "Real-time sensor readings"],
+        "timeout": "Configurable, default 10 seconds",
+        "characteristics": "Requires device online, no persistence"
+      }
+    },
+    "synchronization_patterns": {
+      "device_to_twin": {
+        "mechanism": "Connectivity service with message mapping",
+        "protocols": ["MQTT", "AMQP", "HTTP", "Kafka", "Eclipse Hono"],
+        "mapping": "Payload mapping transforms external formats to Ditto Protocol",
+        "enforcement": "Source enforcement validates device identity against thing IDs",
+        "qos": "Acknowledgements enable QoS 1 'at least once' delivery"
+      },
+      "twin_to_device": {
+        "mechanism": "Connectivity targets publish events to external systems",
+        "events": ["Thing events", "Live events", "Policy announcements", "Connection announcements"],
+        "routing": "Dynamic topic/address routing using placeholders"
+      },
+      "partial_updates": {
+        "merge_operations": {
+          "standard": "JSON Merge Patch (RFC 7396)",
+          "behavior": "Targeted updates without replacing entire resource",
+          "targets": ["Complete Things", "Attributes", "Features", "Properties at any nesting level"],
+          "auto_create": "Automatically creates Thing if doesn't exist during merge"
+        },
+        "conditional_updates": {
+          "mechanisms": ["ETag-based optimistic locking", "RQL expression-based conditions"],
+          "headers": ["If-Match", "If-None-Match"],
+          "path_specific": "v3.8.0+ supports different conditions for different merge patch sections"
+        }
+      },
+      "consistency_model": {
+        "type": "Eventual consistency",
+        "search_lag": "1-2 seconds typical (default 1-second interval, configurable)",
+        "guarantees": "search-persisted acknowledgement for guaranteed awareness of persistence"
+      }
+    },
+    "correlation_and_tracking": {
+      "correlation_id": "Each Protocol message contains correlation-id for associating related messages",
+      "response_validation": "Ditto ensures responses match correlation ID, entity ID, and path",
+      "event_correlation": "Twin events carry correlation IDs of commands that produced them"
+    }
+  },
+  "event_streaming_and_messaging": {
+    "signals_architecture": {
+      "concept": "Unified communication primitive combining commands, responses, events, and announcements",
+      "cqrs_pattern": {
+        "commands": {
+          "description": "Requests for change, named imperatively (e.g., 'ConfirmOrder')",
+          "characteristics": "May be refused, not guaranteed outcomes"
+        },
+        "events": {
+          "description": "Completed actions, named with past-participle verbs (e.g., 'OrderConfirmed')",
+          "characteristics": "Statements of fact, enable reactive components",
+          "persistence": "Events are persisted and published simultaneously"
+        },
+        "lifecycle": "Command -> Success/Error Response -> Event persisted and published"
+      },
+      "event_sourcing": {
+        "implementation": "Pekko persistence with event sourcing",
+        "storage": "MongoDB for journal and snapshots",
+        "replay": "Entity state restored through event replay",
+        "audit_trail": "Immutable event log of all modifications",
+        "services_using": ["Things service", "Policies service", "Connectivity service"]
+      }
+    },
+    "change_notifications": {
+      "mechanisms": [
+        {
+          "type": "WebSocket API",
+          "description": "Clients receive all authorized Events as Ditto Protocol messages",
+          "bidirectional": true
+        },
+        {
+          "type": "HTTP Server-Sent Events (SSE)",
+          "description": "Consumers receive notifications in entity format (Thing JSON)",
+          "resumption": "Supports resumption capability"
+        },
+        {
+          "type": "Connectivity Service",
+          "description": "Established connections stream events to external systems",
+          "protocols": ["MQTT", "AMQP", "Kafka", "HTTP"]
+        }
+      ],
+      "filtering": {
+        "namespace_based": "Filter by comma-separated namespaces",
+        "rql_expressions": "Sophisticated filtering using RQL conditions",
+        "examples": [
+          "gt(attributes/count,42) - Filter for attribute changes exceeding thresholds",
+          "and(like(thingId,'org.eclipse.ditto:myThing*'),exists(features/lamp))",
+          "and(in(topic:action,'created','deleted'),eq(resource:path,'/')) - Monitor creation/deletion only"
+        ]
+      },
+      "enrichment": {
+        "description": "Add extra fields to events, messages, and commands",
+        "mechanism": "extraFields parameter with field selector syntax",
+        "placement": "Extra data included in 'extra' JSON object within Ditto Protocol messages",
+        "wildcards": "Support for features/*/properties/unit patterns",
+        "placeholders": "Dynamic substitution like features/{{feature:id}}/properties/unit"
+      }
+    },
+    "acknowledgements_framework": {
+      "purpose": "QoS guarantees for IoT operations requiring delivery certainty",
+      "qos_levels": {
+        "qos_0": "At most once - default for all messages",
+        "qos_1": "At least once - enabled through acknowledgement requests"
+      },
+      "built_in_labels": [
+        "twin-persisted - Confirms successful database persistence",
+        "live-response - Confirms subscriber receipt of live commands",
+        "search-persisted - Confirms search index updates"
+      ],
+      "custom_acknowledgements": "Subscribers can declare additional acknowledgement labels",
+      "weak_acknowledgements": {
+        "description": "Auto-issued when subscribers filter messages via RQL or lack permissions",
+        "header": "ditto-weak-ack: true",
+        "purpose": "Prevent command failure while avoiding message redelivery"
+      },
+      "status_semantics": {
+        "2xx": "Success (no retry)",
+        "4xx": "Client error (no retry)",
+        "408": "Timeout (retry recommended)",
+        "5xx": "Server error (retry recommended)"
+      }
+    },
+    "historical_data": {
+      "capabilities": [
+        "Point-in-time retrieval (revision-based or timestamp-based)",
+        "Event streaming across defined ranges",
+        "Filtering historical events with RQL"
+      ],
+      "limitations": "Not comparable with time series databases - no aggregations or compactions",
+      "supported_entities": ["Things", "Policies", "Connections"],
+      "retention": "Requires configuration of history-retention-duration setting",
+      "audit": "Historical headers preserve metadata like ditto-originator for tracking changes"
+    }
+  },
+  "http_and_websocket_apis": {
+    "http_api": {
+      "design_philosophy": "Not fully RESTful (no hyperlinks), but follows REST best practices",
+      "versions": "Multiple API versions supported",
+      "content_types": {
+        "standard": "application/json",
+        "patch": "application/merge-patch+json",
+        "wot": "application/td+json for Thing Descriptions"
+      },
+      "channels": {
+        "twin": "Default - communicates with persisted digital twin",
+        "live": "Direct device communication with configurable timeout (default 10s)"
+      },
+      "operations": {
+        "crud": "Full Create, Read, Update, Delete for Things, Features, Attributes, Properties",
+        "merge": "JSON Merge Patch (RFC 7396) for partial updates",
+        "search": "RQL-based search queries",
+        "history": "Historical state retrieval and event streaming"
+      },
+      "authentication": [
+        "HTTP Basic Authentication",
+        "JWT tokens",
+        "Pre-authentication via reverse proxy (x-ditto-pre-authenticated header)"
+      ],
+      "conditional_requests": {
+        "etag_based": "If-Match, If-None-Match headers for optimistic locking",
+        "rql_based": "Condition query parameters for state-based updates",
+        "response_codes": "Standard HTTP semantics (2xx, 4xx, 408, 5xx)"
+      },
+      "timeout_handling": "Live channel returns 408 Request Timeout if no device response",
+      "response_filtering": "Results filtered based on policy permissions"
+    },
+    "websocket_api": {
+      "purpose": "Real-time bidirectional communication for managing digital twins",
+      "advantages": "Higher throughput than HTTP (eliminates repeated overhead)",
+      "message_format": {
+        "protocol": "Ditto Protocol (JSON)",
+        "components": ["topic", "headers", "path", "value", "status"]
+      },
+      "subscription_commands": [
+        "START-SEND-EVENTS - Change events",
+        "START-SEND-MESSAGES - Messages",
+        "START-SEND-LIVE-COMMANDS - Live commands",
+        "START-SEND-LIVE-EVENTS - Live events",
+        "START-SEND-POLICY-ANNOUNCEMENTS - Policy announcements"
+      ],
+      "authentication": {
+        "methods": ["HTTP Basic Authentication", "JWT tokens"],
+        "token_refresh": "JWT-TOKEN messages for refreshing expired tokens",
+        "connection_closure": "Ditto closes WebSocket when JWT expires"
+      },
+      "advanced_features": [
+        "Namespace and RQL expression-based filtering",
+        "Extra field enrichment",
+        "Live channel access for real-time command/event exchange"
+      ]
+    },
+    "ditto_protocol": {
+      "description": "JSON-based text protocol for communicating with digital twins and physical devices",
+      "message_correlation": "Each message contains correlation-id for associating related messages",
+      "message_types": ["Commands", "Responses", "Events", "Announcements"],
+      "capabilities": [
+        "Twin/live channel operations",
+        "Things group management (create, retrieve, modify, delete, merge)",
+        "Policy management",
+        "Connection management",
+        "Search functionality",
+        "Streaming subscriptions"
+      ],
+      "bindings": ["WebSocket", "HTTP CloudEvents", "Server-Sent Events", "AMQP", "MQTT", "Kafka", "HTTP", "Eclipse Hono"]
+    },
+    "placeholders": {
+      "syntax": "{{ prefix:name }}",
+      "categories": {
+        "entity": "{{ entity:id }}, {{ entity:namespace }}, {{ entity:name }}",
+        "thing_data": "{{ thing-json:<json-pointer> }}",
+        "temporal": "{{ time:now+1h[d] }} with offset and truncation",
+        "authentication": "{{ jwt:<claim-pointer> }}"
+      },
+      "function_pipelines": "{{ thing:name | fn:substring-before('-') | fn:upper() }}",
+      "functions": ["fn:filter", "fn:default", "fn:split", "fn:base64-encode", "fn:upper", "fn:lower"],
+      "usage": "Flexible message routing and dynamic field resolution"
+    }
+  },
+  "policy_and_authorization": {
+    "policy_model": {
+      "subjects": {
+        "format": "issuer:identifier",
+        "examples": ["nginx:username", "google:user-id", "custom-oidc:user-id"],
+        "expiration": "ISO-8601 timestamps with configurable granularity"
+      },
+      "resources": {
+        "types": [
+          "policy:/ - Policy structure management",
+          "thing:/ - Thing entity access",
+          "message:/ - Message inbox/outbox"
+        ],
+        "granularity": "Hierarchical paths for fine-grained control"
+      },
+      "permissions": {
+        "types": ["READ", "WRITE", "EXECUTE"],
+        "independence": "Write does not imply read",
+        "hierarchical": "Permissions flow downward unless explicitly revoked"
+      }
+    },
+    "authorization_enforcement": {
+      "things_service": "Validates signals against policies",
+      "gateway_service": "Filters responses based on policy permissions",
+      "connectivity_service": "No policy enforcement (connections lack policyId)",
+      "live_commands": "Policy-based access control on routing"
+    },
+    "advanced_features": {
+      "policy_imports": "Reuse entries from other policies",
+      "expiring_subjects": "Automatic access removal after timestamps",
+      "subject_deletion_announcements": "Notifications before/when subjects expire",
+      "namespace_restrictions": "Operators can restrict entity creation by namespace and subject"
+    }
+  },
+  "search_and_query": {
+    "search_architecture": {
+      "service": "Things-Search microservice",
+      "mechanism": "Automatically consumes all events for Things and Policies changes",
+      "storage": "Optimized database representation (flattened structure)",
+      "indexing": "No custom indexes required - automatically maintained"
+    },
+    "consistency": {
+      "model": "Eventual consistency",
+      "typical_lag": "1-2 seconds (default 1-second interval, configurable)",
+      "guarantees": "search-persisted acknowledgement for guaranteed awareness"
+    },
+    "query_language": {
+      "language": "RQL (Resource Query Language) subset",
+      "supported_values": ["Booleans", "Numbers", "Strings", "Arrays", "Nested objects"],
+      "operators": [
+        "eq() - Equals",
+        "ne() - Not equals",
+        "in() - In set",
+        "like() - Pattern matching",
+        "gt() - Greater than",
+        "ge() - Greater than or equal",
+        "lt() - Less than",
+        "le() - Less than or equal",
+        "exists() - Field existence",
+        "and() - Logical AND",
+        "or() - Logical OR",
+        "not() - Logical NOT"
+      ],
+      "examples": [
+        "eq(attributes/location,'living-room')",
+        "gt(features/temperature/properties/value,20)",
+        "and(like(thingId,'org.eclipse.ditto:*'),exists(features/lamp))"
+      ]
+    },
+    "sorting_and_pagination": {
+      "sorting": "sort(+thingId) for ascending, sort(-property) for descending",
+      "cursor_based_paging": "size(25),cursor(CURSOR_ID) - default 25 items, max 200",
+      "deprecated_limit": "limit(offset,count) - avoid high offsets due to performance"
+    },
+    "filtering": {
+      "namespace": "Filter by specific namespaces for improved performance",
+      "rql_expressions": "Complex filtering on Thing payload",
+      "field_projection": "Select specific fields to return",
+      "array_matching": "Query values within arrays including nested objects"
+    },
+    "apis": {
+      "http": "Stateless request-response",
+      "ditto_protocol": "Reactive-streams compatible via WebSocket",
+      "server_sent_events": "HTML5 streaming with resumption"
+    },
+    "optimization": {
+      "indexed_fields_limitation": "v3.5.0+ - limit indexed fields by namespace pattern",
+      "pre_defined_extra_fields": "v3.7.0+ - static enrichment configuration reduces roundtrips"
+    }
+  },
+  "design_patterns": {
+    "architectural_patterns": {
+      "microservices": {
+        "characteristics": [
+          "Isolated data stores per service",
+          "Signal-based APIs (commands, responses, events)",
+          "Asynchronous communication"
+        ],
+        "services": ["Policies", "Things", "Things-Search", "Gateway", "Connectivity"]
+      },
+      "cqrs": {
+        "description": "Command Query Responsibility Segregation",
+        "commands": "Requests for change (imperative naming)",
+        "queries": "Read operations (separate from writes)",
+        "separation": "Things service handles writes, Things-Search handles queries"
+      },
+      "event_sourcing": {
+        "implementation": "Pekko persistence",
+        "storage": "MongoDB journal and snapshots",
+        "benefits": ["Audit trail", "State reconstruction", "Temporal queries"],
+        "services": "Things, Policies, Connectivity services"
+      },
+      "event_driven": {
+        "signals": "All inter-service communication via signals",
+        "pub_sub": "Event distribution for change notifications",
+        "reactive": "Asynchronous message processing"
+      }
+    },
+    "integration_patterns": {
+      "gateway_pattern": "Gateway service as API facade abstracting protocol complexity",
+      "adapter_pattern": "Protocol adapters for multi-protocol support",
+      "mapper_pattern": "Payload mapping for format transformation",
+      "correlation_pattern": "Correlation IDs for request-response tracking"
+    },
+    "data_patterns": {
+      "builder_pattern": "Fluent APIs for immutable entity construction",
+      "optimistic_locking": "ETag-based concurrency control",
+      "eventual_consistency": "Search index updates asynchronous from writes",
+      "json_merge_patch": "RFC 7396 for partial updates",
+      "metadata_pattern": "Separation of data and context information"
+    },
+    "digital_twin_patterns": {
+      "twin_live_separation": "Distinct channels for persisted vs real-time interaction",
+      "desired_vs_reported": "Desired properties vs actual properties",
+      "feature_composition": "Modular capabilities via Features",
+      "hierarchical_authorization": "Policy-based access control at multiple levels",
+      "semantic_modeling": "W3C WoT integration for standardized device descriptions"
+    }
+  },
+  "dependencies_and_licenses": {
+    "core_framework": {
+      "pekko": {
+        "versions": {
+          "pekko_bom": "1.2.1",
+          "pekko_http_bom": "1.2.0",
+          "pekko_management": "1.1.1",
+          "pekko_connector_kafka": "1.1.0",
+          "pekko_persistence_mongodb": "1.3.1"
+        },
+        "license": "Apache-2.0",
+        "description": "Actor framework (fork of Akka after license change)"
+      }
+    },
+    "data_storage": {
+      "mongodb": {
+        "java_driver": "5.6.0",
+        "scala_driver": "5.6.0",
+        "license": "Apache-2.0",
+        "usage": "Primary persistence store for events, snapshots, and search index"
+      }
+    },
+    "json_serialization": {
+      "jackson_bom": "2.19.2",
+      "minimal_json": "0.9.5",
+      "json_schema_validator": "1.5.8"
+    },
+    "language_support": {
+      "scala": "2.13.16",
+      "scala_parser_combinators": "1.1.2"
+    },
+    "networking": {
+      "netty_bom": "4.2.4.Final",
+      "reactive_streams": "1.0.4"
+    },
+    "messaging_connectivity": {
+      "kafka_clients": "3.9.1",
+      "hivemq_mqtt_client": "1.3.7",
+      "amqp_client": "5.25.0",
+      "qpid_jms_client": "1.14.0"
+    },
+    "logging": {
+      "slf4j": "2.0.17",
+      "logback": "1.5.19",
+      "logstash_logback_encoder": "8.1"
+    },
+    "monitoring": {
+      "kamon_core": "2.7.7",
+      "prometheus": "Built-in support on port 9095"
+    },
+    "security": {
+      "jjwt": "0.13.0",
+      "description": "JWT token handling"
+    },
+    "testing": {
+      "junit_jupiter": "5.13.3",
+      "assertj": "3.27.3",
+      "mockito": "4.11.0",
+      "scalatest": "3.2.19",
+      "awaitility": "4.2.2"
+    },
+    "build_system": {
+      "maven": "4.0.0",
+      "java_version": "21",
+      "plugins": {
+        "maven_compiler": "3.13.0",
+        "maven_surefire": "3.3.1",
+        "jacoco": "0.8.12",
+        "license_maven_plugin": "4.5",
+        "maven_shade": "3.6.0"
+      }
+    },
+    "license_summary": {
+      "primary_license": "EPL-2.0",
+      "dependency_licenses": "Primarily Apache-2.0 for major dependencies",
+      "compatibility": "EPL-2.0 and Apache-2.0 are compatible for combined use",
+      "commercial_friendly": true
+    }
+  },
+  "architecture_and_deployment": {
+    "microservices_architecture": {
+      "gateway": {
+        "responsibilities": ["HTTP/REST API", "WebSocket protocol", "SSE", "Cloud Events"],
+        "pattern": "Stateless translation facade",
+        "persistence": "None - routes to backend services"
+      },
+      "things": {
+        "responsibilities": ["Thing entity persistence", "Feature management", "Authorization enforcement"],
+        "persistence": "MongoDB via Pekko persistence",
+        "pattern": "Event sourcing with CQRS"
+      },
+      "policies": {
+        "responsibilities": ["Policy persistence", "Authorization rules"],
+        "persistence": "MongoDB via Pekko persistence"
+      },
+      "things_search": {
+        "responsibilities": ["Search indexing", "RQL query execution"],
+        "mechanism": "Event-driven index updates",
+        "storage": "Optimized MongoDB indices"
+      },
+      "connectivity": {
+        "responsibilities": ["External protocol integration", "Message mapping", "Connection management"],
+        "protocols": ["MQTT", "AMQP", "Kafka", "HTTP", "Eclipse Hono"],
+        "persistence": "Connection configurations via Pekko persistence"
+      }
+    },
+    "clustering": {
+      "framework": "Pekko cluster",
+      "communication": "TCP-based remoting",
+      "serialization": "JSON for all signals",
+      "sharding": "Entity sharding for scalability"
+    },
+    "deployment_requirements": {
+      "container_platform": "Docker and Docker Compose",
+      "minimum_resources": {
+        "cpu_cores": "2+",
+        "memory": "4+ GB RAM"
+      },
+      "external_dependencies": {
+        "mongodb": "Required for all services",
+        "nginx": "Reverse proxy for authentication and docs"
+      },
+      "quick_start": "docker-compose up -d in deployment directory",
+      "ui_access": "http://localhost:8080"
+    },
+    "production_features": {
+      "encryption": "v3.1.0+ AES/GCM encryption for sensitive connection fields",
+      "rate_limiting": "Configurable throttling for connections and WebSockets",
+      "monitoring": {
+        "prometheus": "Port 9095 with JVM, HTTP, MongoDB, connection metrics",
+        "custom_metrics": "v3.5.0+ namespace/filter-based custom metrics",
+        "logging": "STDOUT/STDERR, optional ELK integration, file logging with rotation"
+      },
+      "maintenance": {
+        "background_cleanup": "Event/snapshot deletion based on load",
+        "default_retention": "3 days, configurable",
+        "runtime_configuration": "DevOps API for dynamic configuration without restarts"
+      }
+    },
+    "scaling_considerations": {
+      "horizontal_scaling": "Pekko cluster sharding supports adding nodes",
+      "search_optimization": "Limit indexed fields by namespace pattern",
+      "enrichment_optimization": "Pre-defined extra fields reduce memory consumption",
+      "namespace_filtering": "Improves performance in large deployments"
+    },
+    "configuration": {
+      "environment_variables": "Override defaults using ${?UPPER_CASE_ENV_NAME} syntax",
+      "configuration_files": "Per-service configuration in GitHub repository",
+      "pre_authentication": "x-ditto-pre-authenticated header support",
+      "entity_creation_restrictions": "ditto-entity-creation.conf for namespace restrictions",
+      "devops_api": "Default credentials devops/foobar for runtime management"
+    }
+  },
+  "complexity_assessment": {
+    "codebase_statistics": {
+      "primary_language": "Java (98.5%)",
+      "supporting_languages": ["TypeScript", "HTML", "JavaScript", "Scala"],
+      "modules": "42 primary modules",
+      "architecture": "Multi-module Maven build"
+    },
+    "complexity_factors": {
+      "high_complexity": [
+        "Microservices architecture with 5 core services",
+        "Event sourcing and CQRS implementation",
+        "Pekko cluster management and sharding",
+        "Multi-protocol support (MQTT, AMQP, Kafka, HTTP, WebSocket)",
+        "Complex policy-based authorization system",
+        "Search index synchronization",
+        "W3C WoT integration and validation"
+      ],
+      "medium_complexity": [
+        "Payload mapping and transformation",
+        "Conditional updates and optimistic locking",
+        "Historical data retrieval",
+        "WebSocket session management",
+        "Placeholder resolution and function pipelines"
+      ],
+      "well_abstracted": [
+        "Clean separation of concerns via microservices",
+        "Signal-based communication abstracts implementation",
+        "Protocol adapters isolate protocol specifics",
+        "Builder patterns for entity construction",
+        "Clear REST API design"
+      ]
+    },
+    "learning_curve": {
+      "basic_usage": "Medium - REST API straightforward for basic CRUD",
+      "advanced_features": "High - Requires understanding of event sourcing, CQRS, Pekko",
+      "customization": "High - Deep knowledge needed for custom protocol adapters or payload mapping",
+      "deployment": "Medium - Docker Compose simplifies, but production requires expertise",
+      "development": "High - Contributing requires Java 21, Maven, Google Java Style, understanding of architecture"
+    },
+    "maturity_indicators": {
+      "production_ready": true,
+      "evidence": [
+        "Since 2017 (8+ years)",
+        "Eclipse Foundation governance",
+        "Growing commercial adoption",
+        "Active maintenance and releases",
+        "Comprehensive documentation",
+        "System testing repository (ditto-testing)",
+        "Binary compatibility checking (v3.8.0)",
+        "Semantic versioning adherence"
+      ]
+    },
+    "testing_quality": {
+      "unit_tests": "Required for non-trivial features",
+      "system_tests": "Separate ditto-testing repository",
+      "code_coverage": "JaCoCo plugin for coverage reporting",
+      "test_frameworks": ["JUnit Jupiter", "AssertJ", "Mockito", "ScalaTest", "Awaitility"]
+    }
+  },
+  "recommendations": {
+    "suitable_for": [
+      "IoT platforms requiring digital twin management",
+      "Applications needing multi-protocol device connectivity",
+      "Systems requiring fine-grained authorization",
+      "Cloud-native microservices architectures",
+      "Projects needing W3C WoT standard compliance",
+      "Large-scale device management (multi-tenant)",
+      "Applications requiring event sourcing and audit trails",
+      "Systems needing both real-time and historical device interaction"
+    ],
+    "not_suitable_for": [
+      "Simple device management with basic CRUD",
+      "Projects requiring true time-series database features (aggregations, compactions)",
+      "Embedded or resource-constrained environments",
+      "Applications requiring strong consistency guarantees",
+      "Projects with very simple authorization needs",
+      "Monolithic application architectures"
+    ],
+    "adoption_strategies": {
+      "quick_start": [
+        "Use Docker Compose for local exploration",
+        "Start with HTTP API for basic Thing CRUD",
+        "Explore UI at http://localhost:8080",
+        "Follow 'Hello World' guide in documentation"
+      ],
+      "production_deployment": [
+        "Plan MongoDB cluster for high availability",
+        "Configure Prometheus monitoring",
+        "Set up proper authentication (JWT or pre-auth)",
+        "Define namespace strategy for multi-tenancy",
+        "Configure rate limiting and throttling",
+        "Plan for horizontal scaling with Pekko cluster",
+        "Set appropriate history retention durations",
+        "Configure encryption for sensitive connection data"
+      ],
+      "integration": [
+        "Start with one protocol (MQTT or HTTP)",
+        "Define Thing Models for your device types",
+        "Set up connectivity for device-to-twin sync",
+        "Implement payload mappers for custom formats",
+        "Use acknowledgements for critical operations",
+        "Subscribe to change notifications via WebSocket or SSE",
+        "Leverage search for device queries"
+      ]
+    },
+    "reuse_patterns": {
+      "as_service": "Deploy Ditto as a standalone digital twin service, interact via HTTP/WebSocket APIs",
+      "as_library": "Not designed as library - microservices architecture",
+      "learn_from": [
+        "CQRS and event sourcing implementation patterns",
+        "Multi-protocol adapter design",
+        "Policy-based authorization at scale",
+        "W3C WoT integration approach",
+        "Signal-based microservices communication",
+        "Event-driven search index updates",
+        "Payload mapping and transformation patterns"
+      ]
+    },
+    "customization_points": {
+      "protocol_adapters": "Add custom connectivity bindings",
+      "payload_mappers": "JavaScript-based custom message transformation",
+      "authentication": "Custom OIDC providers",
+      "policies": "Fine-grained custom authorization rules",
+      "thing_models": "W3C WoT Thing Models for device types",
+      "monitoring": "Custom Prometheus metrics (v3.5.0+)",
+      "devops_commands": "Custom administrative operations"
+    }
+  },
+  "requirements_and_standards": {
+    "development_requirements": {
+      "jdk": "21+",
+      "maven": "3.9.x",
+      "code_style": "Google Java Style Guide (120 char line length)",
+      "license_headers": "EPL-2.0 headers required on all new files",
+      "commit_signoff": "Required - git commit -s with Eclipse account email",
+      "contributor_agreement": "Eclipse Foundation Contributor Agreement",
+      "testing": "Test cases required for non-trivial features",
+      "early_issues": "Create GitHub issues before starting work",
+      "pr_process": "Early draft PRs encouraged, at least one approval required"
+    },
+    "runtime_requirements": {
+      "java": "JDK 21+",
+      "mongodb": "6+ recommended with additional indexing for aggregations",
+      "docker": "For containerized deployment",
+      "resources": "2+ CPU cores, 4+ GB RAM minimum",
+      "network": "TCP for Pekko cluster communication"
+    },
+    "standards_compliance": {
+      "w3c_wot": {
+        "thing_models": "Fully supported",
+        "thing_descriptions": "Generated from Thing Models",
+        "validation": "Schema validation since v3.6.0",
+        "ontologies": ["QUDT.org", "OM-2", "W3C Basic Geo", "W3C Time", "SAREF"]
+      },
+      "rfc_compliance": {
+        "rfc_7396": "JSON Merge Patch for partial updates",
+        "rfc_7232": "Conditional requests (ETags)",
+        "iso_8601": "Timestamps and date handling"
+      },
+      "protocol_standards": {
+        "mqtt": "3.1.1 and 5.0",
+        "amqp": "0.9.1 and 1.0",
+        "http": "1.1",
+        "websocket": "Standard WebSocket protocol",
+        "sse": "HTML5 Server-Sent Events"
+      }
+    },
+    "security_requirements": {
+      "authentication": ["HTTP Basic", "JWT tokens", "Pre-authentication", "AWS IAM for MongoDB"],
+      "authorization": "Policy-based with READ, WRITE, EXECUTE permissions",
+      "encryption": "AES/GCM 256-bit for sensitive connection data (v3.1.0+)",
+      "tls_ssl": "Supported for MongoDB connections",
+      "token_expiration": "Automatic WebSocket closure on JWT expiration"
+    },
+    "quality_requirements": {
+      "code_coverage": "JaCoCo reporting required",
+      "binary_compatibility": "JAPICMP checks against v3.8.0",
+      "api_stability": "Semantic versioning enforced",
+      "feature_toggles": "Required for new features to reduce risk",
+      "system_tests": "Separate testing repository for API validation"
+    }
+  },
+  "key_insights": {
+    "strengths": [
+      "Mature, production-ready framework with 8+ years of development",
+      "Comprehensive digital twin implementation with Thing/Feature model",
+      "Strong architectural patterns (CQRS, Event Sourcing, Microservices)",
+      "Multi-protocol support for diverse IoT ecosystems",
+      "Fine-grained policy-based authorization",
+      "W3C WoT standard compliance for semantic interoperability",
+      "Excellent documentation and active community",
+      "EPL-2.0 license suitable for commercial use",
+      "Event-driven architecture with real-time and historical capabilities",
+      "Flexible payload mapping for custom device formats",
+      "Built-in monitoring and operations support"
+    ],
+    "limitations": [
+      "Not a true time-series database (no aggregations/compactions)",
+      "Eventual consistency may not suit all use cases",
+      "High complexity requires significant expertise",
+      "Resource intensive (microservices + MongoDB + Pekko cluster)",
+      "Not designed as embeddable library",
+      "Learning curve steep for advanced features",
+      "Search lag of 1-2 seconds may impact real-time requirements"
+    ],
+    "innovation_highlights": [
+      "Twin vs Live channel separation for different interaction semantics",
+      "Signal-based microservices communication pattern",
+      "Automatic search index synchronization via event consumption",
+      "Flexible placeholder system with function pipelines",
+      "Weak acknowledgements for filtered/unauthorized messages",
+      "Path-specific merge conditions for fine-grained updates",
+      "W3C WoT integration with automatic skeleton generation",
+      "Historical data access without dedicated time-series DB",
+      "Dynamic message routing with payload mapping"
+    ],
+    "design_philosophy": [
+      "Digital twin as single source of truth",
+      "Separation of concerns via microservices",
+      "Event sourcing for audit and reconstruction",
+      "Policy-based security at multiple granularity levels",
+      "Protocol-agnostic core with adapter pattern",
+      "Eventual consistency with opt-in guarantees",
+      "Immutable entities with builder patterns",
+      "Metadata separation from core data"
+    ]
+  },
+  "relevant_code_locations": {
+    "core_model": {
+      "thing": "things/model/src/main/java/org/eclipse/ditto/things/model/Thing.java",
+      "feature": "things/model/src/main/java/org/eclipse/ditto/things/model/Feature.java",
+      "policy": "policies/model/src/main/java/org/eclipse/ditto/policies/model/Policy.java"
+    },
+    "services": {
+      "things": "things/service/",
+      "policies": "policies/service/",
+      "gateway": "gateway/service/",
+      "connectivity": "connectivity/service/",
+      "things_search": "thingsearch/service/"
+    },
+    "protocols": {
+      "protocol_model": "protocol/",
+      "mqtt": "connectivity/service/src/main/java/org/eclipse/ditto/connectivity/service/messaging/mqtt/",
+      "http": "connectivity/service/src/main/java/org/eclipse/ditto/connectivity/service/messaging/http/"
+    },
+    "deployment": {
+      "docker": "deployment/docker/",
+      "docker_compose": "deployment/docker/docker-compose.yml"
+    }
+  },
+  "use_cases": {
+    "industrial_iot": [
+      "Manufacturing equipment monitoring",
+      "Predictive maintenance with historical analysis",
+      "Multi-site asset management",
+      "Industrial automation with real-time control"
+    ],
+    "smart_home": [
+      "Connected device management",
+      "Home automation orchestration",
+      "Multi-vendor device integration",
+      "User-based access control"
+    ],
+    "automotive": [
+      "Connected vehicle digital twins",
+      "Fleet management and tracking",
+      "Telematics data aggregation",
+      "Remote diagnostics and control"
+    ],
+    "smart_grid": [
+      "Energy meter digital twins",
+      "Grid monitoring and control",
+      "Demand response management",
+      "Distributed energy resource integration"
+    ],
+    "ev_charging": [
+      "Charging station management",
+      "Multi-network integration",
+      "Usage monitoring and billing",
+      "Remote configuration and updates"
+    ]
+  },
+  "comparison_considerations": {
+    "vs_azure_digital_twins": [
+      "Ditto is open-source and self-hosted vs Azure cloud service",
+      "Ditto uses Thing/Feature model vs ADT's DTDL",
+      "Ditto has built-in multi-protocol connectivity",
+      "Azure ADT has tighter Azure ecosystem integration",
+      "Ditto provides more control over deployment and data"
+    ],
+    "vs_aws_iot_twinmaker": [
+      "Ditto is cloud-agnostic vs AWS-specific",
+      "Ditto has stronger event sourcing capabilities",
+      "AWS TwinMaker has 3D visualization focus",
+      "Ditto is more mature and feature-complete",
+      "Ditto provides finer-grained authorization"
+    ],
+    "vs_custom_solution": [
+      "Ditto provides battle-tested patterns (CQRS, Event Sourcing)",
+      "Built-in multi-protocol connectivity saves development time",
+      "Policy engine more sophisticated than typical RBAC",
+      "W3C WoT compliance provides future-proofing",
+      "Trade-off: complexity vs flexibility"
+    ]
+  }
+}

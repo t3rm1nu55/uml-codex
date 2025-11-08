@@ -1,0 +1,1528 @@
+{
+  "project_name": "OpenMetadata",
+  "repository_url": "https://github.com/open-metadata/OpenMetadata",
+  "analysis_date": "2025-11-08",
+  "stars": 7900,
+  "forks": 1500,
+  "contributors": 378,
+  "releases": "170+",
+  "description": "Open-source unified metadata platform for data discovery, data observability, and data governance powered by a central metadata repository",
+
+  "license": {
+    "type": "Apache License 2.0",
+    "spdx_id": "Apache-2.0",
+    "is_permissive": true,
+    "commercial_use": true,
+    "modification": true,
+    "distribution": true,
+    "patent_grant": true,
+    "reusability_assessment": "HIGHLY REUSABLE",
+    "key_requirements": [
+      "Include copy of license",
+      "State changes made to the code",
+      "Retain copyright and attribution notices",
+      "Include NOTICE file if applicable"
+    ],
+    "restrictions": [
+      "Trademark use not permitted",
+      "Patent litigation terminates patent licenses"
+    ],
+    "warranties": "Provided AS IS without warranties",
+    "liability": "No contributor liability for damages",
+    "recommendation": "Excellent for commercial and open-source reuse. Very permissive with minimal restrictions. Safe for derivative works and commercial applications."
+  },
+
+  "architecture": {
+    "overview": "Four-layer architecture with JSON Schema-based metadata model",
+    "core_components": [
+      {
+        "name": "Metadata Schemas",
+        "description": "Core definitions supporting custom extensions",
+        "technology": "JSON Schema",
+        "location": "openmetadata-spec/src/main/resources/json/schema"
+      },
+      {
+        "name": "Metadata Store",
+        "description": "Central repository managing the metadata graph",
+        "technology": "MySQL/PostgreSQL with JDBI 3",
+        "features": ["Graph-based relationships", "Version control", "Audit trails"]
+      },
+      {
+        "name": "Metadata APIs",
+        "description": "RESTful interfaces for metadata production and consumption",
+        "technology": "Dropwizard + Jersey (JAX-RS)",
+        "patterns": ["REST", "OpenAPI/Swagger", "JWT authentication"]
+      },
+      {
+        "name": "Ingestion Framework",
+        "description": "Pluggable system for metadata extraction from diverse sources",
+        "technology": "Python with Airflow integration",
+        "connectors": "84+"
+      }
+    ],
+    "deployment_models": [
+      "Local Docker (quickstart)",
+      "Kubernetes (production)",
+      "Bare metal",
+      "Cloud-native"
+    ]
+  },
+
+  "metadata_model": {
+    "approach": "JSON Schema-based with strong typing and extensibility",
+    "schema_organization": {
+      "entity": "Core metadata objects (tables, dashboards, pipelines, etc.)",
+      "type": "Data type specifications and constraints",
+      "api": "Request/response structures for API endpoints",
+      "configuration": "System and integration configuration models",
+      "security": "Authentication and authorization schemas",
+      "governance": "Policy and workflow automation definitions",
+      "monitoring": "Data insight and monitoring specifications",
+      "metadataIngestion": "Connector and ingestion pipeline configurations",
+      "events": "Event-based communication structures",
+      "jobs": "Scheduled operations and system preferences"
+    },
+    "key_entities": [
+      {
+        "name": "Table",
+        "schema_file": "entity/data/table.json",
+        "required_fields": ["id", "name", "columns"],
+        "key_features": [
+          "Hierarchical structure (service.database.schema.table)",
+          "Table types: Regular, View, MaterializedView, Iceberg, Stream",
+          "Column-level metadata with data types, constraints, ordinal positions",
+          "Storage configuration (location, compression, file formats)",
+          "Lineage connections (upstream models, joined tables)",
+          "Ownership and domain associations",
+          "Custom attributes and metrics",
+          "DBT and DDL model support",
+          "Profiling configuration with partition strategies",
+          "Constraint modeling (PRIMARY_KEY, FOREIGN_KEY, UNIQUE, NOT_NULL)"
+        ]
+      },
+      {
+        "name": "GlossaryTerm",
+        "schema_file": "entity/data/glossaryTerm.json",
+        "purpose": "Business glossary and semantic layer",
+        "features": [
+          "Hierarchical parent-child relationships",
+          "Fully qualified naming (glossaryName.parentTerm.childTerm)",
+          "Synonyms and related terms",
+          "External references",
+          "Multiple owners and reviewers",
+          "Tag propagation",
+          "Usage count tracking",
+          "Approval workflows via entityStatus",
+          "Mutually exclusive rules for child terms"
+        ]
+      },
+      {
+        "name": "Thread",
+        "schema_file": "entity/feed/thread.json",
+        "purpose": "Collaboration and communication",
+        "thread_types": ["Conversation", "Task", "Announcement", "Chatbot"],
+        "features": [
+          "Posts with reactions and mentions",
+          "Task assignments with status tracking",
+          "7 task types (RequestDescription, UpdateTag, etc.)",
+          "Announcement temporal controls (start/end timestamps)",
+          "Resolution status",
+          "Domain associations",
+          "Audit trails"
+        ]
+      },
+      {
+        "name": "Domain",
+        "schema_file": "entity/domains/domain.json",
+        "purpose": "Multi-tenancy and data organization",
+        "features": [
+          "Hierarchical parent-child structure",
+          "3 domain types: Source-aligned, Consumer-aligned, Aggregate",
+          "Ownership and experts assignment",
+          "Followers tracking",
+          "Asset references",
+          "Version control and change descriptions"
+        ]
+      },
+      {
+        "name": "Policy",
+        "schema_file": "entity/policies/policy.json",
+        "purpose": "Access control and governance",
+        "features": [
+          "Multiple rules per policy",
+          "Team, role, and domain scoping",
+          "Enable/disable control",
+          "Mutability controls (allowDelete, allowEdit)",
+          "Lifecycle management"
+        ]
+      },
+      {
+        "name": "SearchIndex",
+        "schema_file": "entity/data/searchIndex.json",
+        "purpose": "Search infrastructure modeling",
+        "features": [
+          "Elasticsearch/OpenSearch support",
+          "41+ field data types",
+          "Vector search support (DENSE_VECTOR)",
+          "Geospatial types (GEO_POINT, GEO_SHAPE)",
+          "Advanced types (COMPLETION, SEARCH_AS_YOU_TYPE, PERCOLATOR)",
+          "Configuration and sample data",
+          "Full metadata integration"
+        ]
+      },
+      {
+        "name": "Tag/Classification",
+        "schema_file": "entity/classification/tag.json",
+        "purpose": "Tagging and classification",
+        "features": [
+          "Hierarchical tag structure",
+          "Mutually exclusive vs. concurrent categorization",
+          "Auto-classification via recognizers",
+          "Priority-based conflict resolution",
+          "Usage count tracking",
+          "Field-level tagging"
+        ]
+      }
+    ],
+    "extensibility": {
+      "custom_properties": {
+        "schema_file": "type/customProperty.json",
+        "naming_convention": "camelCase",
+        "uniqueness": "Property name must be unique per entity",
+        "property_types": [
+          "Enumerations with restricted values",
+          "Dates and times with format specifications",
+          "Entity references with type restrictions",
+          "Tables for complex structured data"
+        ],
+        "features": [
+          "Display names separate from internal names",
+          "Type safety through property type references",
+          "Configuration constraints",
+          "Validation rules"
+        ]
+      },
+      "extension_object": "Generic extension object for additional properties on core entities"
+    },
+    "design_patterns": [
+      "JSON Schema for type safety and validation",
+      "Entity references via UUID and FQN (Fully Qualified Name)",
+      "Hierarchical modeling with parent-child relationships",
+      "Temporal tracking (createdAt, updatedAt, version)",
+      "Change descriptions for audit trails",
+      "Soft deletion support",
+      "Ownership via entity references",
+      "Domain and data product associations",
+      "Tag and classification support",
+      "Custom properties for extensibility"
+    ]
+  },
+
+  "lineage_tracking": {
+    "schema_file": "type/entityLineage.json",
+    "model_type": "Directed graph",
+    "components": {
+      "entity": "Primary data asset being analyzed",
+      "nodes": "All entities in the lineage graph excluding primary entity",
+      "edges": "Directional connections (upstream and downstream)"
+    },
+    "edge_properties": {
+      "required": ["fromEntity (UUID)", "toEntity (UUID)"],
+      "optional": ["lineageDetails", "description"]
+    },
+    "lineage_details": [
+      "SQL transformation query",
+      "Column-level lineage tracking",
+      "Pipeline references",
+      "Transformation function definitions",
+      "Audit metadata (creator, timestamps)",
+      "Lineage source type"
+    ],
+    "source_types": [
+      "Manual",
+      "View-based",
+      "Query-based",
+      "Pipeline-based",
+      "dbt",
+      "Spark"
+    ],
+    "granularity": [
+      "Asset-to-asset (coarse-grained)",
+      "Column-to-column (fine-grained)"
+    ],
+    "features": [
+      "End-to-end tracking",
+      "Column-level visibility",
+      "Manual editing support",
+      "Multiple source system support",
+      "Transformation metadata",
+      "Bidirectional relationships"
+    ],
+    "design_patterns": [
+      "Graph-based representation",
+      "Immutable node references (UUID)",
+      "Rich edge metadata",
+      "Source attribution",
+      "Temporal tracking"
+    ]
+  },
+
+  "data_quality_framework": {
+    "test_platforms": [
+      "OpenMetadata",
+      "Great Expectations",
+      "dbt",
+      "Deequ",
+      "Soda",
+      "Other"
+    ],
+    "test_definition": {
+      "schema_file": "tests/testDefinition.json",
+      "scope_levels": ["TABLE", "COLUMN"],
+      "quality_dimensions": [
+        "Completeness",
+        "Accuracy",
+        "Consistency",
+        "Validity",
+        "Uniqueness",
+        "Integrity",
+        "SQL"
+      ],
+      "parameterization": {
+        "properties": ["name", "displayName", "dataType", "validation rules"],
+        "required_optional": "Parameters can be marked required or optional",
+        "predefined_options": "Option values can be predefined"
+      },
+      "validation_rules": [
+        "EQUALS",
+        "NOT_EQUALS",
+        "GREATER_THAN_OR_EQUALS",
+        "LESS_THAN_OR_EQUALS"
+      ],
+      "supported_data_types": [
+        "NUMBER", "INT", "FLOAT", "DOUBLE", "DECIMAL",
+        "DATE", "TIME", "TIMESTAMP", "DATETIME",
+        "ARRAY", "MAP", "SET",
+        "STRING", "BOOLEAN"
+      ],
+      "advanced_capabilities": [
+        "Row-level passed/failed tracking",
+        "Dynamic assertions",
+        "Profiling integration"
+      ]
+    },
+    "test_case": {
+      "schema_file": "tests/testCase.json",
+      "required_elements": [
+        "name",
+        "test definition reference",
+        "tested entity reference",
+        "test suite association"
+      ],
+      "execution_features": [
+        "Parameter name-value pairs with runtime conversion",
+        "Latest result storage",
+        "Status tracking",
+        "Failed row sampling",
+        "Inspection queries for failure diagnosis",
+        "Dimensional grouping",
+        "Dynamic assertion support"
+      ],
+      "metadata_context": [
+        "Domain inheritance",
+        "Followers",
+        "Tags",
+        "Soft deletion",
+        "Versioning",
+        "Change tracking"
+      ]
+    },
+    "profiling": {
+      "table_level_metrics": [
+        "Row count",
+        "Column count",
+        "Data size",
+        "Creation/modification timestamps"
+      ],
+      "column_level_metrics": [
+        "Null counts and proportions",
+        "Uniqueness measures",
+        "Histograms",
+        "Quartiles and percentiles",
+        "Min/max values",
+        "Mean and standard deviation",
+        "Value distributions"
+      ],
+      "configuration": [
+        "Partition strategies",
+        "Sampling methods",
+        "Custom profiler settings"
+      ]
+    },
+    "no_code_testing": true,
+    "interactive_dashboards": true,
+    "design_patterns": [
+      "Reusable test definitions",
+      "Parameter-driven execution",
+      "Multi-platform support",
+      "Dimensional analysis",
+      "Comprehensive audit trails"
+    ]
+  },
+
+  "connector_framework": {
+    "total_connectors": "84+",
+    "architecture": "Pluggable Python-based system with Airflow integration",
+    "base_location": "ingestion/src/metadata/ingestion/source/",
+    "categories": {
+      "database": {
+        "count": "45+",
+        "examples": [
+          "Snowflake", "BigQuery", "Redshift", "PostgreSQL", "MySQL",
+          "Oracle", "MSSQL", "Databricks", "Delta Lake", "Iceberg",
+          "Hive", "Spark", "Cassandra", "MongoDB", "Teradata",
+          "Vertica", "MariaDB", "DB2", "SAP HANA", "DuckDB",
+          "Pinot", "Druid", "Salesforce", "SAP ERP"
+        ],
+        "shared_utilities": [
+          "common_db_source.py",
+          "sqlalchemy_source.py",
+          "column_helpers.py",
+          "lineage_source.py",
+          "sample_data.py",
+          "sample_usage.py"
+        ]
+      },
+      "dashboard": {
+        "count": "17",
+        "examples": [
+          "Tableau", "PowerBI", "Looker", "Metabase", "Grafana",
+          "Superset", "Redash", "QuickSight", "Qlik", "Domo"
+        ]
+      },
+      "pipeline": {
+        "count": "18",
+        "examples": [
+          "Airflow", "Dagster", "dbt Cloud", "Fivetran", "Airbyte",
+          "NiFi"
+        ]
+      },
+      "messaging": {
+        "count": "3",
+        "examples": ["Kafka", "Kinesis", "Redpanda"]
+      },
+      "ml_model": {
+        "count": "2",
+        "examples": ["MLflow", "Sagemaker"]
+      },
+      "storage": {
+        "count": "2",
+        "examples": ["S3", "GCS"]
+      },
+      "metadata": {
+        "count": "3+",
+        "examples": ["Amundsen", "Atlas", "AlationSink"]
+      },
+      "search": {
+        "count": "2",
+        "examples": ["Elasticsearch", "OpenSearch"]
+      },
+      "api": {
+        "description": "REST API connectors"
+      },
+      "security": {
+        "description": "Security and identity management integrations"
+      }
+    },
+    "workflow_types": [
+      "Metadata ingestion",
+      "Usage tracking",
+      "Lineage extraction",
+      "Data profiling",
+      "Data quality testing",
+      "dbt integration"
+    ],
+    "ingestion_workflow": {
+      "schema_file": "metadataIngestion/workflow.json",
+      "components": {
+        "source": {
+          "description": "Data origin with connector type and service connection",
+          "configuration": "References specific pipeline schemas"
+        },
+        "processor": {
+          "description": "Optional transformation layer",
+          "examples": ["PII masking"]
+        },
+        "stage": {
+          "description": "Intermediate processing step",
+          "examples": ["table-usage analysis"]
+        },
+        "sink_or_bulkSink": {
+          "description": "Destination for processed metadata",
+          "sink": "Individual records",
+          "bulkSink": "Batch operations"
+        }
+      },
+      "control_settings": {
+        "raiseOnError": "Flag workflow as failed on processing errors",
+        "logging_levels": ["DEBUG", "INFO", "WARN", "ERROR"],
+        "success_thresholds": "0-100%",
+        "server_connectivity": "OpenMetadata server configuration"
+      }
+    },
+    "deployment_options": [
+      "OpenMetadata Ingestion Container with Airflow",
+      "External orchestrator (Airflow, Dagster, etc.)",
+      "Manual execution"
+    ],
+    "scheduling": [
+      "Hourly",
+      "Daily",
+      "Weekly",
+      "Manual"
+    ],
+    "filter_patterns": {
+      "support": "Regex-based include/exclude rules",
+      "scope": [
+        "Databases",
+        "Schemas",
+        "Tables",
+        "Dashboards",
+        "Topics"
+      ]
+    },
+    "design_patterns": [
+      "Modular connector architecture",
+      "Shared base classes for similar connectors",
+      "SQLAlchemy abstraction for SQL databases",
+      "Plugin-based system",
+      "Configuration-driven workflows",
+      "Reusable utility functions",
+      "Consistent metadata extraction patterns"
+    ]
+  },
+
+  "collaboration_features": {
+    "conversations": {
+      "schema": "entity/feed/thread.json",
+      "type": "Conversation",
+      "features": [
+        "Posts with rich text",
+        "User mentions",
+        "Data asset mentions",
+        "Reactions",
+        "Threading",
+        "Resolution status",
+        "Domain associations"
+      ]
+    },
+    "tasks": {
+      "schema": "entity/feed/thread.json",
+      "type": "Task",
+      "task_types": [
+        "RequestDescription",
+        "UpdateTag",
+        "RequestTag",
+        "UpdateDescription",
+        "RequestApproval",
+        "Generic"
+      ],
+      "features": [
+        "Assignment to users/teams",
+        "Status tracking (Open/Closed)",
+        "Old/new/suggested value tracking",
+        "Task categorization",
+        "Posts and discussions",
+        "Resolution workflow"
+      ]
+    },
+    "announcements": {
+      "schema": "entity/feed/thread.json",
+      "type": "Announcement",
+      "features": [
+        "Markdown description support",
+        "Temporal controls (start/end timestamps)",
+        "Visibility windows",
+        "Posts and reactions"
+      ]
+    },
+    "notifications": {
+      "channels": [
+        "Slack",
+        "Microsoft Teams",
+        "Google Chat",
+        "Email",
+        "Webhooks"
+      ],
+      "event_types": [
+        "Entity changes",
+        "Data quality alerts",
+        "Task assignments",
+        "Announcements",
+        "Custom events"
+      ]
+    },
+    "glossary": {
+      "schema": "entity/data/glossaryTerm.json",
+      "features": [
+        "Hierarchical business glossary",
+        "Synonyms and related terms",
+        "External references",
+        "Ownership and reviewers",
+        "Approval workflows",
+        "Tag propagation",
+        "Usage tracking"
+      ]
+    },
+    "followers": {
+      "description": "Users can follow data assets, glossaries, and other entities",
+      "notifications": "Receive updates on changes"
+    },
+    "ownership": {
+      "types": ["Technical Owner", "Business Owner", "Data Steward"],
+      "assignment": "Teams and individuals",
+      "responsibilities": "Clear accountability"
+    },
+    "alerts": {
+      "triggers": [
+        "Data quality failures",
+        "Schema changes",
+        "Ownership changes",
+        "Custom events"
+      ],
+      "scheduling": "Scheduled alerts for KPIs"
+    },
+    "design_patterns": [
+      "Unified thread model for all collaboration types",
+      "Entity references for linking",
+      "Temporal controls",
+      "Audit trails",
+      "Integration with external communication platforms"
+    ]
+  },
+
+  "ui_ux_patterns": {
+    "frontend_framework": "React 18.2.0 with TypeScript",
+    "component_libraries": [
+      "Ant Design 4.24.16 (primary)",
+      "Material-UI 7.3.1 (secondary)",
+      "Custom components"
+    ],
+    "styling": {
+      "primary": "Styled Components 6.1.8 (CSS-in-JS)",
+      "preprocessor": "Less",
+      "additional": "PostCSS"
+    },
+    "build_tools": {
+      "bundler": "Vite 7.1.3",
+      "transpiler": "Babel 7.11.1+",
+      "type_system": "TypeScript 5.0.0"
+    },
+    "state_management": {
+      "primary": "Zustand 4.5.0",
+      "routing": "React Router DOM 6.22.1"
+    },
+    "data_visualization": {
+      "graph_flows": "ReactFlow 11.10.2",
+      "charts": "Recharts 2.10.3",
+      "data_grids": "React Data Grid 7.0.0-beta.47"
+    },
+    "rich_editing": {
+      "text_editor": "Tiptap 2.3.0+ with markdown support",
+      "code_editor": "CodeMirror 5.65.16"
+    },
+    "advanced_components": {
+      "query_builder": "React Awesome Query Builder (Ant Design) 6.6.15",
+      "search": "Advanced search with filters",
+      "lineage_graph": "Interactive lineage visualization with ReactFlow",
+      "data_profiling": "Interactive dashboards with charts"
+    },
+    "authentication": {
+      "providers": [
+        "Auth0",
+        "Azure MSAL",
+        "Okta",
+        "OIDC"
+      ]
+    },
+    "internationalization": {
+      "library": "i18next 21.10.0",
+      "features": ["Browser language detection", "Multiple language support"]
+    },
+    "testing": {
+      "unit": "Jest 29.7.0",
+      "e2e": "Playwright 1.51.1"
+    },
+    "http_client": "Axios 1.8.3",
+    "directory_structure": {
+      "components": "Reusable React components",
+      "pages": "Page-level components and routing",
+      "hooks": "Custom React hooks",
+      "context": "React context for state management",
+      "utils": "Utility functions and helpers",
+      "styles": "CSS and styling configurations",
+      "rest": "API integration and REST calls",
+      "generated": "Auto-generated code from JSON schemas",
+      "constants": "Application-wide constants",
+      "enums": "TypeScript enumerations",
+      "interface": "Interface definitions"
+    },
+    "key_patterns": [
+      "Component-based architecture",
+      "Type-safe development with TypeScript",
+      "Auto-generated types from JSON schemas",
+      "Centralized state management",
+      "Modular styling with CSS-in-JS",
+      "Responsive design",
+      "Rich interactive visualizations",
+      "Advanced search and filtering",
+      "Real-time updates",
+      "Progressive enhancement"
+    ],
+    "node_requirement": ">=22.0.0"
+  },
+
+  "search_and_discovery": {
+    "search_engine": {
+      "options": ["Elasticsearch", "OpenSearch"],
+      "indexing": "Real-time metadata indexing"
+    },
+    "search_capabilities": {
+      "keyword_search": "Full-text search across all entities",
+      "advanced_queries": "Complex query builder",
+      "filters": {
+        "entity_type": "Tables, dashboards, pipelines, topics, etc.",
+        "service": "Source system",
+        "tier": "Data tier classification",
+        "tags": "Tag-based filtering",
+        "domain": "Domain filtering",
+        "owner": "Ownership filtering",
+        "glossary_terms": "Business glossary filtering"
+      },
+      "faceted_navigation": "Multiple filter dimensions",
+      "relevance_ranking": "Usage-based ranking",
+      "search_as_you_type": "Autocomplete and suggestions"
+    },
+    "discovery_features": {
+      "data_associations": "Related entities and dependencies",
+      "lineage_exploration": "Interactive lineage graphs",
+      "usage_analytics": "Popular and frequently accessed data",
+      "recommendations": "Similar entities",
+      "domain_browsing": "Hierarchical domain navigation",
+      "glossary_browsing": "Business glossary navigation"
+    },
+    "field_types_indexed": [
+      "TEXT", "KEYWORD", "NUMBER", "BOOLEAN",
+      "DATE", "DATETIME", "TIMESTAMP",
+      "GEO_POINT", "GEO_SHAPE",
+      "DENSE_VECTOR (for vector search)",
+      "COMPLETION", "SEARCH_AS_YOU_TYPE",
+      "NESTED", "OBJECT", "FLATTENED"
+    ],
+    "design_patterns": [
+      "Elasticsearch/OpenSearch abstraction",
+      "Real-time indexing",
+      "Faceted search",
+      "Relevance tuning",
+      "Vector search support for semantic discovery"
+    ]
+  },
+
+  "multi_tenancy_support": {
+    "domains": {
+      "schema": "entity/domains/domain.json",
+      "purpose": "Bounded contexts aligned with business units or functions",
+      "hierarchy": "Parent-child relationships for nested domains",
+      "domain_types": [
+        "Source-aligned",
+        "Consumer-aligned",
+        "Aggregate"
+      ],
+      "features": [
+        "Explicit ownership (owners, experts, followers)",
+        "Asset associations",
+        "Version control",
+        "Change tracking",
+        "Role-based access control"
+      ]
+    },
+    "teams": {
+      "hierarchical_structure": "Parent-child team relationships",
+      "ownership_assignment": "Teams as entity owners",
+      "policy_scoping": "Policies applied to teams"
+    },
+    "roles": {
+      "purpose": "Define access permissions",
+      "policy_association": "Roles consume policies",
+      "user_assignment": "Users assigned to roles"
+    },
+    "policies": {
+      "schema": "entity/policies/policy.json",
+      "rules": "Multiple access control rules per policy",
+      "scoping": "Applied to teams, roles, and domains",
+      "controls": "Enable/disable, mutability controls"
+    },
+    "data_products": {
+      "schema": "entity/data/dataProduct.json",
+      "purpose": "Group related data assets as products",
+      "ownership": "Clear product ownership",
+      "domain_association": "Data products belong to domains"
+    },
+    "access_control": {
+      "authentication": [
+        "SSO (SAML, OIDC)",
+        "Google OAuth",
+        "Azure AD",
+        "Okta",
+        "Auth0"
+      ],
+      "authorization": "Role-based access control (RBAC)",
+      "policy_engine": "Flexible policy definitions",
+      "resource_scoping": "Granular permissions per entity type"
+    },
+    "design_patterns": [
+      "Domain-driven design",
+      "Hierarchical organization",
+      "Policy-based access control",
+      "Separation of authentication and authorization",
+      "Flexible team structures"
+    ]
+  },
+
+  "analytics_and_insights": {
+    "schema_file": "analytics/reportData.json",
+    "categories": [
+      {
+        "name": "Entity Report Data",
+        "description": "General metadata entity information tracking"
+      },
+      {
+        "name": "Web Analytics User Activity",
+        "description": "User engagement patterns and behavior"
+      },
+      {
+        "name": "Web Analytics Entity Views",
+        "description": "Entity access frequency and timing"
+      },
+      {
+        "name": "Raw Cost Analysis",
+        "description": "Unprocessed cost data for financial tracking"
+      },
+      {
+        "name": "Aggregated Cost Analysis",
+        "description": "Summarized cost metrics for reporting"
+      }
+    ],
+    "data_insights": [
+      "Data asset usage patterns",
+      "Ownership coverage",
+      "Description coverage",
+      "Tag coverage",
+      "Data quality metrics",
+      "Cost analysis",
+      "User activity trends"
+    ],
+    "kpis": {
+      "tracking": "Performance metrics and goal-setting",
+      "alerts": "Scheduled alerts for KPI thresholds"
+    },
+    "observability": {
+      "metrics": [
+        "Data freshness",
+        "Data volume",
+        "Data quality",
+        "Query latency"
+      ],
+      "health_monitoring": "Real-time health status"
+    },
+    "time_series": "All metrics are timestamped for trend analysis",
+    "design_patterns": [
+      "Time-series data collection",
+      "Aggregated and raw data support",
+      "Multi-dimensional analytics",
+      "Cost tracking integration"
+    ]
+  },
+
+  "dependencies": {
+    "frontend": {
+      "runtime": "Node.js >=22.0.0",
+      "package_manager": "Yarn >=1.22.0",
+      "core_frameworks": {
+        "react": "^18.2.0",
+        "typescript": "^5.0.0",
+        "vite": "^7.1.3"
+      },
+      "ui_libraries": {
+        "antd": "4.24.16",
+        "@mui/material": "^7.3.1",
+        "styled-components": "^6.1.8"
+      },
+      "state_and_routing": {
+        "zustand": "^4.5.0",
+        "react-router-dom": "^6.22.1"
+      },
+      "data_visualization": {
+        "reactflow": "^11.10.2",
+        "recharts": "2.10.3",
+        "react-data-grid": "7.0.0-beta.47"
+      },
+      "editors": {
+        "@tiptap/core": "^2.3.0+",
+        "codemirror": "^5.65.16",
+        "@react-awesome-query-builder/antd": "^6.6.15"
+      },
+      "http_and_auth": {
+        "axios": "1.8.3",
+        "@auth0/auth0-react": "latest",
+        "@azure/msal-react": "latest"
+      },
+      "i18n": {
+        "i18next": "^21.10.0"
+      },
+      "testing": {
+        "jest": "^29.7.0",
+        "playwright": "1.51.1"
+      },
+      "build_tools": {
+        "babel": "^7.11.1+",
+        "postcss": "latest"
+      }
+    },
+    "backend": {
+      "runtime": "Java (version not specified, likely 11+)",
+      "core_frameworks": {
+        "dropwizard": "Core web framework",
+        "jersey": "JAX-RS implementation",
+        "jetty": "11.0.25"
+      },
+      "database": {
+        "jdbi": "3.x - SQL abstraction",
+        "hibernate-validator": "Bean validation",
+        "flyway": "Database migrations",
+        "mysql-connector": "MySQL driver",
+        "postgresql": "PostgreSQL driver",
+        "hikari": "Connection pooling"
+      },
+      "authentication_security": {
+        "pac4j": "5.7.0",
+        "google-oauth-client": "Google authentication",
+        "auth0": "JWT and JWKS-RSA",
+        "java-saml": "2.9.0",
+        "azure-identity": "Azure authentication",
+        "aws-sdk": "Secret Manager, SSM, STS"
+      },
+      "data_processing": {
+        "jackson": "JSON processing",
+        "jakarta.json-api": "JSON API",
+        "johnzon": "JSON processing",
+        "json-patch": "JSON patch operations",
+        "snakeyaml": "YAML parsing",
+        "json-schema-validator": "Network JSON Schema Validator"
+      },
+      "search": {
+        "elasticsearch": "Search indexing",
+        "opensearch": "Alternative search engine",
+        "lettuce": "Redis client"
+      },
+      "semantic_graph": {
+        "apache-jena": "4.10.0 - RDF framework"
+      },
+      "utilities": {
+        "guava": "33.4.8-jre",
+        "commons-collections": "Apache Commons",
+        "commons-csv": "CSV processing",
+        "quartz": "2.5.0-rc2 - Job scheduling",
+        "freemarker": "Template engine"
+      },
+      "workflow": {
+        "flowable": "7.2.0 - BPM/workflow engine"
+      },
+      "monitoring": {
+        "prometheus": "Metrics collection",
+        "micrometer": "Metrics abstraction",
+        "dropwizard-metrics": "Application metrics"
+      },
+      "sql_parsing": {
+        "antlr4": "SQL grammar parsing"
+      },
+      "realtime": {
+        "socket.io": "Real-time communication"
+      },
+      "kubernetes": {
+        "kubernetes-client": "24.0.0"
+      },
+      "integrations": {
+        "slack-api": "Notifications"
+      },
+      "testing": {
+        "junit5": "Test framework",
+        "testcontainers": "1.20.3 - Docker-based integration tests",
+        "mockito": "Mocking",
+        "assertj": "Fluent assertions"
+      }
+    },
+    "ingestion_python": {
+      "runtime": "Python 3.9-3.11",
+      "core": {
+        "pydantic": "v2.0+",
+        "sqlalchemy": "SQL abstraction",
+        "pyyaml": "YAML parsing",
+        "jinja2": "Templating",
+        "boto3": "AWS SDK",
+        "azure-identity": "Azure SDK",
+        "azure-keyvault": "Azure Key Vault",
+        "google-cloud-storage": "GCS",
+        "kubernetes": "K8s client",
+        "cryptography": "Encryption",
+        "antlr4-python3-runtime": "Parser runtime"
+      },
+      "databases": {
+        "psycopg2": "PostgreSQL",
+        "mysql-connector": "MySQL",
+        "pymssql": "SQL Server",
+        "cx-oracle": "Oracle",
+        "pymongo": "MongoDB",
+        "cassandra-driver": "Cassandra",
+        "snowflake-connector-python": "Snowflake",
+        "redshift-connector": "Redshift",
+        "databricks-sql-connector": "Databricks",
+        "trino": "Trino",
+        "pyhive": "Hive"
+      },
+      "cloud_storage": {
+        "s3fs": "S3",
+        "gcsfs": "GCS",
+        "adlfs": "Azure Data Lake"
+      },
+      "big_data": {
+        "delta-spark": "Delta Lake",
+        "pyiceberg": "Apache Iceberg",
+        "kafka-python": "Kafka"
+      },
+      "dashboards": {
+        "tableau-api": "Tableau",
+        "looker-sdk": "Looker",
+        "powerbi-api": "PowerBI"
+      },
+      "ml": {
+        "mlflow": "MLflow tracking"
+      },
+      "search": {
+        "elasticsearch": "Elasticsearch client",
+        "opensearch-py": "OpenSearch client"
+      }
+    }
+  },
+
+  "design_patterns_and_best_practices": {
+    "metadata_management": [
+      {
+        "pattern": "JSON Schema-based modeling",
+        "description": "All entities defined via JSON Schema for strong typing and validation",
+        "benefits": ["Type safety", "Validation", "Documentation", "Interoperability"]
+      },
+      {
+        "pattern": "Entity-Relationship Graph",
+        "description": "Metadata stored as a graph with typed relationships",
+        "benefits": ["Rich relationships", "Lineage tracking", "Discovery"]
+      },
+      {
+        "pattern": "Fully Qualified Names (FQN)",
+        "description": "Hierarchical naming (service.database.schema.table)",
+        "benefits": ["Uniqueness", "Hierarchy", "Human-readable"]
+      },
+      {
+        "pattern": "UUID-based References",
+        "description": "All entities identified by UUID with FQN as alternative",
+        "benefits": ["Stability", "Immutability", "Cross-references"]
+      },
+      {
+        "pattern": "Version Control",
+        "description": "All entities versioned with change tracking",
+        "benefits": ["Audit trails", "History", "Rollback"]
+      },
+      {
+        "pattern": "Soft Deletion",
+        "description": "Entities marked as deleted rather than removed",
+        "benefits": ["Recovery", "Audit", "References maintained"]
+      },
+      {
+        "pattern": "Custom Properties",
+        "description": "Extensible properties on core entities",
+        "benefits": ["Flexibility", "Domain-specific extensions", "Type safety"]
+      },
+      {
+        "pattern": "Domain-Driven Design",
+        "description": "Domains as bounded contexts",
+        "benefits": ["Multi-tenancy", "Organization", "Access control"]
+      }
+    ],
+    "api_design": [
+      {
+        "pattern": "REST + OpenAPI",
+        "description": "RESTful APIs with OpenAPI/Swagger documentation",
+        "benefits": ["Standards-based", "Self-documenting", "Client generation"]
+      },
+      {
+        "pattern": "CRUD + Search",
+        "description": "Standard CRUD operations plus advanced search",
+        "benefits": ["Consistency", "Predictability"]
+      },
+      {
+        "pattern": "JWT Authentication",
+        "description": "Token-based authentication",
+        "benefits": ["Stateless", "Scalable", "Secure"]
+      },
+      {
+        "pattern": "Pagination",
+        "description": "Paginated responses for large result sets",
+        "benefits": ["Performance", "Memory efficiency"]
+      },
+      {
+        "pattern": "Filter Patterns",
+        "description": "Regex-based include/exclude filtering",
+        "benefits": ["Selective ingestion", "Control"]
+      }
+    ],
+    "data_quality": [
+      {
+        "pattern": "Test Definitions + Test Cases",
+        "description": "Reusable test definitions instantiated as test cases",
+        "benefits": ["Reusability", "Consistency", "Parameterization"]
+      },
+      {
+        "pattern": "Multi-platform Support",
+        "description": "Support for Great Expectations, dbt, Soda, etc.",
+        "benefits": ["Flexibility", "Existing tool integration"]
+      },
+      {
+        "pattern": "Dimensional Testing",
+        "description": "Group tests by dimensions for granular analysis",
+        "benefits": ["Detailed insights", "Root cause analysis"]
+      },
+      {
+        "pattern": "Quality Dimensions",
+        "description": "Standard quality dimensions (Completeness, Accuracy, etc.)",
+        "benefits": ["Classification", "Reporting", "Standardization"]
+      }
+    ],
+    "ingestion": [
+      {
+        "pattern": "Source-Processor-Sink Pipeline",
+        "description": "Standard ETL pattern for metadata",
+        "benefits": ["Modularity", "Reusability", "Extensibility"]
+      },
+      {
+        "pattern": "SQLAlchemy Abstraction",
+        "description": "Common abstraction for SQL databases",
+        "benefits": ["Code reuse", "Consistency", "Maintainability"]
+      },
+      {
+        "pattern": "Workflow Configuration",
+        "description": "YAML-based workflow configuration",
+        "benefits": ["Declarative", "Version control", "Portability"]
+      },
+      {
+        "pattern": "Airflow Integration",
+        "description": "Native Airflow DAG support",
+        "benefits": ["Scheduling", "Monitoring", "Orchestration"]
+      }
+    ],
+    "collaboration": [
+      {
+        "pattern": "Unified Thread Model",
+        "description": "Single schema for conversations, tasks, and announcements",
+        "benefits": ["Consistency", "Simplicity", "Code reuse"]
+      },
+      {
+        "pattern": "Event-Driven Notifications",
+        "description": "Webhooks and event subscriptions",
+        "benefits": ["Real-time updates", "Integration", "Automation"]
+      },
+      {
+        "pattern": "Followers Pattern",
+        "description": "Users can follow entities for updates",
+        "benefits": ["Engagement", "Notifications", "Discovery"]
+      }
+    ],
+    "ui_architecture": [
+      {
+        "pattern": "Component-Based Design",
+        "description": "React components with TypeScript",
+        "benefits": ["Reusability", "Type safety", "Maintainability"]
+      },
+      {
+        "pattern": "Auto-Generated Types",
+        "description": "Types generated from JSON schemas",
+        "benefits": ["Consistency", "Type safety", "DRY"]
+      },
+      {
+        "pattern": "Graph Visualization",
+        "description": "ReactFlow for lineage graphs",
+        "benefits": ["Interactive", "Scalable", "User-friendly"]
+      }
+    ]
+  },
+
+  "complexity_assessment": {
+    "overall_complexity": "HIGH",
+    "codebase_size": "Large (14,300+ commits, 378 contributors)",
+    "technical_complexity": {
+      "score": "High",
+      "factors": [
+        "Multi-language stack (Java, TypeScript, Python)",
+        "Complex domain model with 100+ entity types",
+        "Graph-based data model",
+        "84+ connectors with diverse integrations",
+        "Real-time collaboration features",
+        "Advanced search with Elasticsearch/OpenSearch",
+        "Workflow engine integration (Flowable)",
+        "Multi-platform data quality support",
+        "Comprehensive security and multi-tenancy"
+      ]
+    },
+    "domain_complexity": {
+      "score": "Very High",
+      "factors": [
+        "Metadata management is inherently complex",
+        "Multiple metadata types (structural, operational, social)",
+        "Lineage tracking with column-level granularity",
+        "Data quality with multiple platforms",
+        "Governance and compliance requirements",
+        "Multi-tenancy and access control"
+      ]
+    },
+    "learning_curve": {
+      "score": "Steep",
+      "time_to_productivity": "Several weeks to months",
+      "knowledge_required": [
+        "Metadata management concepts",
+        "Java backend development (Dropwizard, Jersey)",
+        "React and TypeScript",
+        "Python for connectors",
+        "Database design and SQL",
+        "Elasticsearch/OpenSearch",
+        "Graph data structures",
+        "Data quality concepts",
+        "Workflow engines",
+        "OAuth/SAML/SSO",
+        "Docker and Kubernetes"
+      ]
+    },
+    "deployment_complexity": {
+      "score": "Medium-High",
+      "factors": [
+        "Multiple services (backend, UI, ingestion, search)",
+        "Database setup (MySQL/PostgreSQL)",
+        "Search engine (Elasticsearch/OpenSearch)",
+        "Airflow for ingestion workflows",
+        "SSO configuration",
+        "Kubernetes for production"
+      ],
+      "quickstart": "Docker Compose makes initial setup easy",
+      "production": "Kubernetes deployment is more complex"
+    },
+    "maintenance_complexity": {
+      "score": "Medium-High",
+      "factors": [
+        "Regular updates and releases",
+        "Schema migrations",
+        "Connector maintenance",
+        "Dependency updates across 3 language ecosystems",
+        "Security patches",
+        "Performance tuning"
+      ]
+    }
+  },
+
+  "recommendations": {
+    "for_reuse": [
+      {
+        "area": "JSON Schema-based Metadata Model",
+        "recommendation": "Highly recommended for reuse",
+        "rationale": "Well-designed, extensible, and comprehensive. Can be adopted wholesale or adapted.",
+        "adoption_effort": "Low-Medium",
+        "benefits": ["Type safety", "Validation", "Documentation", "Interoperability"]
+      },
+      {
+        "area": "Lineage Model",
+        "recommendation": "Excellent pattern to adopt",
+        "rationale": "Graph-based with rich edge metadata. Column-level support. Multiple source types.",
+        "adoption_effort": "Medium",
+        "benefits": ["Complete lineage tracking", "Flexible", "Industry standard"]
+      },
+      {
+        "area": "Data Quality Framework",
+        "recommendation": "Strong candidate for adoption",
+        "rationale": "Flexible, multi-platform, well-structured with test definitions and cases.",
+        "adoption_effort": "Medium",
+        "benefits": ["Reusable tests", "Multi-platform", "Comprehensive"]
+      },
+      {
+        "area": "Connector Framework",
+        "recommendation": "Reference architecture, selective reuse",
+        "rationale": "Excellent patterns but 84+ connectors may be too many. Adopt the architecture and select specific connectors.",
+        "adoption_effort": "Medium-High (full), Low (selective)",
+        "benefits": ["Proven patterns", "Extensive coverage", "Active maintenance"]
+      },
+      {
+        "area": "Collaboration Features",
+        "recommendation": "Good patterns to learn from",
+        "rationale": "Unified thread model is elegant. Implementation may be overkill for some use cases.",
+        "adoption_effort": "Medium",
+        "benefits": ["User engagement", "Governance workflows", "Communication"]
+      },
+      {
+        "area": "Domain-Driven Multi-Tenancy",
+        "recommendation": "Strong pattern for enterprise use",
+        "rationale": "Hierarchical domains with ownership and access control. Well-designed.",
+        "adoption_effort": "Medium",
+        "benefits": ["Organization", "Access control", "Scalability"]
+      },
+      {
+        "area": "UI Components",
+        "recommendation": "Reference implementation",
+        "rationale": "Modern React stack with excellent visualizations. May want to adapt rather than adopt directly.",
+        "adoption_effort": "High (full), Low (patterns)",
+        "benefits": ["Modern stack", "Good UX", "Visualization libraries"]
+      },
+      {
+        "area": "API Design",
+        "recommendation": "Excellent patterns to follow",
+        "rationale": "RESTful with OpenAPI, consistent patterns, well-documented.",
+        "adoption_effort": "Low",
+        "benefits": ["Standards-based", "Self-documenting", "Client generation"]
+      }
+    ],
+    "for_uml_codex": [
+      {
+        "recommendation": "Adopt JSON Schema approach for UML model representation",
+        "rationale": "Provides type safety, validation, and documentation. Can generate code from schemas.",
+        "priority": "High"
+      },
+      {
+        "recommendation": "Study lineage graph model for relationship tracking",
+        "rationale": "UML diagrams are graphs. OpenMetadata's approach to graph representation is relevant.",
+        "priority": "High"
+      },
+      {
+        "recommendation": "Adopt domain-driven organization pattern",
+        "rationale": "Multi-tenancy and organization will be important for enterprise UML modeling.",
+        "priority": "Medium"
+      },
+      {
+        "recommendation": "Learn from data quality patterns for UML model validation",
+        "rationale": "UML models need validation. Test definition + test case pattern is applicable.",
+        "priority": "Medium"
+      },
+      {
+        "recommendation": "Study collaboration patterns for team-based modeling",
+        "rationale": "UML modeling is often collaborative. Thread model and tasks are relevant.",
+        "priority": "Medium"
+      },
+      {
+        "recommendation": "Consider connector framework pattern for model importers/exporters",
+        "rationale": "UML Codex will need to import/export from various tools. Connector pattern is proven.",
+        "priority": "High"
+      },
+      {
+        "recommendation": "Adopt custom properties pattern for UML stereotype extensions",
+        "rationale": "UML stereotypes and tagged values are similar to custom properties.",
+        "priority": "High"
+      },
+      {
+        "recommendation": "Study versioning and change tracking patterns",
+        "rationale": "UML models evolve. Version control is essential.",
+        "priority": "High"
+      }
+    ],
+    "cautions": [
+      {
+        "area": "Complexity",
+        "caution": "Full adoption would be very complex. Be selective.",
+        "mitigation": "Start with core patterns (schemas, lineage, domains) and expand."
+      },
+      {
+        "area": "Technology Stack",
+        "caution": "Three-language stack (Java, TypeScript, Python) increases maintenance burden.",
+        "mitigation": "Consider if all three are necessary for your use case."
+      },
+      {
+        "area": "Dependencies",
+        "caution": "Many dependencies to manage and update.",
+        "mitigation": "Carefully evaluate each dependency. Consider lighter alternatives."
+      },
+      {
+        "area": "Elasticsearch/OpenSearch",
+        "caution": "Additional infrastructure requirement.",
+        "mitigation": "Evaluate if full-text search is needed or if simpler solutions suffice."
+      },
+      {
+        "area": "Workflow Engine (Flowable)",
+        "caution": "BPM engine adds complexity.",
+        "mitigation": "Evaluate if workflow automation is needed for initial version."
+      }
+    ]
+  },
+
+  "requirements_and_documentation": {
+    "system_requirements": {
+      "runtime": {
+        "java": "Java 11+ (likely)",
+        "node": ">=22.0.0",
+        "python": "3.9-3.11",
+        "yarn": ">=1.22.0"
+      },
+      "infrastructure": {
+        "database": "MySQL or PostgreSQL",
+        "search": "Elasticsearch or OpenSearch",
+        "orchestration": "Airflow (optional, for ingestion)",
+        "cache": "Redis (via Lettuce, optional)"
+      },
+      "deployment": {
+        "docker": "For local and container deployments",
+        "kubernetes": "For production deployments",
+        "cloud": "AWS, Azure, GCP support"
+      }
+    },
+    "documentation": {
+      "main_docs": "https://docs.open-metadata.org/",
+      "api_docs": "OpenAPI/Swagger",
+      "sandbox": "http://sandbox.open-metadata.org",
+      "community": "Slack community",
+      "quality": "Comprehensive with quickstart, deployment, connectors, API docs"
+    },
+    "development_requirements": {
+      "frontend": {
+        "setup": "yarn install",
+        "build": "Vite",
+        "testing": "Jest (unit), Playwright (E2E)",
+        "linting": "ESLint, Prettier"
+      },
+      "backend": {
+        "build": "Maven",
+        "testing": "JUnit 5, Testcontainers",
+        "migrations": "Flyway"
+      },
+      "ingestion": {
+        "setup": "pip install",
+        "testing": "pytest (implied)",
+        "connectors": "Modular installation via extras"
+      }
+    },
+    "prerequisites": {
+      "skills": [
+        "Java backend development",
+        "React and TypeScript",
+        "Python",
+        "Database design",
+        "Elasticsearch/OpenSearch",
+        "Docker and Kubernetes",
+        "OAuth/SAML/SSO",
+        "Metadata management concepts"
+      ],
+      "infrastructure_knowledge": [
+        "Microservices architecture",
+        "Container orchestration",
+        "Database administration",
+        "Search engine tuning",
+        "API design",
+        "Security best practices"
+      ]
+    }
+  },
+
+  "key_takeaways": [
+    {
+      "takeaway": "OpenMetadata is a comprehensive, production-grade metadata management platform",
+      "implication": "Full adoption would be a major undertaking. Selective pattern reuse is recommended."
+    },
+    {
+      "takeaway": "JSON Schema-based metadata model is excellent",
+      "implication": "This pattern is highly reusable and should be considered for UML Codex."
+    },
+    {
+      "takeaway": "Graph-based lineage tracking is sophisticated and proven",
+      "implication": "Relevant for UML relationship tracking. Study and adapt."
+    },
+    {
+      "takeaway": "84+ connectors demonstrate mature integration patterns",
+      "implication": "Connector architecture is solid. Adopt patterns, not necessarily all connectors."
+    },
+    {
+      "takeaway": "Multi-tenancy via domains is well-designed",
+      "implication": "Important for enterprise UML modeling. Consider early adoption."
+    },
+    {
+      "takeaway": "Data quality framework is flexible and multi-platform",
+      "implication": "Test definition + test case pattern applicable to UML validation."
+    },
+    {
+      "takeaway": "Collaboration features are comprehensive",
+      "implication": "May be overkill initially, but patterns are valuable for future."
+    },
+    {
+      "takeaway": "Modern React UI with excellent visualizations",
+      "implication": "Good reference for UML diagram visualization. ReactFlow is particularly relevant."
+    },
+    {
+      "takeaway": "Apache 2.0 license is very permissive",
+      "implication": "Code and patterns can be freely reused in commercial or open-source projects."
+    },
+    {
+      "takeaway": "Active community with 378 contributors",
+      "implication": "Patterns are battle-tested and continuously improved."
+    }
+  ],
+
+  "next_steps": [
+    "Deep dive into JSON Schema definitions for metadata entities",
+    "Study lineage graph implementation in detail",
+    "Examine connector base classes and patterns",
+    "Analyze domain and multi-tenancy implementation",
+    "Review custom properties mechanism for extensibility",
+    "Investigate ReactFlow usage for graph visualization",
+    "Study API patterns and OpenAPI schema generation",
+    "Review test definition and test case implementation",
+    "Examine version control and change tracking mechanisms",
+    "Consider proof-of-concept adopting core patterns for UML Codex"
+  ],
+
+  "related_projects": [
+    {
+      "name": "Apache Atlas",
+      "relationship": "OpenMetadata can sync with Atlas (AlationSink connector exists)",
+      "relevance": "Alternative metadata platform to study"
+    },
+    {
+      "name": "Amundsen",
+      "relationship": "OpenMetadata can sync with Amundsen",
+      "relevance": "Another open-source data catalog"
+    },
+    {
+      "name": "DataHub",
+      "relationship": "Competitor in open-source metadata space",
+      "relevance": "Alternative to compare patterns"
+    },
+    {
+      "name": "Great Expectations",
+      "relationship": "Integrated for data quality testing",
+      "relevance": "Data quality framework to study"
+    },
+    {
+      "name": "dbt",
+      "relationship": "Deep integration for metadata and lineage",
+      "relevance": "Model transformation and lineage"
+    }
+  ],
+
+  "revision_history": [
+    {
+      "version": "1.0",
+      "date": "2025-11-08",
+      "author": "Claude Code Agent",
+      "changes": "Initial comprehensive analysis of OpenMetadata repository"
+    }
+  ]
+}

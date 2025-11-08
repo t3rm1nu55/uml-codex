@@ -1,0 +1,1385 @@
+{
+  "project": {
+    "name": "Eclipse BaSyx Java Server SDK",
+    "repository": "https://github.com/eclipse-basyx/basyx-java-server-sdk",
+    "version": "2.0.0-SNAPSHOT (Milestone-08)",
+    "language": "Java",
+    "description": "Eclipse BaSyx provides a comprehensive open-source middleware implementation of the Industry 4.0 Asset Administration Shell (AAS) V3 specification for industrial digital twins",
+    "stars": 77,
+    "forks": 62,
+    "contributors": 34,
+    "commits": 780,
+    "analyzed_date": "2025-11-08"
+  },
+
+  "license": {
+    "primary_license": "MIT License",
+    "spdx_identifier": "MIT",
+    "reuse_assessment": {
+      "can_reuse": true,
+      "commercial_use": true,
+      "modification_allowed": true,
+      "distribution_allowed": true,
+      "patent_grant": false,
+      "trademark_grant": false,
+      "conditions": [
+        "Include original copyright notice",
+        "Include MIT license text in distributions"
+      ],
+      "limitations": [
+        "Software provided 'as is' with no warranties",
+        "No liability for authors or copyright holders"
+      ]
+    },
+    "third_party_dependencies": [
+      {
+        "name": "Eclipse Milo",
+        "license": "EPL 2.0"
+      },
+      {
+        "name": "Eclipse Paho MQTT",
+        "license": "EPL 2.0",
+        "version": "1.2.5"
+      },
+      {
+        "name": "Spring Boot",
+        "license": "Apache License 2.0",
+        "version": "3.5.4"
+      },
+      {
+        "name": "MongoDB Driver",
+        "license": "Apache License 2.0"
+      },
+      {
+        "name": "Logback",
+        "license": "EPL 1.0"
+      },
+      {
+        "name": "GSON",
+        "license": "Apache License 2.0"
+      },
+      {
+        "name": "Apache POI",
+        "license": "Apache License 2.0"
+      },
+      {
+        "name": "Moquette MQTT Broker",
+        "license": "Apache License 2.0",
+        "version": "0.16"
+      },
+      {
+        "name": "PostgreSQL Driver",
+        "license": "PostgreSQL License"
+      },
+      {
+        "name": "Janino",
+        "license": "BSD 3-Clause"
+      }
+    ],
+    "license_compatibility": "Excellent - MIT license is highly permissive and compatible with most commercial and open-source uses. Third-party dependencies use compatible open-source licenses (EPL, Apache, BSD)"
+  },
+
+  "industry_standard_compliance": {
+    "standard": "Asset Administration Shell (AAS) Specification V3",
+    "organization": "Industrial Digital Twin Association (IDTA) / Platform Industrie 4.0",
+    "specifications_implemented": [
+      "DotAAS Part 1 V3 - Metamodel",
+      "DotAAS Part 2 V3 - HTTP/REST API Specifications",
+      "AAS Repository Service Specification",
+      "Submodel Service Specification",
+      "ConceptDescription Repository Specification",
+      "AAS Registry Specification",
+      "Submodel Registry Specification",
+      "AAS Discovery Service Specification"
+    ],
+    "standards_body": "Eclipse Foundation / Platform Industrie 4.0",
+    "compliance_level": "Full compliance with AAS V3 specification"
+  },
+
+  "key_components": {
+    "core_services": [
+      {
+        "name": "AAS Service",
+        "description": "Provides operations for managing a single Asset Administration Shell instance",
+        "module": "basyx.aasservice",
+        "key_operations": [
+          "getAAS() - Retrieve the AAS",
+          "getSubmodelReferences() - Get all linked submodels with pagination",
+          "addSubmodelReference() - Link new submodels",
+          "removeSubmodelReference() - Unlink submodels",
+          "setAssetInformation() - Update asset metadata",
+          "getAssetInformation() - Retrieve asset metadata",
+          "getThumbnail() - Get AAS thumbnail image",
+          "setThumbnail() - Upload AAS thumbnail",
+          "deleteThumbnail() - Remove thumbnail"
+        ],
+        "backends": ["In-Memory", "MongoDB"],
+        "features": ["MQTT Event Publishing"]
+      },
+      {
+        "name": "Submodel Service",
+        "description": "Manages individual submodel instances with support for operations, files, and nested elements",
+        "module": "basyx.submodelservice",
+        "key_operations": [
+          "getSubmodel() - Retrieve complete submodel",
+          "getSubmodelElements() - Get all elements with pagination",
+          "getSubmodelElement() - Get element by idShortPath",
+          "getSubmodelElementValue() - Extract element values",
+          "setSubmodelElementValue() - Update element values",
+          "createSubmodelElement() - Add new elements",
+          "updateSubmodelElement() - Modify existing elements",
+          "deleteSubmodelElement() - Remove elements",
+          "patchSubmodelElements() - Replace element collections",
+          "invokeOperation() - Execute operations with parameters",
+          "getFileByPath() - Retrieve file content",
+          "setFileValue() - Upload files",
+          "deleteFileValue() - Remove files"
+        ],
+        "backends": ["In-Memory", "MongoDB"],
+        "features": [
+          "Authorization",
+          "Kafka Event Publishing",
+          "MQTT Event Publishing",
+          "Operation Dispatching (Runtime Java compilation)",
+          "Registry Integration"
+        ]
+      },
+      {
+        "name": "AAS Repository",
+        "description": "Manages multiple Asset Administration Shell instances",
+        "module": "basyx.aasrepository",
+        "key_operations": [
+          "getAllAas() - Retrieve all shells with pagination and filtering",
+          "getAas() - Get specific shell by ID",
+          "createAas() - Add new shells",
+          "updateAas() - Modify existing shells",
+          "deleteAas() - Remove shells",
+          "getSubmodelReferences() - Get submodel links",
+          "addSubmodelReference() - Create relationships",
+          "removeSubmodelReference() - Remove relationships"
+        ],
+        "backends": ["In-Memory", "MongoDB"],
+        "design_pattern": "Repository Pattern - Abstracts storage complexity"
+      },
+      {
+        "name": "Submodel Repository",
+        "description": "Manages multiple submodel instances with support for semantic filtering",
+        "module": "basyx.submodelrepository",
+        "key_operations": [
+          "getAllSubmodels() - Retrieve all with semantic ID filtering",
+          "getSubmodel() - Get specific submodel",
+          "createSubmodel() - Add new submodels",
+          "updateSubmodel() - Modify submodels",
+          "deleteSubmodel() - Remove submodels",
+          "Element operations (nested) - Full element CRUD",
+          "Value operations - Get/set element values",
+          "Operation invocation - Execute operations",
+          "File handling - Upload/download/delete files"
+        ],
+        "backends": ["In-Memory", "MongoDB"],
+        "special_features": [
+          "Value-only representation support",
+          "Metadata extraction",
+          "Semantic ID filtering"
+        ]
+      },
+      {
+        "name": "ConceptDescription Repository",
+        "description": "Stores semantic definitions and concept dictionaries for AAS elements",
+        "module": "basyx.conceptdescriptionrepository",
+        "purpose": "Provides semantic descriptions and ontologies for submodel elements",
+        "backends": ["In-Memory", "MongoDB"],
+        "standards_compliance": "DotAAS Part 2 V3 - ConceptDescription Repository",
+        "features": ["Authorization support"]
+      },
+      {
+        "name": "AAS Environment",
+        "description": "Integrated component aggregating AAS Repository, Submodel Repository, and ConceptDescription Repository",
+        "module": "basyx.aasenvironment",
+        "purpose": "Off-the-shelf solution combining multiple repositories into single component",
+        "key_features": [
+          "Unified endpoint for all repositories",
+          "GenerateSerializationByIds feature",
+          "Multi-format import (XML, JSON, AASX)",
+          "Upload endpoints for serialized environments",
+          "Recursive directory scanning for batch configuration",
+          "Version-based conflict resolution",
+          "Configurable file size limits"
+        ],
+        "deployment": "Docker-based with pre-configuration support"
+      },
+      {
+        "name": "AASX File Server",
+        "description": "Manages AASX package files for AAS serialization",
+        "module": "basyx.aasxfileserver",
+        "purpose": "Handles standardized AAS package format (AASX)",
+        "format": "AASX - Asset Administration Shell Exchange format (ZIP-based)"
+      }
+    ],
+
+    "registry_and_discovery": [
+      {
+        "name": "AAS Registry",
+        "description": "Service for registering and discovering Asset Administration Shells",
+        "module": "basyx.aasregistry",
+        "purpose": "Indexes AAS locations and metadata for distributed systems",
+        "pattern": "Service Registry Pattern",
+        "backends": ["In-Memory", "MongoDB"],
+        "standards_compliance": "DotAAS Part 2 V3 - AAS Registry Specification"
+      },
+      {
+        "name": "Submodel Registry",
+        "description": "Service for registering and discovering Submodels",
+        "module": "basyx.submodelregistry",
+        "purpose": "Tracks submodel locations and metadata",
+        "pattern": "Service Registry Pattern",
+        "backends": ["In-Memory", "MongoDB"]
+      },
+      {
+        "name": "AAS Discovery Service",
+        "description": "Enables discovery of AAS instances based on asset identifiers",
+        "module": "basyx.aasdiscoveryservice",
+        "key_operations": [
+          "getAllAssetAdministrationShellIdsByAssetLink() - Find AAS by asset identifiers with pagination",
+          "getAllAssetLinksById() - Retrieve asset identifier pairs for a shell",
+          "createAllAssetLinksById() - Create new asset identifier mappings",
+          "deleteAllAssetLinksById() - Remove asset associations"
+        ],
+        "purpose": "Map physical assets to digital twins",
+        "pattern": "Discovery Service Pattern",
+        "data_model": "SpecificAssetId - Key-value pairs linking assets to shells"
+      },
+      {
+        "name": "AAS Digital Twin Registry",
+        "description": "Enhanced registry supporting distributed digital twin scenarios",
+        "module": "basyx.aasdigitaltwinregistry",
+        "purpose": "Advanced registry for enterprise digital twin ecosystems"
+      }
+    ],
+
+    "common_infrastructure": {
+      "authorization": {
+        "module": "basyx.authorization",
+        "description": "Authorization framework for securing BaSyx components",
+        "backends": [
+          "In-Memory RBAC (Role-Based Access Control)",
+          "Submodel-based RBAC"
+        ],
+        "roadmap": "ABAC (Attribute-Based Access Control) planned for Q1 2025"
+      },
+      "messaging": {
+        "mqtt": {
+          "module": "basyx.mqttcore",
+          "description": "MQTT messaging integration for event-driven architectures",
+          "client": "Eclipse Paho MQTT v3",
+          "broker": "Moquette embedded broker",
+          "components": [
+            "AbstractMqttTopicFactory - Topic management patterns",
+            "encoding/ - Message encoding utilities",
+            "listener/ - Event subscription handlers",
+            "serializer/ - Message serialization"
+          ],
+          "pattern": "Publish-Subscribe Event Pattern"
+        },
+        "kafka": {
+          "module": "basyx.kafka",
+          "description": "Apache Kafka integration for event streaming",
+          "purpose": "High-throughput event streaming for industrial scenarios"
+        }
+      },
+      "storage_backends": {
+        "inmemory": {
+          "module": "basyx.backend.inmemory.core",
+          "description": "In-memory storage for development and testing",
+          "use_case": "Development, testing, ephemeral data"
+        },
+        "mongodb": {
+          "module": "basyx.mongocore",
+          "description": "MongoDB persistence backend",
+          "use_case": "Production deployments requiring persistence"
+        },
+        "file_repository": {
+          "backends": ["In-Memory", "MongoDB"],
+          "module": "basyx.filerepository-backend",
+          "purpose": "File storage abstraction for AAS file elements"
+        }
+      },
+      "http_communication": {
+        "module": "basyx.http",
+        "framework": "Spring Boot 3.5.4",
+        "api_documentation": "OpenAPI 3.0 with Swagger UI",
+        "features": [
+          "RESTful API endpoints",
+          "CORS configuration",
+          "Health monitoring endpoints",
+          "Management endpoints"
+        ]
+      },
+      "query": {
+        "module": "basyx.querycore",
+        "description": "Query functionality for AAS elements",
+        "library": "QueryDSL 5.1.0"
+      },
+      "hierarchy": {
+        "module": "basyx.hierarchy",
+        "description": "Hierarchy management for nested AAS structures"
+      },
+      "client": {
+        "module": "basyx.client",
+        "description": "Client utilities for accessing BaSyx services",
+        "clients_available": [
+          "AAS Repository Client",
+          "Submodel Repository Client",
+          "AAS Service Client",
+          "Submodel Service Client",
+          "AAS Registry Client",
+          "Submodel Registry Client",
+          "AAS Discovery Client",
+          "AAS Environment Client"
+        ]
+      }
+    }
+  },
+
+  "aas_metamodel": {
+    "description": "The Asset Administration Shell (AAS) metamodel defines the structure of industrial digital twins according to Industry 4.0 standards",
+    "core_library": {
+      "name": "AAS4J - Asset Administration Shell for Java",
+      "group_id": "org.eclipse.digitaltwin.aas4j",
+      "version": "2.0.0",
+      "purpose": "Official Java implementation of AAS V3 metamodel"
+    },
+    "core_concepts": [
+      {
+        "name": "Asset Administration Shell (AAS)",
+        "description": "Digital representation of an asset (machine, product, process)",
+        "key_attributes": [
+          "Identifier - Globally unique ID",
+          "idShort - Human-readable name",
+          "AssetInformation - Metadata about physical/logical asset",
+          "Submodel References - Links to submodels",
+          "Thumbnail - Visual representation"
+        ],
+        "relationships": "Contains references to multiple Submodels"
+      },
+      {
+        "name": "Submodel",
+        "description": "Aspect of an asset describing specific domain or lifecycle phase",
+        "key_attributes": [
+          "Identifier - Globally unique ID",
+          "idShort - Human-readable name",
+          "Semantic ID - Reference to concept description",
+          "SubmodelElements - Collection of properties, operations, files"
+        ],
+        "examples": [
+          "Technical Data Submodel",
+          "Operational Data Submodel",
+          "Documentation Submodel",
+          "Digital Nameplate",
+          "Time Series Data"
+        ]
+      },
+      {
+        "name": "SubmodelElement",
+        "description": "Elements within a submodel representing data, operations, or structure",
+        "types": [
+          "Property - Single value with semantic description",
+          "MultiLanguageProperty - Translated text values",
+          "Range - Min/max value pair",
+          "File - Reference to binary file",
+          "Blob - Embedded binary data",
+          "ReferenceElement - Pointer to another element",
+          "RelationshipElement - Relationship between elements",
+          "SubmodelElementCollection - Structured container",
+          "SubmodelElementList - Ordered collection",
+          "Operation - Executable function with input/output",
+          "Entity - Logical or physical entity",
+          "BasicEventElement - Event definition",
+          "Capability - Capability description"
+        ],
+        "hierarchical": true,
+        "path_notation": "idShortPath - Dot-separated path (e.g., 'TechnicalData.Weight')"
+      },
+      {
+        "name": "AssetInformation",
+        "description": "Metadata about the physical or logical asset",
+        "attributes": [
+          "assetKind - Type (Instance, Type, NotApplicable)",
+          "globalAssetId - Unique identifier",
+          "specificAssetIds - Additional identifiers",
+          "assetType - Classification",
+          "defaultThumbnail - Image reference"
+        ]
+      },
+      {
+        "name": "ConceptDescription",
+        "description": "Semantic definition of submodel elements from standardized dictionaries",
+        "purpose": "Provides ontology and semantic interoperability",
+        "attributes": [
+          "Identifier - Unique concept ID",
+          "idShort - Short name",
+          "IsCaseOf - Reference to standard (e.g., IEC CDD, ECLASS)",
+          "DataSpecification - Detailed semantic specification"
+        ],
+        "standards": [
+          "IEC Common Data Dictionary (IEC CDD)",
+          "ECLASS",
+          "eCl@ss",
+          "OPC UA NodeSets",
+          "Custom ontologies"
+        ]
+      },
+      {
+        "name": "Reference",
+        "description": "Typed reference to AAS elements or external resources",
+        "types": [
+          "ModelReference - Points to AAS element",
+          "ExternalReference - Points to external resource"
+        ],
+        "structure": "List of Keys forming path to referenced element"
+      },
+      {
+        "name": "SpecificAssetId",
+        "description": "Key-value pair for asset identification",
+        "purpose": "Links physical asset identifiers to AAS for discovery",
+        "examples": [
+          "Serial number",
+          "Manufacturer part number",
+          "Asset tag",
+          "QR code ID"
+        ]
+      }
+    ],
+    "serialization_formats": [
+      "JSON - JSON representation of AAS",
+      "XML - XML representation of AAS",
+      "AASX - ZIP-based package format with embedded files"
+    ],
+    "representation_modes": [
+      "Full - Complete element with all metadata",
+      "Value-Only - Just values without metadata",
+      "Metadata - Only metadata without values"
+    ]
+  },
+
+  "design_patterns": {
+    "architectural_patterns": [
+      {
+        "pattern": "Repository Pattern",
+        "implementation": "AasRepository, SubmodelRepository, ConceptDescriptionRepository",
+        "description": "Abstracts data persistence with clean separation between business logic and storage",
+        "benefits": [
+          "Pluggable backends (InMemory, MongoDB)",
+          "Testability with in-memory implementations",
+          "Clear contract for data access"
+        ]
+      },
+      {
+        "pattern": "Service Registry Pattern",
+        "implementation": "AAS Registry, Submodel Registry",
+        "description": "Central registry for discovering distributed AAS components",
+        "use_case": "Enables federated digital twin architectures across multiple systems"
+      },
+      {
+        "pattern": "Discovery Service Pattern",
+        "implementation": "AAS Discovery Service",
+        "description": "Maps physical asset identifiers to digital twin instances",
+        "use_case": "Finding the right digital twin from asset tags, serial numbers, etc."
+      },
+      {
+        "pattern": "Aggregator Pattern",
+        "implementation": "AAS Environment",
+        "description": "Combines multiple repositories into unified component",
+        "benefits": [
+          "Simplified deployment",
+          "Reduced operational complexity",
+          "Single endpoint for multiple services"
+        ]
+      },
+      {
+        "pattern": "Decorator Pattern",
+        "implementation": "DecoratedFactory in basyx.core",
+        "description": "Allows adding features dynamically to components",
+        "examples": [
+          "Adding MQTT publishing to repositories",
+          "Adding authorization to services",
+          "Adding operation dispatching to submodels"
+        ]
+      },
+      {
+        "pattern": "Factory Pattern",
+        "implementation": "AbstractMqttTopicFactory",
+        "description": "Standardized creation of MQTT topics for events",
+        "purpose": "Consistent event topic naming across BaSyx components"
+      },
+      {
+        "pattern": "Publish-Subscribe Pattern",
+        "implementation": "MQTT and Kafka integration",
+        "description": "Event-driven communication for AAS changes",
+        "events": [
+          "AAS created/updated/deleted",
+          "Submodel element value changes",
+          "Operation invocations",
+          "File uploads"
+        ]
+      },
+      {
+        "pattern": "Strategy Pattern",
+        "implementation": "Multiple backend implementations (InMemory, MongoDB)",
+        "description": "Interchangeable storage strategies",
+        "configuration": "Spring-based configuration switching"
+      },
+      {
+        "pattern": "Pagination Pattern",
+        "implementation": "CursorResult and PaginationInfo",
+        "description": "Efficient handling of large result sets",
+        "approach": "Cursor-based pagination for stateless API"
+      }
+    ],
+
+    "industrial_digital_twin_patterns": [
+      {
+        "pattern": "Hierarchical Asset Modeling",
+        "description": "AAS contains references to Submodels, Submodels contain hierarchical elements",
+        "structure": "Asset → Shell → Submodels → Elements (nested)",
+        "use_case": "Complex industrial assets with multiple aspects"
+      },
+      {
+        "pattern": "Semantic Modeling",
+        "description": "All elements reference ConceptDescriptions from standardized dictionaries",
+        "benefit": "Interoperability between different manufacturers and systems",
+        "standards": "ECLASS, IEC CDD, domain-specific ontologies"
+      },
+      {
+        "pattern": "Aspect-Oriented Modeling",
+        "description": "Different submodels represent different aspects or lifecycle phases",
+        "examples": [
+          "Design aspect - CAD models, specifications",
+          "Manufacturing aspect - Production parameters",
+          "Operation aspect - Runtime data, diagnostics",
+          "Maintenance aspect - Service records, manuals"
+        ]
+      },
+      {
+        "pattern": "Operation Delegation",
+        "description": "Operations in submodels can be delegated to Java implementations",
+        "features": [
+          "Direct mapping of operations to Java classes",
+          "Runtime compilation of Java code",
+          "Default fallback handler"
+        ],
+        "use_case": "Exposing machine operations through standardized AAS interface"
+      },
+      {
+        "pattern": "File Attachment Pattern",
+        "description": "Submodel elements can reference or embed files (CAD, PDFs, images)",
+        "element_types": ["File element", "Blob element"],
+        "use_case": "Attaching documentation, 3D models, certificates to digital twins"
+      },
+      {
+        "pattern": "Time Series Integration",
+        "description": "Integration with time-series databases for operational data",
+        "examples": ["InfluxDB integration example"],
+        "use_case": "Monitoring equipment performance over time"
+      },
+      {
+        "pattern": "Multi-Protocol Access",
+        "description": "Same digital twin accessible through different protocols",
+        "protocols": [
+          "HTTP/REST - Standard web access",
+          "MQTT - Event-driven updates",
+          "Kafka - High-throughput streaming",
+          "OPC UA - (via DataBridge)",
+          "Other industrial protocols - (via DataBridge)"
+        ]
+      },
+      {
+        "pattern": "Registry Integration Pattern",
+        "description": "Automatic registration of AAS and Submodels when created",
+        "feature": "Registry integration in repositories",
+        "benefit": "Automatic discoverability in distributed systems"
+      },
+      {
+        "pattern": "Federated Digital Twin",
+        "description": "Digital twins distributed across multiple systems, discoverable via registry",
+        "roadmap": "Gateway component planned to manage distribution (Q4 2024)",
+        "use_case": "Large manufacturing networks with decentralized systems"
+      }
+    ],
+
+    "api_design_patterns": [
+      {
+        "pattern": "RESTful Resource Hierarchy",
+        "description": "HTTP API follows REST principles with hierarchical resource structure",
+        "example_paths": [
+          "/shells/{aasId}",
+          "/shells/{aasId}/submodel-refs",
+          "/submodels/{submodelId}",
+          "/submodels/{submodelId}/submodel-elements/{idShortPath}",
+          "/submodels/{submodelId}/submodel-elements/{idShortPath}/value"
+        ]
+      },
+      {
+        "pattern": "Cursor-Based Pagination",
+        "description": "Stateless pagination using cursors instead of offset/limit",
+        "implementation": "PaginationInfo and CursorResult",
+        "benefit": "Consistent results even with concurrent modifications"
+      },
+      {
+        "pattern": "Path-Based Element Access",
+        "description": "Hierarchical elements accessed via dot-separated paths",
+        "example": "TechnicalData.Dimensions.Weight",
+        "benefit": "Natural navigation of nested structures"
+      },
+      {
+        "pattern": "Value-Only Representation",
+        "description": "Option to retrieve just values without metadata",
+        "use_case": "Efficient data transfer for monitoring systems",
+        "endpoints": "Separate value endpoints"
+      },
+      {
+        "pattern": "OpenAPI Documentation",
+        "description": "Self-documenting APIs with interactive Swagger UI",
+        "endpoints": [
+          "/v3/api-docs - OpenAPI specification",
+          "/swagger-ui/index.html - Interactive UI"
+        ]
+      }
+    ]
+  },
+
+  "technology_stack": {
+    "core_framework": {
+      "name": "Spring Boot",
+      "version": "3.5.4",
+      "java_version": "17",
+      "purpose": "Core application framework"
+    },
+    "aas_metamodel": {
+      "library": "AAS4J",
+      "version": "2.0.0",
+      "modules": [
+        "aas4j-model - Core metamodel",
+        "aas4j-dataformat-json - JSON serialization",
+        "aas4j-dataformat-xml - XML serialization",
+        "aas4j-dataformat-core - Core serialization",
+        "aas4j-dataformat-aasx - AASX package handling"
+      ]
+    },
+    "api_documentation": {
+      "library": "SpringDoc OpenAPI",
+      "version": "2.8.13",
+      "output": "OpenAPI 3.0 specifications with Swagger UI"
+    },
+    "messaging": {
+      "mqtt": {
+        "client": "Eclipse Paho MQTT",
+        "version": "1.2.5",
+        "broker": "Moquette 0.16"
+      },
+      "kafka": "Apache Kafka integration"
+    },
+    "persistence": {
+      "mongodb": "MongoDB Driver (Spring Data MongoDB)",
+      "database": "MongoDB for production storage"
+    },
+    "querying": {
+      "library": "QueryDSL",
+      "version": "5.1.0",
+      "purpose": "Type-safe query construction"
+    },
+    "serialization": {
+      "json": "Jackson with jackson-databind-nullable 0.2.8",
+      "yaml": "SnakeYAML 2.5"
+    },
+    "file_handling": {
+      "tika": "Apache Tika 3.2.3 for file type detection",
+      "poi": "Apache POI for Office formats",
+      "commons-io": "Apache Commons IO 2.20.0"
+    },
+    "http_client": {
+      "library": "Apache HTTP Components",
+      "version": "httpmime 4.5.14"
+    },
+    "testing": {
+      "unit": "JUnit (via Spring Boot)",
+      "integration": "Maven Failsafe 3.5.4",
+      "mock_server": "MockServer 5.15.0"
+    },
+    "build": {
+      "tool": "Maven",
+      "plugins": [
+        "maven-compiler-plugin (Java 17)",
+        "maven-jar-plugin",
+        "maven-source-plugin",
+        "maven-failsafe-plugin 3.5.4",
+        "flatten-maven-plugin 1.7.3",
+        "docker-maven-plugin 0.47.0"
+      ]
+    },
+    "containerization": {
+      "technology": "Docker",
+      "platforms": ["linux/amd64", "linux/arm64", "linux/arm/v7"],
+      "registry": "DockerHub (eclipsebasyx namespace)"
+    },
+    "utilities": {
+      "reflections": "Reflections 0.10.2",
+      "jsr305": "FindBugs JSR305 3.0.2"
+    }
+  },
+
+  "deployment": {
+    "docker": {
+      "available": true,
+      "registry": "DockerHub",
+      "namespace": "eclipsebasyx",
+      "platforms": ["linux/amd64", "linux/arm64", "linux/arm/v7"],
+      "components_available": [
+        "AAS Repository",
+        "Submodel Repository",
+        "ConceptDescription Repository",
+        "AAS Environment",
+        "AAS Registry",
+        "Submodel Registry",
+        "AAS Discovery Service",
+        "AASX File Server"
+      ]
+    },
+    "configuration": {
+      "method": "Spring Boot properties",
+      "formats": ["application.properties", "application.yml", "Environment variables"],
+      "environment_variables": "Period → underscore, uppercase (e.g., basyx.backend → BASYX_BACKEND)"
+    },
+    "backends": {
+      "inmemory": "For development, testing, demos",
+      "mongodb": "For production with persistence"
+    },
+    "deployment_models": [
+      {
+        "name": "All-in-One",
+        "description": "AAS Environment with all repositories in single container",
+        "use_case": "Simple deployments, development"
+      },
+      {
+        "name": "Microservices",
+        "description": "Separate containers for each component",
+        "use_case": "Production, scalability, resilience"
+      },
+      {
+        "name": "Federated",
+        "description": "Multiple BaSyx instances with central registry",
+        "use_case": "Multi-site manufacturing, distributed systems"
+      }
+    ],
+    "infrastructure_examples": [
+      "Minimal - Basic infrastructure setup",
+      "NGINX - Production setup with reverse proxy",
+      "Secured - Keycloak authentication",
+      "Node-RED - IoT workflow integration"
+    ]
+  },
+
+  "api_specifications": {
+    "http_rest": {
+      "standard": "DotAAS Part 2 V3",
+      "openapi_version": "3.0",
+      "documentation_endpoint": "/v3/api-docs",
+      "swagger_ui": "/swagger-ui/index.html",
+      "content_types": ["application/json", "application/xml"],
+      "authentication": "OAuth2/OpenID Connect (via Spring Security)",
+      "cors_support": true
+    },
+    "mqtt": {
+      "version": "MQTT v3.1.1",
+      "pattern": "Publish-Subscribe",
+      "topics": "Hierarchical topic structure via AbstractMqttTopicFactory",
+      "events": [
+        "AAS lifecycle events",
+        "Submodel value changes",
+        "Element CRUD operations"
+      ]
+    },
+    "kafka": {
+      "pattern": "Event streaming",
+      "use_case": "High-throughput industrial data"
+    }
+  },
+
+  "examples_and_use_cases": {
+    "minimal_setup": {
+      "name": "BaSyxMinimal",
+      "description": "Minimal infrastructure with docker-compose",
+      "components": [
+        "AAS Repository",
+        "Submodel Repository",
+        "ConceptDescription Repository",
+        "AAS Registry",
+        "Submodel Registry",
+        "AAS Discovery",
+        "Web UI"
+      ],
+      "deployment": "Single docker-compose up command",
+      "feature": "Automatic registry integration"
+    },
+    "security": {
+      "name": "BaSyxSecured",
+      "description": "Keycloak-based authentication and authorization",
+      "auth_provider": "Keycloak",
+      "protocol": "OAuth2/OpenID Connect"
+    },
+    "operation_delegation": {
+      "name": "BaSyxOperationDelegation",
+      "description": "Delegating submodel operations to Java implementations",
+      "features": [
+        "Direct operation-to-class mapping",
+        "Runtime Java compilation",
+        "Default fallback handlers"
+      ],
+      "use_case": "Exposing machine operations through AAS"
+    },
+    "cad_files": {
+      "name": "BaSyxCADFiles",
+      "description": "Integrating CAD files into AAS",
+      "use_case": "Product design documentation"
+    },
+    "node_red": {
+      "name": "BaSyxNodeRED",
+      "description": "Node-RED workflow with MQTT integration",
+      "use_case": "IoT data collection and visualization"
+    },
+    "nginx": {
+      "name": "BaSyxNGINX",
+      "description": "Production deployment with NGINX reverse proxy",
+      "features": [
+        "Load balancing",
+        "SSL termination",
+        "Path-based routing"
+      ]
+    },
+    "kafka": {
+      "name": "BaSyxKafka",
+      "description": "Kafka integration for event streaming",
+      "use_case": "High-throughput industrial event processing"
+    },
+    "rbac": {
+      "name": "BaSyxDynamicRBAC",
+      "description": "Dynamic role-based access control",
+      "authorization": "Role-based with submodel backend"
+    },
+    "query_language": {
+      "name": "BaSyxQueryLanguage",
+      "description": "Querying AAS elements",
+      "technology": "QueryDSL-based queries"
+    },
+    "databridge": {
+      "name": "BaSyxDatabridge",
+      "description": "Bridging between different protocols",
+      "protocols": [
+        "OPC UA",
+        "MQTT",
+        "HTTP",
+        "PLC4X",
+        "Kafka"
+      ],
+      "use_case": "Integrating legacy systems into AAS ecosystem"
+    },
+    "client": {
+      "name": "BaSyxClient",
+      "description": "Using BaSyx Java clients to interact with services",
+      "libraries": "Native Java clients for all components"
+    }
+  },
+
+  "manufacturing_use_cases": {
+    "digital_product_passport": {
+      "description": "Complete product information from design through lifecycle",
+      "submodels": [
+        "Digital Nameplate",
+        "Technical Data",
+        "Documentation",
+        "Certificates",
+        "Maintenance Records"
+      ]
+    },
+    "machine_monitoring": {
+      "description": "Real-time monitoring of production equipment",
+      "components": [
+        "Operational Data Submodel",
+        "Time-series integration",
+        "MQTT for real-time updates",
+        "Operations for control"
+      ]
+    },
+    "production_tracking": {
+      "description": "Track products through production process",
+      "features": [
+        "Asset discovery by serial number",
+        "Process documentation",
+        "Quality data"
+      ]
+    },
+    "supply_chain_integration": {
+      "description": "Integration across supply chain partners",
+      "approach": [
+        "Federated registries",
+        "Standardized semantic models",
+        "Cross-company data exchange"
+      ]
+    },
+    "predictive_maintenance": {
+      "description": "Maintenance based on equipment condition",
+      "data": [
+        "Operational time series",
+        "Maintenance history",
+        "Operations for diagnostics"
+      ]
+    },
+    "shopfloor_connectivity": {
+      "description": "Connecting factory floor equipment",
+      "protocols": [
+        "OPC UA via DataBridge",
+        "MQTT for sensors",
+        "PLC integration via PLC4X"
+      ]
+    }
+  },
+
+  "requirements": {
+    "runtime": {
+      "java_version": "Java 17 or higher",
+      "jvm": "OpenJDK or Oracle JDK"
+    },
+    "infrastructure": {
+      "optional_database": "MongoDB 4.0+ for persistent storage",
+      "optional_message_broker": "External MQTT broker or use embedded Moquette"
+    },
+    "development": {
+      "build_tool": "Maven 3.6+",
+      "ide": "Any Java IDE (IntelliJ IDEA, Eclipse, VS Code)",
+      "docker": "Docker for containerized deployment"
+    },
+    "standards_knowledge": {
+      "required": [
+        "Asset Administration Shell (AAS) V3 specification",
+        "Industry 4.0 concepts",
+        "Digital twin principles"
+      ],
+      "helpful": [
+        "ECLASS or IEC CDD for semantic modeling",
+        "OPC UA for industrial automation",
+        "RESTful API design"
+      ]
+    }
+  },
+
+  "complexity_assessment": {
+    "overall_complexity": "High",
+    "complexity_score": 8,
+    "complexity_scale": "1-10 (10 = most complex)",
+    "factors": {
+      "domain_complexity": {
+        "score": 9,
+        "description": "Industry 4.0 and Asset Administration Shell standards are complex",
+        "challenges": [
+          "Understanding AAS metamodel concepts",
+          "Semantic modeling with concept descriptions",
+          "Industry-specific domain knowledge required",
+          "Multiple interrelated components",
+          "Distributed system architecture"
+        ]
+      },
+      "code_complexity": {
+        "score": 7,
+        "description": "Well-structured Spring Boot architecture but extensive codebase",
+        "characteristics": [
+          "Clean separation of concerns",
+          "Repository pattern well implemented",
+          "Modular architecture",
+          "Good use of Spring features",
+          "Multiple backend implementations add complexity"
+        ]
+      },
+      "integration_complexity": {
+        "score": 8,
+        "description": "Multiple protocols and integration points",
+        "challenges": [
+          "HTTP/REST, MQTT, Kafka integration",
+          "Registry and discovery coordination",
+          "Operation delegation and runtime compilation",
+          "Multi-protocol data bridging",
+          "Authorization across components"
+        ]
+      },
+      "deployment_complexity": {
+        "score": 6,
+        "description": "Docker simplifies deployment but many components to coordinate",
+        "characteristics": [
+          "Docker images provided",
+          "Good documentation",
+          "Multiple deployment models",
+          "Configuration can be complex",
+          "Microservices coordination"
+        ]
+      },
+      "learning_curve": {
+        "score": 8,
+        "description": "Steep learning curve due to domain and technical complexity",
+        "factors": [
+          "Must learn AAS specification",
+          "Industry 4.0 concepts",
+          "Spring Boot ecosystem",
+          "Distributed systems patterns",
+          "Semantic modeling"
+        ]
+      }
+    },
+    "code_quality": {
+      "structure": "Excellent - Clean modular architecture",
+      "documentation": "Good - OpenAPI specs, README files, examples",
+      "testing": "Present - Unit and integration tests",
+      "patterns": "Excellent - Proper use of design patterns",
+      "standards_compliance": "Excellent - Full AAS V3 compliance"
+    }
+  },
+
+  "recommendations": {
+    "reuse_scenarios": [
+      {
+        "scenario": "Industrial Digital Twin Platform",
+        "recommendation": "Excellent fit",
+        "approach": "Use BaSyx as-is or extend for specific needs",
+        "benefits": [
+          "Standards-compliant AAS implementation",
+          "Production-ready components",
+          "Extensive feature set",
+          "Active community"
+        ]
+      },
+      {
+        "scenario": "Manufacturing Execution Systems (MES)",
+        "recommendation": "Highly recommended",
+        "approach": "Integrate BaSyx to provide digital twin layer",
+        "benefits": [
+          "Equipment digital twins",
+          "Production tracking",
+          "Shopfloor connectivity via DataBridge"
+        ]
+      },
+      {
+        "scenario": "Product Lifecycle Management (PLM)",
+        "recommendation": "Good fit",
+        "approach": "Use AAS for product digital twins across lifecycle",
+        "benefits": [
+          "Standardized product information",
+          "Multi-aspect modeling",
+          "File attachment support"
+        ]
+      },
+      {
+        "scenario": "IoT Platform",
+        "recommendation": "Consider carefully",
+        "approach": "Use if AAS compliance is needed, otherwise may be over-engineered",
+        "considerations": [
+          "AAS adds structure and semantics",
+          "More complex than simple IoT platforms",
+          "Excellent for industrial IoT"
+        ]
+      },
+      {
+        "scenario": "Supply Chain Integration",
+        "recommendation": "Excellent fit",
+        "approach": "Federated BaSyx deployments with shared registries",
+        "benefits": [
+          "Standardized data exchange",
+          "Semantic interoperability",
+          "Distributed architecture support"
+        ]
+      }
+    ],
+
+    "implementation_guidance": [
+      {
+        "phase": "Learning",
+        "recommendation": "Start with BaSyx Minimal example",
+        "steps": [
+          "Run docker-compose minimal setup",
+          "Explore Web UI",
+          "Read AAS V3 specification basics",
+          "Try creating simple AAS with submodels"
+        ],
+        "duration": "1-2 weeks"
+      },
+      {
+        "phase": "Prototyping",
+        "recommendation": "Use AAS Environment component",
+        "approach": [
+          "Define your asset structure",
+          "Create appropriate submodels",
+          "Use concept descriptions for semantics",
+          "Test with in-memory backend"
+        ],
+        "duration": "2-4 weeks"
+      },
+      {
+        "phase": "Development",
+        "recommendation": "Adopt microservices architecture",
+        "approach": [
+          "Separate repositories for different domains",
+          "Use registries for discovery",
+          "Implement custom operations via delegation",
+          "Add MQTT for real-time updates"
+        ],
+        "duration": "2-3 months"
+      },
+      {
+        "phase": "Production",
+        "recommendation": "Deploy with MongoDB, NGINX, and security",
+        "approach": [
+          "MongoDB for persistence",
+          "NGINX reverse proxy",
+          "Keycloak authentication",
+          "Monitoring and health checks",
+          "Backup strategy"
+        ],
+        "duration": "1-2 months"
+      }
+    ],
+
+    "customization_points": [
+      {
+        "area": "Storage",
+        "approach": "Implement custom backend",
+        "complexity": "Medium",
+        "use_case": "Custom database or storage system"
+      },
+      {
+        "area": "Operations",
+        "approach": "Operation delegation with custom Java classes",
+        "complexity": "Low-Medium",
+        "use_case": "Exposing machine/equipment operations"
+      },
+      {
+        "area": "Events",
+        "approach": "Custom MQTT topics or Kafka consumers",
+        "complexity": "Medium",
+        "use_case": "Integration with existing event infrastructure"
+      },
+      {
+        "area": "Authorization",
+        "approach": "Custom authorization rules",
+        "complexity": "High",
+        "use_case": "Complex access control requirements"
+      },
+      {
+        "area": "Protocols",
+        "approach": "Extend DataBridge or create custom integration",
+        "complexity": "High",
+        "use_case": "Proprietary protocols or systems"
+      }
+    ],
+
+    "alternatives_comparison": [
+      {
+        "alternative": "Eclipse Ditto",
+        "focus": "Generic digital twins with JSON-based twin model",
+        "vs_basyx": "BaSyx is specific to Industry 4.0/AAS, Ditto is more general purpose"
+      },
+      {
+        "alternative": "Azure Digital Twins",
+        "focus": "Cloud-native digital twins with DTDL",
+        "vs_basyx": "BaSyx is open-source and AAS-compliant, Azure is cloud-only"
+      },
+      {
+        "alternative": "AWS IoT TwinMaker",
+        "focus": "Cloud-based digital twins for IoT",
+        "vs_basyx": "BaSyx supports on-premise and is standards-based"
+      },
+      {
+        "alternative": "Custom REST API",
+        "focus": "Lightweight custom solution",
+        "vs_basyx": "BaSyx provides standards compliance and rich features but is more complex"
+      }
+    ],
+
+    "key_considerations": [
+      {
+        "consideration": "Standards Compliance",
+        "importance": "Critical",
+        "guidance": "If AAS V3 compliance is required (especially in Europe), BaSyx is ideal",
+        "decision_factor": "Regulatory or ecosystem requirements"
+      },
+      {
+        "consideration": "Team Expertise",
+        "importance": "High",
+        "guidance": "Team needs Java/Spring Boot skills and willingness to learn AAS concepts",
+        "investment": "Significant training investment for AAS concepts"
+      },
+      {
+        "consideration": "Scalability",
+        "importance": "High",
+        "guidance": "Architecture supports horizontal scaling with registries",
+        "evidence": "Used in production industrial scenarios"
+      },
+      {
+        "consideration": "Ecosystem",
+        "importance": "Medium-High",
+        "guidance": "Growing Industry 4.0 ecosystem, good for interoperability",
+        "community": "Active Eclipse community, monthly open hours"
+      },
+      {
+        "consideration": "Maintenance",
+        "importance": "High",
+        "guidance": "Active development, regular releases, good for long-term use",
+        "roadmap": "Clear roadmap through 2025"
+      }
+    ]
+  },
+
+  "strengths": [
+    "Full compliance with AAS V3 specification",
+    "Comprehensive component set covering all AAS needs",
+    "Clean, modular architecture with Spring Boot",
+    "Multiple backend options (InMemory, MongoDB)",
+    "Multi-protocol support (HTTP, MQTT, Kafka)",
+    "Excellent Docker support for deployment",
+    "Rich example set covering diverse scenarios",
+    "Active development with clear roadmap",
+    "MIT license - very permissive for reuse",
+    "Production-ready components",
+    "Strong design pattern implementation",
+    "Good documentation and API specs",
+    "Semantic modeling support with ConceptDescriptions",
+    "Registry and discovery for distributed systems",
+    "Operation delegation for custom logic",
+    "Security features (OAuth2, RBAC, future ABAC)"
+  ],
+
+  "weaknesses": [
+    "Steep learning curve for AAS concepts",
+    "High complexity for simple use cases",
+    "Limited documentation for advanced customization",
+    "Some features still in development (ABAC, Gateway)",
+    "Performance characteristics not well documented",
+    "Query capabilities limited (noted in limitations)",
+    "Java 17 requirement may be barrier for some",
+    "Requires understanding of distributed systems",
+    "MongoDB dependency for production persistence",
+    "Testing infrastructure could be more comprehensive"
+  ],
+
+  "roadmap_highlights": [
+    {
+      "timeframe": "Q4 2024",
+      "features": [
+        "Dynamic integration of features/backends in OTS components",
+        "Gateway component for AAS distribution management"
+      ]
+    },
+    {
+      "timeframe": "Q1 2025",
+      "features": [
+        "Attribute-Based Access Control (ABAC) across all components"
+      ]
+    },
+    {
+      "timeframe": "Q2 2025",
+      "features": [
+        "Eclipse Dataspace Connector compatibility",
+        "Performance measurement tools for AAS API",
+        "Advanced data transformation features",
+        "Historical data aggregation"
+      ]
+    },
+    {
+      "timeframe": "Ongoing",
+      "features": [
+        "Code generation from AASX files",
+        "DataBridge enhancements (submodel support, config UI, access control)"
+      ]
+    }
+  ],
+
+  "integration_opportunities": {
+    "with_uml_codex": [
+      {
+        "opportunity": "Model-Driven AAS Generation",
+        "description": "Generate AAS structures from UML/SysML models",
+        "approach": "Create UML profiles for AAS metamodel, generate JSON/XML",
+        "benefit": "Design digital twins with visual modeling"
+      },
+      {
+        "opportunity": "AAS to UML Reverse Engineering",
+        "description": "Import existing AAS as UML models for visualization",
+        "approach": "Parse AAS JSON/XML and create UML class/object diagrams",
+        "benefit": "Visualize complex AAS structures"
+      },
+      {
+        "opportunity": "Semantic Model Design",
+        "description": "Design ConceptDescriptions and semantic models in UML",
+        "approach": "UML profiles for ECLASS, IEC CDD concepts",
+        "benefit": "Better semantic modeling tools"
+      },
+      {
+        "opportunity": "Process Integration",
+        "description": "Combine BPMN process models with AAS asset models",
+        "approach": "Link BPMN tasks to AAS operations",
+        "benefit": "Process-aware digital twins"
+      },
+      {
+        "opportunity": "Ontology Alignment",
+        "description": "Align AAS concepts with ontologies (OWL/RDF)",
+        "approach": "Export AAS semantic models to ontology formats",
+        "benefit": "Semantic web integration"
+      }
+    ]
+  },
+
+  "documentation_resources": {
+    "official_documentation": "https://wiki.basyx.org/",
+    "github_repository": "https://github.com/eclipse-basyx/basyx-java-server-sdk",
+    "dockerhub": "https://hub.docker.com/u/eclipsebasyx",
+    "starter_kit": "https://basyx.org (interactive setup generator)",
+    "aas_specification": "https://industrialdigitaltwin.org/",
+    "eclipse_project": "https://www.eclipse.org/basyx/",
+    "examples_in_repo": "/examples directory",
+    "api_docs": "Each component exposes /v3/api-docs and /swagger-ui/index.html"
+  },
+
+  "community": {
+    "organization": "Eclipse Foundation",
+    "project_type": "Open source",
+    "contributors": 34,
+    "engagement": "Monthly BaSyx Open Hour meetings",
+    "contributing_guide": ".github/CONTRIBUTING.md",
+    "security_policy": "GitHub security policy available",
+    "issue_tracker": "GitHub Issues",
+    "release_cadence": "Regular milestone releases, latest: 2.0.0-milestone-08 (Oct 2025)"
+  },
+
+  "summary": {
+    "conclusion": "Eclipse BaSyx is a comprehensive, production-ready implementation of the Industry 4.0 Asset Administration Shell (AAS) V3 specification. It provides a complete digital twin platform for industrial applications with excellent standards compliance, clean architecture, and extensive features.",
+
+    "ideal_for": [
+      "Manufacturing companies requiring AAS V3 compliance",
+      "Industrial IoT platforms in Industry 4.0 context",
+      "Digital twin implementations for production equipment",
+      "Supply chain integration requiring standardized data exchange",
+      "Companies building Industry 4.0 ecosystems",
+      "Product lifecycle management systems",
+      "Manufacturing execution systems (MES)"
+    ],
+
+    "not_ideal_for": [
+      "Simple IoT applications without AAS requirements",
+      "Projects without Java expertise",
+      "Applications requiring ultra-low latency",
+      "Teams unable to invest in learning AAS concepts",
+      "Non-industrial digital twin use cases"
+    ],
+
+    "overall_assessment": "BaSyx represents one of the most mature and complete open-source implementations of the AAS specification. The MIT license makes it highly suitable for reuse in both commercial and open-source projects. The main barrier to adoption is the complexity of the AAS standard itself and the learning investment required. However, for organizations committed to Industry 4.0 standards compliance, BaSyx provides exceptional value with its comprehensive feature set, production-ready components, and active development community.",
+
+    "reuse_recommendation": "Highly Recommended for Industry 4.0 / AAS use cases",
+    "complexity_vs_value": "High complexity justified by comprehensive Industry 4.0 compliance and rich feature set"
+  }
+}
