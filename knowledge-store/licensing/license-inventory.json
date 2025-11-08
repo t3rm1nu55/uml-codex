@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "last_updated": "2025-11-08T00:00:00Z",
+  "summary": "Comprehensive license analysis of all analyzed repositories and their dependencies",
+  "repositories_analyzed": 10,
+  "unique_licenses": 5,
+  "licenses": [
+    {
+      "name": "Apache License 2.0",
+      "spdx_id": "Apache-2.0",
+      "category": "Permissive",
+      "commercial_use": true,
+      "modification": true,
+      "distribution": true,
+      "patent_grant": true,
+      "copyleft": false,
+      "attribution_required": true,
+      "license_inclusion_required": true,
+      "repositories": [
+        "REGnosys/rosetta-code-generators",
+        "REGnosys/rune-dsl",
+        "REGnosys/cdm-object-builder",
+        "REGnosys/cdm-starter",
+        "finos/common-domain-model (code)",
+        "camunda/camunda-bpm-platform",
+        "camunda/camunda-bpmn-model",
+        "flowable/flowable-engine"
+      ],
+      "risk_level": "LOW",
+      "notes": "Highly permissive, widely used in enterprise. Patent grant provides additional protection. Only requires attribution and license file inclusion."
+    },
+    {
+      "name": "Community Specification License 1.0",
+      "spdx_id": "Community-Spec-1.0",
+      "category": "Specification License",
+      "commercial_use": true,
+      "modification": true,
+      "distribution": true,
+      "patent_grant": true,
+      "copyleft": false,
+      "attribution_required": true,
+      "license_inclusion_required": true,
+      "repositories": [
+        "finos/common-domain-model (specification)"
+      ],
+      "risk_level": "MEDIUM",
+      "notes": "Used for specifications, not code. Implementation freedom guaranteed. Contributions to the specification have additional requirements (CLA). Does not restrict implementing the specification."
+    },
+    {
+      "name": "Eclipse Public License 2.0",
+      "spdx_id": "EPL-2.0",
+      "category": "Weak Copyleft",
+      "commercial_use": true,
+      "modification": true,
+      "distribution": true,
+      "patent_grant": true,
+      "copyleft": "weak",
+      "attribution_required": true,
+      "license_inclusion_required": true,
+      "repositories": [],
+      "found_in_dependencies": [
+        "Eclipse EMF (via rosetta-dsl)",
+        "Eclipse Xtext (via rosetta-dsl)",
+        "Jakarta Persistence API (via flowable)"
+      ],
+      "risk_level": "LOW",
+      "notes": "Weak copyleft - only modified EPL files must be shared, not the entire codebase. Compatible with Apache 2.0 in most cases. OSI-approved."
+    },
+    {
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "category": "Permissive",
+      "commercial_use": true,
+      "modification": true,
+      "distribution": true,
+      "patent_grant": false,
+      "copyleft": false,
+      "attribution_required": true,
+      "license_inclusion_required": true,
+      "repositories": [],
+      "found_in_dependencies": [
+        "SLF4J (via camunda, flowable)",
+        "Various npm packages (via cdm-object-builder)"
+      ],
+      "risk_level": "LOW",
+      "notes": "Very permissive, minimal restrictions. No patent grant unlike Apache 2.0, but still very safe for use."
+    },
+    {
+      "name": "BSD 3-Clause License",
+      "spdx_id": "BSD-3-Clause",
+      "category": "Permissive",
+      "commercial_use": true,
+      "modification": true,
+      "distribution": true,
+      "patent_grant": false,
+      "copyleft": false,
+      "attribution_required": true,
+      "license_inclusion_required": true,
+      "repositories": [],
+      "found_in_dependencies": [
+        "Various Java libraries (via rosetta-code-generators)"
+      ],
+      "risk_level": "LOW",
+      "notes": "Permissive license similar to MIT. Includes non-endorsement clause."
+    }
+  ],
+  "license_compatibility_matrix": {
+    "Apache-2.0_with_Apache-2.0": "COMPATIBLE",
+    "Apache-2.0_with_MIT": "COMPATIBLE",
+    "Apache-2.0_with_BSD-3-Clause": "COMPATIBLE",
+    "Apache-2.0_with_EPL-2.0": "COMPATIBLE",
+    "MIT_with_MIT": "COMPATIBLE",
+    "MIT_with_BSD-3-Clause": "COMPATIBLE",
+    "MIT_with_EPL-2.0": "COMPATIBLE",
+    "EPL-2.0_with_EPL-2.0": "COMPATIBLE",
+    "Community-Spec-1.0_implementation": "UNRESTRICTED"
+  },
+  "overall_assessment": {
+    "can_use_for_commercial": true,
+    "can_modify": true,
+    "can_distribute": true,
+    "primary_obligations": [
+      "Include original license text",
+      "Include copyright notices",
+      "Document modifications (for Apache 2.0)"
+    ],
+    "patent_protection": "Yes (Apache 2.0, EPL 2.0, Community Spec 1.0)",
+    "copyleft_concerns": "None (all permissive or weak copyleft)",
+    "blockers_identified": "None"
+  },
+  "recommendations": {
+    "for_uml_codex": {
+      "recommended_license": "Apache-2.0",
+      "rationale": "Most analyzed projects use Apache 2.0. Provides patent grant, widely understood in enterprise, compatible with all dependencies.",
+      "attribution_strategy": "Create NOTICES.txt file listing all dependencies and their licenses. Include in distribution.",
+      "dependency_management": "Track dependency licenses in project metadata. Automated license scanning recommended (pip-licenses, licensecheck).",
+      "compliance_checklist": [
+        "Include Apache 2.0 LICENSE file in repository",
+        "Create NOTICES.txt with dependency attributions",
+        "Include copyright headers in source files (optional but recommended)",
+        "Document any modifications to Apache 2.0 dependencies",
+        "Ensure CI/CD includes license compliance checks"
+      ]
+    }
+  },
+  "special_cases": {
+    "finos_cdm_specification": {
+      "license": "Community Specification License 1.0",
+      "implication": "Can freely implement the CDM specification. Cannot directly modify the specification itself without contributor agreement. For UML-Codex: reference CDM patterns and concepts, do not fork specification.",
+      "risk": "LOW"
+    },
+    "archived_repositories": {
+      "repositories": ["camunda/camunda-bpm-platform", "camunda/camunda-bpmn-model"],
+      "license": "Apache-2.0",
+      "implication": "License remains valid despite archival. No ongoing support or security updates. Can use code but must maintain ourselves.",
+      "risk": "MEDIUM (maintenance burden, not legal risk)"
+    }
+  },
+  "third_party_dependencies": {
+    "summary": "All third-party dependencies identified use permissive licenses (Apache 2.0, MIT, BSD-3-Clause) or weak copyleft (EPL 2.0). No GPL or strong copyleft licenses found.",
+    "key_dependencies": [
+      {
+        "name": "Eclipse EMF",
+        "license": "EPL-2.0",
+        "used_by": ["rune-dsl"],
+        "risk": "LOW",
+        "notes": "Weak copyleft, compatible with Apache 2.0"
+      },
+      {
+        "name": "Eclipse Xtext",
+        "license": "EPL-2.0",
+        "used_by": ["rune-dsl"],
+        "risk": "LOW",
+        "notes": "Weak copyleft, compatible with Apache 2.0"
+      },
+      {
+        "name": "MyBatis",
+        "license": "Apache-2.0",
+        "used_by": ["camunda", "flowable"],
+        "risk": "LOW",
+        "notes": "Permissive"
+      },
+      {
+        "name": "Spring Framework",
+        "license": "Apache-2.0",
+        "used_by": ["flowable"],
+        "risk": "LOW",
+        "notes": "Permissive"
+      },
+      {
+        "name": "Jackson",
+        "license": "Apache-2.0",
+        "used_by": ["Multiple"],
+        "risk": "LOW",
+        "notes": "Permissive"
+      }
+    ]
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "repository": "REGnosys/rune-dsl",
+  "analysis_date": "2025-11-08",
+  "last_updated": "2025-11-08T00:00:00Z",
+  "change_history": [
+    {
+      "date": "2025-11-08",
+      "description": "Initial analysis of repository issues"
+    }
+  ],
+  "total_issues": 0,
+  "issues_analyzed": 0,
+  "open_issues": 0,
+  "closed_issues": 0,
+  "date_range": {
+    "from": null,
+    "to": null
+  },
+  "categories": {
+    "bugs": [],
+    "features": [],
+    "enhancements": [],
+    "questions": [],
+    "documentation": []
+  },
+  "key_insights": [
+    {
+      "theme": "No Public Issue Tracking",
+      "insight": "The REGnosys/rune-dsl repository (forked from finos/rune-dsl) has no tracked issues. This could indicate either (1) issues are disabled for this fork, (2) issue tracking happens in the upstream FINOS repository, or (3) the fork is primarily for internal use without public issue management.",
+      "impact": "Unable to extract user pain points or feature requests from this repository",
+      "recommendation": "If analyzing Rune DSL issues is important, check the upstream finos/rune-dsl repository"
+    }
+  ],
+  "pain_points": [],
+  "feature_requests": [],
+  "architectural_decisions": [],
+  "common_patterns": [],
+  "actionable_items_for_uml_codex": [
+    {
+      "item": "Check Upstream Repositories for Issues",
+      "priority": "low",
+      "description": "When analyzing forked repositories, also check the upstream source repository for issues that may be relevant",
+      "learning": "Forks may not have independent issue tracking; issues may be managed in the original repository"
+    }
+  ],
+  "repository_health": {
+    "activity_level": "unknown",
+    "issue_closure_rate": "N/A",
+    "average_time_to_close": "N/A",
+    "community_engagement": "unknown",
+    "maintenance_status": "unknown",
+    "notes": [
+      "Repository is a fork from finos/rune-dsl",
+      "No issues are tracked in this fork",
+      "9 pull requests are present in the repository",
+      "To assess Rune DSL issues, consider analyzing the upstream FINOS repository"
+    ]
+  }
+}

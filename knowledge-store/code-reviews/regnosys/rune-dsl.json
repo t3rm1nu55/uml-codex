@@ -1,0 +1,422 @@
+{
+  "version": 1,
+  "repository": "REGnosys/rune-dsl",
+  "reviewed_date": "2025-11-08",
+  "last_updated": "2025-11-07T00:00:00Z",
+  "change_history": [],
+  "license": "Apache License 2.0",
+  "reuse_decision": "CAN_LIFT",
+  "reuse_rationale": "Apache License 2.0 is a permissive open source license that allows commercial use, modification, distribution, and sublicensing. The license requires preservation of copyright notices and disclaimers but does not impose copyleft requirements. The code can be freely integrated into proprietary or open source UML-Codex project with proper attribution. REGnosys has made this available as part of FINOS (Fintech Open Source Foundation) promoting industry collaboration.",
+  "components": [
+    {
+      "name": "rune-lang",
+      "type": "language_definition",
+      "description": "Core language module containing Xtext grammar (Rosetta.xtext), AST definitions, parser, type system, validation, scoping, and code generators. Built on Eclipse Modeling Framework (EMF) and Xtext.",
+      "value_proposition": "Complete reference implementation of a financial domain DSL showing grammar design, type system implementation, validation framework, and multi-target code generation",
+      "key_files": [
+        "src/main/java/com/regnosys/rosetta/Rosetta.xtext",
+        "src/main/java/com/regnosys/rosetta/GenerateRosetta.mwe2",
+        "src/main/java/com/regnosys/rosetta/types/TypeSystem.java",
+        "src/main/java/com/regnosys/rosetta/validation/RosettaValidator.java",
+        "src/main/java/com/regnosys/rosetta/generator/RosettaGenerator.java"
+      ],
+      "dependencies": [
+        "org.eclipse.xtext:2.38.0",
+        "org.eclipse.emf:ecore",
+        "org.eclipse.emf:ecore.xcore.lib:1.7.0",
+        "org.apache.commons:commons-text:3.14.0",
+        "com.fasterxml.jackson:jackson-dataformat-yaml:2.17.1",
+        "org.eclipse.lsp4j"
+      ],
+      "complexity": "high",
+      "recommendation": "STUDY"
+    },
+    {
+      "name": "rune-runtime",
+      "type": "runtime_library",
+      "description": "Runtime library providing base classes and interfaces for generated code including RosettaModelObject, builders, metadata support, and label providers",
+      "value_proposition": "Shows runtime architecture needed to support generated DSL code, including immutable data patterns, builder patterns, and metadata handling",
+      "key_patterns": [
+        "Immutable model objects",
+        "Builder pattern for object construction",
+        "Metadata attachment",
+        "Object pruning for empty nodes"
+      ],
+      "complexity": "medium",
+      "recommendation": "ADAPT"
+    },
+    {
+      "name": "rune-ide",
+      "type": "tooling",
+      "description": "IDE integration module providing Eclipse/VSCode support through Language Server Protocol (LSP), syntax highlighting, code completion, validation, and navigation",
+      "value_proposition": "Complete IDE integration showing LSP implementation for DSL tooling support",
+      "dependencies": [
+        "org.eclipse.lsp4j"
+      ],
+      "complexity": "medium",
+      "recommendation": "STUDY"
+    },
+    {
+      "name": "rune-maven-plugin",
+      "type": "build_integration",
+      "description": "Maven plugin for DSL code generation and formatting during build process",
+      "value_proposition": "Shows build tool integration patterns for DSL compilation and code generation workflows",
+      "key_files": [
+        "src/main/java/com/regnosys/rosetta/maven/RuneGenerateMojo.java",
+        "src/main/java/com/regnosys/rosetta/maven/RuneTestGenerateMojo.java",
+        "src/main/java/com/regnosys/rosetta/maven/RuneFormatterMojo.java"
+      ],
+      "dependencies": [
+        "org.apache.maven:maven-plugin-api:3.9.8",
+        "org.apache.maven:maven-core:3.9.8",
+        "org.apache.maven:maven-plugin-annotations:3.13.1"
+      ],
+      "complexity": "low",
+      "recommendation": "ADAPT"
+    },
+    {
+      "name": "rune-testing",
+      "type": "testing_framework",
+      "description": "Testing utilities for DSL validation, compiler testing, and model validation",
+      "value_proposition": "Testing infrastructure for DSL implementations including test models and validation utilities",
+      "key_components": [
+        "RosettaInjectorProvider for dependency injection",
+        "Compiler testing utilities",
+        "Validation test framework",
+        "Test model definitions"
+      ],
+      "complexity": "medium",
+      "recommendation": "ADAPT"
+    },
+    {
+      "name": "rune-integration-tests",
+      "type": "testing",
+      "description": "Integration test suite for end-to-end DSL functionality testing",
+      "value_proposition": "Integration testing patterns for DSL projects",
+      "complexity": "low",
+      "recommendation": "STUDY"
+    },
+    {
+      "name": "rune-tools",
+      "type": "utilities",
+      "description": "Utility tools for DSL development and analysis",
+      "value_proposition": "Supporting tools for DSL development workflow",
+      "complexity": "low",
+      "recommendation": "STUDY"
+    },
+    {
+      "name": "rosetta-backport",
+      "type": "legacy_support",
+      "description": "Backport module maintaining compatibility with previous Rosetta DSL versions. Contains parallel structure of lang, ide, runtime, maven-plugin, testing, and tools",
+      "value_proposition": "Shows versioning and backward compatibility strategies for DSL evolution",
+      "complexity": "medium",
+      "recommendation": "AVOID"
+    }
+  ],
+  "design_patterns": [
+    {
+      "pattern": "Xtext Grammar-Driven Development",
+      "description": "Uses Eclipse Xtext framework to define language grammar in declarative .xtext format. Grammar automatically generates parser, lexer, AST, and basic editor support",
+      "implementation": "Rosetta.xtext defines complete grammar with imports from three Xcore models (Rosetta.xcore, RosettaSimple.xcore, RosettaExpression.xcore)",
+      "benefit": "Rapid language development with automatic tooling generation",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML-Codex could leverage Xtext for grammar definition and automatic parser generation"
+    },
+    {
+      "pattern": "EMF-Based Metamodeling",
+      "description": "Uses Eclipse Modeling Framework (EMF) Ecore for metamodel definition. Xcore provides extended syntax for defining metamodels with behavior",
+      "implementation": "Three Xcore models define the metamodel structure, referenced by the Xtext grammar",
+      "benefit": "Strong typing, model validation, serialization, and code generation from metamodel",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - EMF is standard for UML tools and provides rich metamodeling capabilities"
+    },
+    {
+      "pattern": "Multi-Stage Code Generation",
+      "description": "MWE2 (Modeling Workflow Engine) orchestrates multi-stage generation: grammar to parser, metamodel to Java classes, models to target code",
+      "implementation": "GenerateRosetta.mwe2 defines workflow with XtextGenerator, parser fragments, scoping, serialization, and custom optimization fragments",
+      "benefit": "Separation of concerns in generation pipeline, extensible through custom fragments",
+      "applicability_to_uml": "APPLICABLE - UML-Codex needs multi-stage generation for different output targets"
+    },
+    {
+      "pattern": "Modular Type System",
+      "description": "Comprehensive type system with 29 type-related classes supporting parametrized types, generics, enums, choices, data types, and type inference",
+      "implementation": "TypeSystem.java coordinates RType hierarchy including RDataType, REnumType, RChoiceType, RParametrizedType, with TypeFactory for instantiation",
+      "benefit": "Rich type checking, inference, and validation capabilities",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML requires sophisticated type system for classes, interfaces, generics, etc."
+    },
+    {
+      "pattern": "Visitor-Based Validation",
+      "description": "Validation framework using visitor pattern with specialized validators for each construct type (attributes, choices, enums, functions, types, reports)",
+      "implementation": "RosettaValidator coordinates AttributeValidator, ChoiceValidator, EnumValidator, FunctionValidator, TypeValidator, ReportValidator",
+      "benefit": "Modular, extensible validation with clear separation of concerns",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML needs extensive validation of constraints, multiplicities, and well-formedness rules"
+    },
+    {
+      "pattern": "Scoped Name Resolution",
+      "description": "Custom scoping mechanism for resolving references across namespace boundaries with import support",
+      "implementation": "RosettaScopeProvider with AliasAwareImportNormalizer, PatchedImportNormalizer, RosettaLinkingService, RosettaQualifiedNameProvider",
+      "benefit": "Proper namespace isolation and cross-reference resolution",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML has complex package structure and qualified name resolution requirements"
+    },
+    {
+      "pattern": "Interpreter with Value Objects",
+      "description": "Interpreter pattern with typed value objects (RosettaBooleanValue, RosettaNumberValue, RosettaStringValue, etc.) for expression evaluation",
+      "implementation": "RosettaInterpreter with RosettaValueFactory creating strongly-typed value objects with context management",
+      "benefit": "Type-safe runtime evaluation of DSL expressions",
+      "applicability_to_uml": "APPLICABLE - Useful for evaluating OCL constraints and UML expressions"
+    },
+    {
+      "pattern": "Target Language Abstraction",
+      "description": "Abstract representation of target languages enabling multi-language code generation",
+      "implementation": "TargetLanguageRepresentation and TargetLanguageStringConcatenation provide language-agnostic code generation with Java as default implementation",
+      "benefit": "Single DSL can generate code in multiple programming languages",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML-Codex needs to generate code in multiple languages (Java, Python, C++, etc.)"
+    },
+    {
+      "pattern": "Immutable Model Objects with Builders",
+      "description": "Generated code produces immutable model objects with nested builder classes for construction",
+      "implementation": "All generated types implement RosettaModelObject, are immutable after creation, and include nested Builder implementing RosettaModelObjectBuilder",
+      "benefit": "Thread-safe, predictable objects with fluent construction API",
+      "applicability_to_uml": "APPLICABLE - Good pattern for generated model classes from UML"
+    },
+    {
+      "pattern": "Metadata Annotation System",
+      "description": "Rich metadata system with annotations for scheme, key, reference, template, location, address, and custom qualifiers",
+      "implementation": "Annotation syntax in grammar with metadata attachment to types and attributes",
+      "benefit": "Extensible metadata without changing core metamodel",
+      "applicability_to_uml": "APPLICABLE - UML has stereotypes and tagged values serving similar purpose"
+    },
+    {
+      "pattern": "Synonym-Based Mapping",
+      "description": "Declarative mapping from external formats (FpML, ISDACreate) to internal model through synonym annotations",
+      "implementation": "Synonym sources with path expressions, conditional mappings (set when, set to), and merge strategies",
+      "benefit": "Separation of data transformation logic from core model",
+      "applicability_to_uml": "MODERATELY_APPLICABLE - Could be used for mapping between different UML profiles or serialization formats"
+    },
+    {
+      "pattern": "Document Reference Traceability",
+      "description": "Linking model elements to regulatory documents through hierarchical reference system (body, corpus, segment)",
+      "implementation": "Document references attached to model elements with publisher, document set, and section identifiers",
+      "benefit": "Traceability to requirements and regulatory sources",
+      "applicability_to_uml": "APPLICABLE - Similar to requirements traceability in UML models"
+    },
+    {
+      "pattern": "Function Specification vs Implementation",
+      "description": "Separates function API specification from implementation, allowing partial definitions requiring implementor extensions",
+      "implementation": "Functions can be fully defined, partially defined, or purely specified. Output construction uses 'set' and 'add' keywords with alias support",
+      "benefit": "Supports both complete automation and human-in-the-loop approaches",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML operations can be abstract or have method bodies"
+    },
+    {
+      "pattern": "Cardinality-Based Constraints",
+      "description": "First-class cardinality constraints on all attributes with (min..max) syntax, supporting optional, required, and collections",
+      "implementation": "RCardinality type with CardinalityProvider for computation, integrated into type system",
+      "benefit": "Clear data integrity rules enforced at model and runtime levels",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - Direct mapping to UML multiplicities"
+    },
+    {
+      "pattern": "Choice Types (Union Types)",
+      "description": "Explicit choice types representing mutually exclusive attribute sets (similar to union types or XSD choice)",
+      "implementation": "Choice type with required-choice, optional-choice, and one-of conditions enforced through ChoiceValidator",
+      "benefit": "Type-safe representation of alternatives without inheritance",
+      "applicability_to_uml": "MODERATELY_APPLICABLE - UML doesn't have direct choice construct but pattern useful for specific domains"
+    },
+    {
+      "pattern": "Expression DSL with List Operations",
+      "description": "Embedded expression language with functional operations: filter, map (extract), reduce (sum/min/max), sort, flatten, distinct",
+      "implementation": "Rich expression hierarchy in grammar supporting path expressions, operators, conditionals, and collection transformations",
+      "benefit": "Powerful declarative query and transformation capabilities",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - Similar to OCL (Object Constraint Language) in UML"
+    },
+    {
+      "pattern": "Controlled Turing-Incompleteness",
+      "description": "Deliberately limits language expressiveness to prevent infinite loops and complex control flow, making it accessible to domain experts",
+      "implementation": "No while loops, no goto, limited recursion - only if-then-else, switch, and functional list operations",
+      "benefit": "Guaranteed termination and easier formal verification",
+      "applicability_to_uml": "APPLICABLE - UML Action Language and OCL have similar constraints"
+    }
+  ],
+  "requirements_identified": [
+    {
+      "id": "REQ-RUNE-001",
+      "category": "grammar_definition",
+      "description": "DSL must support declarative grammar definition using industry-standard tooling (Xtext/ANTLR)",
+      "source": "Rosetta.xtext implementation",
+      "priority": "high",
+      "applicability": "UML-Codex needs formal grammar for UML notation parsing"
+    },
+    {
+      "id": "REQ-RUNE-002",
+      "category": "type_system",
+      "description": "Rich type system supporting primitive types, complex types, generics/parameterized types, enumerations, and type aliases",
+      "source": "rune-lang/types package with 29 type-related classes",
+      "priority": "high",
+      "applicability": "UML Class Diagrams require comprehensive type system"
+    },
+    {
+      "id": "REQ-RUNE-003",
+      "category": "validation",
+      "description": "Modular validation framework with specialized validators for each language construct type",
+      "source": "rune-lang/validation package with 11 validator classes",
+      "priority": "high",
+      "applicability": "UML-Codex needs validation of OCL constraints, multiplicities, and well-formedness rules"
+    },
+    {
+      "id": "REQ-RUNE-004",
+      "category": "code_generation",
+      "description": "Multi-target code generation supporting multiple programming languages from single DSL model",
+      "source": "rune-lang/generator with TargetLanguageRepresentation abstraction",
+      "priority": "high",
+      "applicability": "UML-Codex must generate code in Java, Python, C++, etc."
+    },
+    {
+      "id": "REQ-RUNE-005",
+      "category": "namespace_management",
+      "description": "Hierarchical namespace system with import/export capabilities and qualified name resolution",
+      "source": "Namespace component in documentation and scoping implementation",
+      "priority": "high",
+      "applicability": "UML packages require namespace management"
+    },
+    {
+      "id": "REQ-RUNE-006",
+      "category": "cardinality",
+      "description": "First-class cardinality constraints with (min..max) syntax supporting 0..1, 1..1, 0..*, 1..* patterns",
+      "source": "RCardinality implementation and documentation",
+      "priority": "high",
+      "applicability": "Direct mapping to UML multiplicities on associations and attributes"
+    },
+    {
+      "id": "REQ-RUNE-007",
+      "category": "metadata",
+      "description": "Extensible metadata/annotation system for attaching additional information to model elements",
+      "source": "Annotation component and metadata attributes",
+      "priority": "medium",
+      "applicability": "UML stereotypes and tagged values"
+    },
+    {
+      "id": "REQ-RUNE-008",
+      "category": "inheritance",
+      "description": "Support for type inheritance with 'extends' keyword and attribute overriding",
+      "source": "Data type inheritance in grammar and documentation",
+      "priority": "high",
+      "applicability": "UML class inheritance and generalization"
+    },
+    {
+      "id": "REQ-RUNE-009",
+      "category": "immutability",
+      "description": "Generated code should produce immutable objects with builder pattern for construction",
+      "source": "Runtime implementation and Java documentation",
+      "priority": "medium",
+      "applicability": "Thread-safe generated code from UML models"
+    },
+    {
+      "id": "REQ-RUNE-010",
+      "category": "expression_language",
+      "description": "Embedded expression/constraint language with path navigation, operators, and collection operations",
+      "source": "Expression component with filter, map, reduce operations",
+      "priority": "high",
+      "applicability": "UML needs OCL-like constraint language"
+    },
+    {
+      "id": "REQ-RUNE-011",
+      "category": "ide_integration",
+      "description": "IDE support through Language Server Protocol providing syntax highlighting, completion, validation, and navigation",
+      "source": "rune-ide module with LSP4J dependency",
+      "priority": "high",
+      "applicability": "UML-Codex should provide modern IDE experience"
+    },
+    {
+      "id": "REQ-RUNE-012",
+      "category": "build_integration",
+      "description": "Integration with build tools (Maven/Gradle) for automated DSL compilation and code generation",
+      "source": "rune-maven-plugin with Generate and Test mojos",
+      "priority": "medium",
+      "applicability": "UML-Codex should integrate with standard build pipelines"
+    },
+    {
+      "id": "REQ-RUNE-013",
+      "category": "function_definition",
+      "description": "Support for function/operation definitions with inputs, outputs, pre-conditions, and post-conditions",
+      "source": "Function component with conditions and specification vs implementation separation",
+      "priority": "high",
+      "applicability": "UML operations and behavioral specifications"
+    },
+    {
+      "id": "REQ-RUNE-014",
+      "category": "testing_framework",
+      "description": "Comprehensive testing infrastructure for DSL validation, compilation, and code generation",
+      "source": "rune-testing and rune-integration-tests modules",
+      "priority": "medium",
+      "applicability": "Quality assurance for UML-Codex"
+    },
+    {
+      "id": "REQ-RUNE-015",
+      "category": "traceability",
+      "description": "Link model elements to source documentation/requirements for traceability",
+      "source": "Document reference system with body, corpus, segment hierarchy",
+      "priority": "low",
+      "applicability": "Requirements traceability in enterprise UML models"
+    },
+    {
+      "id": "REQ-RUNE-016",
+      "category": "runtime_library",
+      "description": "Runtime support library providing base classes and utilities for generated code",
+      "source": "rune-runtime module with RosettaModelObject and builders",
+      "priority": "medium",
+      "applicability": "Runtime support for UML-generated code"
+    },
+    {
+      "id": "REQ-RUNE-017",
+      "category": "serialization",
+      "description": "Model serialization and deserialization support for persistence and interchange",
+      "source": "Serialization module and Jackson YAML dependency",
+      "priority": "medium",
+      "applicability": "XMI serialization for UML models"
+    },
+    {
+      "id": "REQ-RUNE-018",
+      "category": "error_handling",
+      "description": "Comprehensive error handling with specific exception types and aggregation of multiple errors",
+      "source": "GenerationException, AggregateGenerationException, RosettaInterpreterException",
+      "priority": "medium",
+      "applicability": "User-friendly error reporting in UML-Codex"
+    }
+  ],
+  "technical_debt": [
+    {
+      "category": "legacy_compatibility",
+      "description": "Rosetta-backport module maintains parallel codebase for backward compatibility, increasing maintenance burden",
+      "impact": "high",
+      "recommendation": "UML-Codex should design for versioning from start but avoid maintaining parallel codebases"
+    },
+    {
+      "category": "naming_inconsistency",
+      "description": "Repository named 'rune-dsl' but internal code uses 'Rosetta' naming throughout. Creates confusion about actual project name",
+      "impact": "medium",
+      "recommendation": "Maintain consistent naming between repository, packages, and classes in UML-Codex"
+    },
+    {
+      "category": "dependency_versions",
+      "description": "Using SNAPSHOT version (0.0.0.main-SNAPSHOT) indicates non-stable release. Project requires Java 21 which limits adoption",
+      "impact": "medium",
+      "recommendation": "UML-Codex should target LTS Java versions and maintain stable release versions"
+    },
+    {
+      "category": "documentation",
+      "description": "Limited documentation with only 2 markdown files. Complex DSL requires comprehensive user guide and reference documentation",
+      "impact": "high",
+      "recommendation": "Invest heavily in documentation from beginning - grammar reference, user guide, API docs, examples"
+    },
+    {
+      "category": "test_coverage",
+      "description": "No .rosetta example files in repository for users to reference. Testing framework exists but examples not visible",
+      "impact": "medium",
+      "recommendation": "UML-Codex should include extensive examples and reference models in repository"
+    },
+    {
+      "category": "complexity",
+      "description": "Very complex implementation with 13 modules and deep integration with EMF/Xtext. High learning curve for contributors",
+      "impact": "high",
+      "recommendation": "UML-Codex should balance feature richness with implementation simplicity, providing clear architectural documentation"
+    }
+  ],
+  "notes": "The REGnosys rune-dsl repository is a sophisticated domain-specific language implementation for financial regulatory compliance modeling. Despite being named 'rune-dsl', the internal implementation consistently uses 'Rosetta' naming, which is the actual DSL name. This is a fork of the FINOS (Fintech Open Source Foundation) project.\n\nKey architectural decisions:\n1. Built on Eclipse Modeling Framework (EMF) and Xtext - industry standard for DSL development\n2. Multi-module Maven project with clear separation: lang, runtime, IDE, testing, tools, maven-plugin\n3. Grammar-driven development with automatic parser and tooling generation\n4. Rich type system (29 classes) supporting parametrized types, generics, enums, choices\n5. Multi-target code generation with Java as default target\n6. Language Server Protocol (LSP) integration for modern IDE support\n7. Embedded expression language with functional programming features (filter, map, reduce)\n8. Deliberately Turing-incomplete to ensure termination and accessibility to domain experts\n\nThe DSL addresses a real-world problem: siloed IT systems in financial infrastructure implementing the same regulatory processes differently. Rune/Rosetta provides a unified, human-readable representation accessible to non-programmers.\n\nFor UML-Codex, this repository offers exceptional value:\n- HIGHLY_APPLICABLE patterns: Xtext grammar development, EMF metamodeling, type system design, validation framework, multi-target generation, expression language, cardinality constraints\n- APPLICABLE patterns: Interpreter implementation, IDE integration, build tool integration, metadata annotations\n- MODERATELY_APPLICABLE: Choice types, synonym mapping, document references\n\nRecommendations by component:\n- STUDY: rune-lang (grammar and architecture), rune-ide (LSP integration), rune-integration-tests\n- ADAPT: rune-runtime (patterns for generated code), rune-maven-plugin (build integration), rune-testing\n- AVOID: rosetta-backport (legacy compatibility complexity)\n\nCritical lessons:\n1. EMF/Xtext is proven technology for DSL development - don't reinvent the wheel\n2. Multi-stage code generation pipeline is essential for complex transformations\n3. Comprehensive type system is crucial for enterprise-grade DSL\n4. Modular validation framework scales better than monolithic validators\n5. IDE integration via LSP is expected by modern developers\n6. Build tool integration (Maven/Gradle) is essential for adoption\n7. Clear separation of specification from implementation enables flexibility\n8. Immutable generated code with builders is good practice\n9. Documentation and examples are critical - this project falls short\n10. Naming consistency matters - rune vs rosetta confusion is problematic\n\nDependencies are primarily Apache 2.0 (Xtext, EMF, Commons, Jackson) or EPL (Eclipse components), all compatible with commercial use.\n\nThe codebase is 85.2% Java, 14.6% Xtend (JVM language for template-heavy code), with minimal Python/TypeScript. This suggests Xtend is useful for code generation templates.\n\nOverall assessment: This is a production-quality, enterprise-grade DSL implementation that demonstrates best practices in language engineering. While complex, it provides an excellent reference architecture for UML-Codex. The Apache 2.0 license allows code reuse with attribution. Primary concerns are complexity and documentation gaps, but the architectural patterns and design decisions are sound and directly applicable to UML tool development."
+}

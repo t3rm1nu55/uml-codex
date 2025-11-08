@@ -1,0 +1,288 @@
+{
+  "version": 1,
+  "last_updated": "2025-11-08T00:00:00Z",
+  "summary": "Reuse decisions for each analyzed repository: CAN_LIFT, MUST_REBUILD, or HYBRID",
+  "decision_criteria": {
+    "CAN_LIFT": "License permits use, code quality good, directly applicable, dependencies compatible",
+    "MUST_REBUILD": "Incompatible license, code quality issues, tightly coupled to proprietary systems, or fundamental mismatch",
+    "HYBRID": "License permits use but strategic reasons to rebuild (e.g., different tech stack, simplification needed, EOL status)"
+  },
+  "repositories": [
+    {
+      "repository": "REGnosys/rosetta-code-generators",
+      "license": "Apache-2.0",
+      "decision": "CAN_LIFT",
+      "legal_clearance": true,
+      "technical_assessment": "HYBRID",
+      "final_recommendation": "ADAPT",
+      "rationale": "Legally can lift entire codebase. Technically, architecture excellent but Java/Eclipse ecosystem not ideal for Python project. ADAPT: Use architectural patterns (Template Method, Plugin Architecture) but reimplement in Python with Jinja2 templates.",
+      "what_to_lift": [
+        "Architectural patterns (Template Method, Plugin)",
+        "Type mapping strategies",
+        "Test infrastructure design",
+        "Multi-language generation approach"
+      ],
+      "what_to_rebuild": [
+        "Xtend templates → Jinja2",
+        "EMF/Ecore intermediate model → Pydantic",
+        "Maven build → Poetry",
+        "Java implementation → Python"
+      ],
+      "dependencies_review": "All Apache 2.0 or EPL 2.0 - compatible",
+      "risk_level": "LOW"
+    },
+    {
+      "repository": "REGnosys/rune-dsl",
+      "license": "Apache-2.0",
+      "decision": "CAN_LIFT",
+      "legal_clearance": true,
+      "technical_assessment": "STUDY",
+      "final_recommendation": "STUDY",
+      "rationale": "Legally can lift but UML already has metamodel defined by OMG. No need for new DSL. Value is studying type system design, validation architecture, and expression language patterns.",
+      "what_to_lift": [
+        "Type system patterns (inheritance, composition, constraints)",
+        "Validation architecture (multi-layer)",
+        "Constraint specification approach",
+        "Metadata annotation patterns"
+      ],
+      "what_to_rebuild": [
+        "Not applicable - UML metamodel already defined"
+      ],
+      "dependencies_review": "Eclipse Xtext, EMF - heavy dependencies, not needed if not building DSL",
+      "risk_level": "LOW"
+    },
+    {
+      "repository": "REGnosys/cdm-object-builder",
+      "license": "Apache-2.0",
+      "decision": "CAN_LIFT",
+      "legal_clearance": true,
+      "technical_assessment": "ADAPT",
+      "final_recommendation": "ADAPT",
+      "rationale": "Legally clear. Angular 14 outdated, CDM-specific. Adapt schema-driven UI generation pattern and tree-based object builder for UML. Rebuild with modern stack (React 18, TypeScript 5).",
+      "what_to_lift": [
+        "Schema-driven UI generation pattern",
+        "Tree-based object builder architecture",
+        "Type-specific component pattern",
+        "Validation integration in UI",
+        "JSON import/export patterns"
+      ],
+      "what_to_rebuild": [
+        "Angular 14 → React 18",
+        "CDM-specific components → UML metaclass components",
+        "Backend integration approach"
+      ],
+      "dependencies_review": "Angular, RxJS, Material Design - all permissive licenses",
+      "risk_level": "LOW"
+    },
+    {
+      "repository": "REGnosys/cdm-starter",
+      "license": "Apache-2.0 (code) / Community Spec License 1.0 (CDM dependency)",
+      "decision": "CAN_LIFT",
+      "legal_clearance": true,
+      "technical_assessment": "STUDY",
+      "final_recommendation": "STUDY",
+      "rationale": "Starter code is Apache 2.0 and liftable. CDM dependency uses Community Spec License - can implement spec freely. Minimal code, mainly useful for patterns (Maven config, test data loading). Study and adapt patterns rather than lift code.",
+      "what_to_lift": [
+        "Maven/Poetry configuration patterns",
+        "Resource-based test data approach",
+        "Repository configuration patterns"
+      ],
+      "what_to_rebuild": [
+        "Maven → Poetry for Python",
+        "Minimal implementation → comprehensive UML support"
+      ],
+      "dependencies_review": "JUnit, Jackson - permissive. CDM - Community Spec (implementation freedom)",
+      "risk_level": "LOW"
+    },
+    {
+      "repository": "finos/common-domain-model",
+      "license": "Community Specification License 1.0 (spec) / Apache-2.0 (code)",
+      "decision": "HYBRID",
+      "legal_clearance": true,
+      "technical_assessment": "STUDY_AND_ADAPT",
+      "final_recommendation": "HYBRID",
+      "rationale": "Can freely implement specification. Code is Apache 2.0. Financial domain specific, so direct lift inappropriate. HYBRID: Adopt architectural patterns (event model, qualification functions, type system), study governance, avoid financial-specific implementations.",
+      "what_to_lift": [
+        "Event model architecture (primitive instructions)",
+        "Qualification function pattern",
+        "Type system patterns (inheritance, composition, constraints)",
+        "Validation framework approach",
+        "Namespace organization (base/domain/integration)",
+        "Versioning strategy"
+      ],
+      "what_to_rebuild": [
+        "Financial domain models → UML domain (if building UML-specific patterns)",
+        "Rosetta DSL → UML metamodel implementation"
+      ],
+      "dependencies_review": "Rosetta DSL (Apache 2.0), various Apache 2.0 libraries - all compatible",
+      "risk_level": "LOW"
+    },
+    {
+      "repository": "camunda/camunda-bpm-platform",
+      "license": "Apache-2.0",
+      "decision": "HYBRID",
+      "legal_clearance": true,
+      "technical_assessment": "STUDY",
+      "final_recommendation": "HYBRID",
+      "rationale": "Legally can lift. ARCHIVED (EOL Nov 2025) creates practical concerns. Very high complexity. HYBRID: Study PVM abstraction, Command pattern, State machine, Model API. Adapt specific components. Avoid wholesale adoption due to EOL status and complexity.",
+      "what_to_lift": [
+        "Process Virtual Machine abstraction concept",
+        "Command pattern with interceptors",
+        "State machine with explicit state tracking",
+        "Activity behavior strategy pattern",
+        "Service-oriented architecture",
+        "BPMN parsing patterns"
+      ],
+      "what_to_rebuild": [
+        "PVM → Simpler execution model for UML",
+        "MyBatis persistence → SQLAlchemy",
+        "Complex enterprise features → Focused UML features",
+        "BPMN parsing → UML XMI parsing"
+      ],
+      "dependencies_review": "MyBatis, Joda-Time, JUEL - all permissive but some outdated",
+      "risk_level": "MEDIUM (EOL status, not legal)"
+    },
+    {
+      "repository": "camunda/camunda-bpmn-model",
+      "license": "Apache-2.0",
+      "decision": "CAN_LIFT",
+      "legal_clearance": true,
+      "technical_assessment": "ADAPT",
+      "final_recommendation": "ADAPT",
+      "rationale": "Legally clear. ARCHIVED but stable library. Excellent metamodel implementation patterns. ADAPT: Type Object pattern, fluent builders, XML serialization for UML XMI. Consider code generation for UML's larger scale (700+ metaclasses vs BPMN's 200).",
+      "what_to_lift": [
+        "Type Object pattern for metamodel",
+        "Declarative type registration",
+        "Fluent builder pattern with recursive generics",
+        "XML wrapper pattern",
+        "Bidirectional serialization approach",
+        "Namespace handling",
+        "Validation layers"
+      ],
+      "what_to_rebuild": [
+        "Manual implementation → Code generation for UML scale",
+        "BPMN types → UML metaclasses",
+        "BPMN XML → UML XMI"
+      ],
+      "dependencies_review": "Only camunda-xml-model (Apache 2.0) - minimal dependencies",
+      "risk_level": "LOW"
+    },
+    {
+      "repository": "flowable/flowable-engine",
+      "license": "Apache-2.0",
+      "decision": "HYBRID",
+      "legal_clearance": true,
+      "technical_assessment": "STUDY_AND_ADAPT",
+      "final_recommendation": "HYBRID",
+      "rationale": "Legally can lift. ACTIVE development (advantage over Camunda). High complexity. HYBRID: Adopt service-oriented API, command pattern, Spring Boot integration. Adapt agenda-based execution, execution tree model. Study but simplify persistence, avoid complex enterprise features.",
+      "what_to_lift": [
+        "Agenda-based execution pattern",
+        "Execution tree model",
+        "Service-oriented API design",
+        "Command pattern",
+        "Builder pattern",
+        "Spring Boot auto-configuration approach",
+        "Pluggable storage abstraction (in-memory + SQL)",
+        "Configuration validation"
+      ],
+      "what_to_rebuild": [
+        "BPMN/CMMN parsing → UML XMI parsing",
+        "Workflow execution → UML behavioral diagram execution",
+        "MyBatis → SQLAlchemy",
+        "Complex enterprise features → Focused UML features"
+      ],
+      "dependencies_review": "MyBatis, Spring, Groovy, Drools - all Apache 2.0 or compatible",
+      "risk_level": "LOW"
+    }
+  ],
+  "summary": {
+    "total_repositories": 8,
+    "CAN_LIFT": 6,
+    "MUST_REBUILD": 0,
+    "HYBRID": 2,
+    "legal_blockers": 0,
+    "primary_obstacles": [
+      "Technology stack differences (Java vs Python)",
+      "Scale differences (BPMN 200 types vs UML 700 metaclasses)",
+      "EOL status (Camunda archived)",
+      "Domain specificity (Financial CDM vs general UML)"
+    ],
+    "recommended_approach": "Adopt architectural patterns, adapt implementations to Python ecosystem, study complex components for insights, avoid wholesale code lifting due to tech stack differences."
+  },
+  "implementation_strategy": {
+    "phase_1_foundations": {
+      "priority": "P0",
+      "components": [
+        "Type Object metamodel pattern (from Camunda BPMN model)",
+        "Command pattern with interceptors (from both engines)",
+        "Service-oriented API (from both engines)",
+        "Multi-layer validation (from Rosetta/CDM)",
+        "Namespace handling (from BPMN models)"
+      ],
+      "effort": "Medium",
+      "timeline": "Months 1-3"
+    },
+    "phase_2_code_generation": {
+      "priority": "P0",
+      "components": [
+        "Template Method generator pattern (from rosetta-code-generators)",
+        "Plugin architecture (from rosetta-code-generators)",
+        "Type mapping strategies (from rosetta-code-generators)",
+        "Completeness checking (from issues analysis)"
+      ],
+      "effort": "High",
+      "timeline": "Months 2-5"
+    },
+    "phase_3_execution": {
+      "priority": "P1",
+      "components": [
+        "Agenda-based execution (from Flowable)",
+        "Execution tree model (from Flowable)",
+        "State machine implementation (from Camunda PVM insights)",
+        "Expression language integration (OCL)"
+      ],
+      "effort": "High",
+      "timeline": "Months 4-8"
+    },
+    "phase_4_persistence": {
+      "priority": "P1",
+      "components": [
+        "Pluggable storage abstraction (from Flowable insights)",
+        "SQLAlchemy ORM (not MyBatis)",
+        "Optimistic locking (from both engines)",
+        "History event stream (from both engines)"
+      ],
+      "effort": "Medium",
+      "timeline": "Months 3-6"
+    },
+    "phase_5_ui": {
+      "priority": "P2",
+      "components": [
+        "Schema-driven UI generation (from cdm-object-builder)",
+        "Tree-based model builder (from cdm-object-builder)",
+        "Diagram editors (custom - no direct reference)",
+        "Fluent builders for model construction (from BPMN models)"
+      ],
+      "effort": "Very High",
+      "timeline": "Months 6-12"
+    }
+  },
+  "risk_mitigation": {
+    "archived_repositories": {
+      "risk": "No ongoing support for Camunda",
+      "mitigation": "Study patterns only, do not depend on libraries. Flowable actively maintained as alternative reference."
+    },
+    "tech_stack_differences": {
+      "risk": "Java patterns may not translate cleanly to Python",
+      "mitigation": "Proof-of-concept implementations for critical patterns. Use Python-idiomatic approaches (Pydantic, type hints, protocols)."
+    },
+    "complexity": {
+      "risk": "Workflow engines very complex, may over-engineer UML tool",
+      "mitigation": "Start simple, add complexity only when needed. Focus on UML-specific requirements, avoid enterprise workflow features."
+    },
+    "scale": {
+      "risk": "UML has 700+ metaclasses vs BPMN's 200",
+      "mitigation": "Use code generation for metamodel implementation. Manual approach works for BPMN but won't scale to UML."
+    }
+  }
+}

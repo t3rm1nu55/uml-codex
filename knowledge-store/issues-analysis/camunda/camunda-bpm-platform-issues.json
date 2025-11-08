@@ -1,0 +1,841 @@
+{
+  "version": 1,
+  "repository": "camunda/camunda-bpm-platform",
+  "analysis_date": "2025-11-08",
+  "last_updated": "2025-11-08T00:00:00Z",
+  "repository_status": "archived",
+  "archived_date": "2025-11-04",
+  "change_history": [
+    {
+      "date": "2025-11-08",
+      "description": "Initial comprehensive analysis of camunda-bpm-platform issues focusing on workflow engine challenges"
+    }
+  ],
+  "total_issues": 100,
+  "issues_analyzed": 50,
+  "open_issues": 0,
+  "closed_issues": 50,
+  "date_range": {
+    "from": "2021-03-16",
+    "to": "2025-11-03"
+  },
+  "categories": {
+    "bugs": [
+      {
+        "number": 5505,
+        "title": "HTTP connector type service tasks, history records not persisted in database",
+        "state": "closed",
+        "created": "2025-10-31",
+        "closed": "2025-10-31",
+        "labels": ["type:bug"],
+        "description": "HTTP connector service tasks in Camunda 7.16 with history-level audit were not persisting task or activity history records",
+        "severity": "high",
+        "technical_details": [
+          "History records not appearing in ACT_HI_TASKINST and ACT_HI_ACTINST tables",
+          "Configuration: history-level set to audit",
+          "Affects HTTP connector service tasks specifically",
+          "Closed as not_planned suggesting expected behavior or documentation issue"
+        ]
+      },
+      {
+        "number": 5500,
+        "title": "Reopen Timer Boundary Event fails with processDefinitionId null",
+        "state": "closed",
+        "created": "2025-10-29",
+        "closed": "2025-10-31",
+        "labels": ["type:bug"],
+        "description": "Upgrading from 7.23.0 to 7.24.0 caused timer boundary event reopening to fail with null processDefinitionId",
+        "severity": "high",
+        "technical_details": [
+          "Regression introduced in 7.24.0",
+          "Affects timer boundary event operations",
+          "Process definition ID handling issue",
+          "Marked as duplicate of existing issue"
+        ]
+      },
+      {
+        "number": 5502,
+        "title": "Tasklist Search query not returning process variables when task is completed",
+        "state": "closed",
+        "created": "2025-10-30",
+        "closed": "2025-10-30",
+        "labels": ["type:bug"],
+        "description": "Camunda 8.7 Tasklist search API with includeVariables only returns variables passed during task completion, not complete process variable set",
+        "severity": "medium",
+        "technical_details": [
+          "Affects completed and canceled tasks",
+          "includeVariables parameter behavior differs between active and completed tasks",
+          "Only variables explicitly passed during completion are returned",
+          "Closed as not_planned"
+        ]
+      },
+      {
+        "number": 5410,
+        "title": "StringIndexOutOfBoundsException in ContainerBasedAuthenticationFilter",
+        "state": "closed",
+        "created": "2025-09-11",
+        "closed": "2025-10-29",
+        "labels": ["type:bug"],
+        "description": "Authentication filter crashes with StringIndexOutOfBoundsException when requests lack application path suffix",
+        "severity": "high",
+        "technical_details": [
+          "Filter assumes '/camunda' app path in all request URLs",
+          "Accessing without app-name suffix causes HTTP 500 errors",
+          "Improper string slicing without validation",
+          "Path extraction logic needs defensive checks"
+        ]
+      },
+      {
+        "number": 5454,
+        "title": "Data Migrator should filter out invalid or hidden files",
+        "state": "closed",
+        "created": "2025-10-02",
+        "closed": "2025-10-06",
+        "labels": ["type:bug", "scope:data-migrator"],
+        "description": "Data Migrator attempted deploying macOS hidden files like .DS_Store causing deployment failures",
+        "severity": "medium",
+        "technical_details": [
+          "Auto deployment includes system hidden files",
+          "macOS .DS_Store files cause deployment errors",
+          "Need file type filtering for deployment",
+          "Affects C8 auto deployment process"
+        ]
+      },
+      {
+        "number": 5453,
+        "title": "Data Migrator error is cryptic when C8 datasource is not configured",
+        "state": "closed",
+        "created": "2025-10-01",
+        "closed": "2025-10-07",
+        "labels": ["type:bug", "scope:data-migrator"],
+        "description": "Missing C8 datasource configuration produces unhelpful NoSuchBeanDefinitionException",
+        "severity": "low",
+        "technical_details": [
+          "Poor error messaging for configuration issues",
+          "NoSuchBeanDefinitionException not user-friendly",
+          "Need explicit datasource configuration validation",
+          "User experience issue in migration tooling"
+        ]
+      },
+      {
+        "number": 5455,
+        "title": "Data Migrator Runtime can't complete migrated PI with parallel gateway",
+        "state": "closed",
+        "created": "2025-10-02",
+        "closed": "2025-10-07",
+        "labels": ["type:bug", "scope:data-migrator"],
+        "description": "Process instances with parallel gateways couldn't complete after migration",
+        "severity": "high",
+        "technical_details": [
+          "Parallel gateway state not properly migrated",
+          "Process instances hang after migration",
+          "Resolved by documenting to skip such instances",
+          "Indicates migration limitations with complex flow patterns"
+        ]
+      },
+      {
+        "number": 5396,
+        "title": "Data Migrator Runtime fails when migrating process without local variables",
+        "state": "closed",
+        "created": "2025-09-03",
+        "closed": "2025-09-30",
+        "labels": ["type:bug", "scope:data-migrator"],
+        "description": "Migration threw 'No variables provided' error when processes lacked local variables",
+        "severity": "medium",
+        "technical_details": [
+          "Variable handling assumes non-empty variable sets",
+          "Need to handle empty variable collections gracefully",
+          "Fixed to support processes without local variables",
+          "Edge case in data migration logic"
+        ]
+      },
+      {
+        "number": 5362,
+        "title": "OR query generates 'LIKE null' instead of filled expression",
+        "state": "closed",
+        "created": "2025-08-21",
+        "closed": "2025-09-30",
+        "labels": ["type:bug", "version:7.24.0"],
+        "description": "candidateGroupLike in OR queries generated 'LIKE NULL' instead of proper expressions",
+        "severity": "medium",
+        "technical_details": [
+          "MyBatis parameter mapping issue",
+          "OR queries with LIKE operators fail",
+          "Generates invalid SQL: 'I.GROUP_ID_ LIKE null'",
+          "Query builder parameter binding bug"
+        ]
+      },
+      {
+        "number": 5436,
+        "title": "Event Subprocess History removal_time Issue",
+        "state": "closed",
+        "created": "2025-09-25",
+        "closed": "2025-09-29",
+        "labels": ["type:bug"],
+        "description": "Event subprocess historic activity instances don't receive removal_time values",
+        "severity": "medium",
+        "technical_details": [
+          "Prevents automatic history cleanup",
+          "Affects processes with recurring timer events",
+          "removal_time field not propagated to event subprocesses",
+          "History cleanup strategy incomplete"
+        ]
+      },
+      {
+        "number": 5420,
+        "title": "Data Migrator History doesn't save createTime when data is skipped",
+        "state": "closed",
+        "created": "2025-09-18",
+        "closed": "2025-09-25",
+        "labels": ["type:bug", "scope:data-migrator"],
+        "description": "Skipped entities didn't persist creation dates breaking pagination continuation logic",
+        "severity": "low",
+        "technical_details": [
+          "createTime field not saved for skipped records",
+          "Breaks pagination during interrupted migrations",
+          "Migration restart logic relies on timestamps",
+          "Data consistency issue in migration tracking"
+        ]
+      },
+      {
+        "number": 3385,
+        "title": "ExternalTaskClient TCP session termination not detected",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": ["type:bug"],
+        "description": "External task client fails to detect TCP session termination during long polling and cannot restart after server recovery",
+        "severity": "high",
+        "technical_details": [
+          "Long polling requests don't detect server disconnection",
+          "Client cannot receive TCP session termination frame",
+          "No automatic reconnection after server recovery",
+          "Network resilience issue in external task pattern"
+        ]
+      },
+      {
+        "number": 4292,
+        "title": "Spring Boot 3.2.x multi-module project deployment fails",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": ["type:bug"],
+        "description": "Camunda Spring Boot starter fails to boot with Spring Boot 3.2.x in multi-module projects",
+        "severity": "high",
+        "technical_details": [
+          "Spring Boot 3.2 changed from jar:file to jar:nested URI schemes",
+          "IOException while scanning nested JAR archives",
+          "Nested JAR scanning incompatibility",
+          "Framework version compatibility issue"
+        ]
+      },
+      {
+        "number": 4855,
+        "title": "Optimize Client collection import failure with encoded slashes",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": ["type:bug"],
+        "description": "Importing reports into collections via Optimize REST API fails due to encoded trailing slashes in collection IDs",
+        "severity": "medium",
+        "technical_details": [
+          "Collection IDs contain %2F suffix",
+          "API lookup fails with 'Collection does not exist'",
+          "URL encoding handling issue",
+          "REST API parameter processing bug"
+        ]
+      },
+      {
+        "number": 3182,
+        "title": "Historic process instance queries with incidents produce incorrect results",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": ["type:bug"],
+        "description": "Queries using withIncidents combined with OR queries produce incorrect results due to improper JOIN types",
+        "severity": "high",
+        "technical_details": [
+          "Incorrect JOIN type selection in query builder",
+          "Should use INNER JOIN for AND conditions",
+          "Should use OUTER JOIN for OR conditions",
+          "Query optimization and correctness issue"
+        ]
+      }
+    ],
+    "features": [
+      {
+        "number": 2771,
+        "title": "Integrate Camunda metrics into Spring Boot Actuator",
+        "state": "closed",
+        "created": "2022-06-22",
+        "closed": "2025-10-30",
+        "labels": ["type:feature", "scope:core-api", "scope:spring-boot"],
+        "description": "Expose engine metrics through Spring Boot Actuator/Micrometer for monitoring",
+        "priority": "high",
+        "technical_scope": "Add monitoring metrics to CamundaBpmActuatorConfiguration, fetch from engine collector, integrate with Micrometer registry",
+        "business_value": "Enable system administrators to monitor Camunda performance alongside standard application metrics"
+      },
+      {
+        "number": 2471,
+        "title": "Support Tomcat 10",
+        "state": "closed",
+        "created": "2021-03-16",
+        "closed": "2024-08-21",
+        "labels": ["type:feature", "scope:core-api", "version:7.22.0"],
+        "description": "Add support for Tomcat 10 as popular deployment environment",
+        "priority": "high",
+        "technical_scope": "CI coverage, backward compatibility with Tomcat 9 for Java EE users",
+        "business_value": "Support modern servlet container versions"
+      },
+      {
+        "number": 4165,
+        "title": "Support PostgreSQL 17",
+        "state": "closed",
+        "created": "2024-03-13",
+        "closed": "2024-12-04",
+        "labels": ["type:feature", "version:7.23.0"],
+        "description": "Add PostgreSQL 17 database support",
+        "priority": "medium",
+        "technical_scope": "CI migration for unit, large-data, rolling-update, and SQL script tests",
+        "business_value": "Support latest PostgreSQL version"
+      },
+      {
+        "number": 4981,
+        "title": "Data Migration C7 to C8 (Runtime & History)",
+        "state": "closed",
+        "created": "2025-03-11",
+        "closed": "2025-09-26",
+        "labels": ["type:feature", "scope:data-migrator"],
+        "description": "Standalone migrator application supporting runtime and history migration from Camunda 7 to 8",
+        "priority": "high",
+        "technical_scope": "Instance tracking, rerun capabilities, audit trail preservation",
+        "business_value": "Enable complete C7 to C8 migration with compliance audit trail"
+      },
+      {
+        "number": 5043,
+        "title": "Support Quarkus 3.27 LTS",
+        "state": "closed",
+        "created": "2025-03-21",
+        "closed": "2025-09-30",
+        "labels": ["type:feature", "version:7.24.0"],
+        "description": "Add support for Quarkus 3.27 LTS",
+        "priority": "medium",
+        "technical_scope": "Platform-wide updates across documentation and related projects",
+        "business_value": "Support modern microservices framework"
+      },
+      {
+        "number": 5334,
+        "title": "Process variable and definition key query for external tasks",
+        "state": "closed",
+        "created": "2025-08-05",
+        "closed": "2025-09-15",
+        "labels": ["type:feature", "group:community-contrib", "version:7.24.0"],
+        "description": "ExternalTaskQuery enhancement enabling search based on process variables",
+        "priority": "medium",
+        "technical_scope": "Methods like processVariableValueEquals() for filtering active external tasks",
+        "business_value": "Align external task querying capabilities with user task queries"
+      },
+      {
+        "number": 4968,
+        "title": "Not In query for task definition keys",
+        "state": "closed",
+        "created": "2025-03-04",
+        "closed": "2025-09-05",
+        "labels": ["type:feature", "version:7.24.0"],
+        "description": "TaskQuery method enabling filtering of tasks excluding specified definition keys",
+        "priority": "low",
+        "technical_scope": "Implementation via taskDefinitionKeyNotIn() method",
+        "business_value": "Enable exclusion-based task filtering"
+      },
+      {
+        "number": 4487,
+        "title": "Fetch variables with task query results",
+        "state": "closed",
+        "created": "2024-07-14",
+        "closed": "2025-09-05",
+        "labels": ["type:feature", "scope:core-api", "version:7.24.0"],
+        "description": "Optional flags for task endpoints to retrieve variables in single API call",
+        "priority": "medium",
+        "technical_scope": "Support task-local and process variables without default performance impact",
+        "business_value": "Reduce API round trips for task and variable data"
+      },
+      {
+        "number": 4980,
+        "title": "End-time cleanup strategy for root process instances",
+        "state": "closed",
+        "created": "2025-03-08",
+        "closed": "2025-09-26",
+        "labels": ["type:feature"],
+        "description": "Cleanup strategy ensuring only complete root process instances removal",
+        "priority": "high",
+        "technical_scope": "Check ACT_RU_EXECUTION table state before cleanup",
+        "business_value": "Prevent orphan records when process instances include call activities"
+      },
+      {
+        "number": 3966,
+        "title": "Improve metrics visualization",
+        "state": "closed",
+        "created": "2023-11-20",
+        "closed": "2024-03-26",
+        "labels": ["type:feature", "version:7.21.0"],
+        "description": "Admin interface displaying usage metrics grouped by time period",
+        "priority": "low",
+        "technical_scope": "Monthly/annual grouping by metric type with diagnostics data export",
+        "business_value": "Better visibility into engine usage patterns"
+      }
+    ],
+    "enhancements": [
+      {
+        "number": 5358,
+        "title": "DB2 pagination performance improvement",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": ["type:enhancement"],
+        "description": "Update DB2 pagination to modern syntax for 40x performance improvement",
+        "technical_details": [
+          "Current implementation uses pre-11.1 DB2 syntax",
+          "Query cost reduction from 2245 to 439-453",
+          "Update to LIMIT X OFFSET Y or OFFSET Y ROWS FETCH FIRST X ROWS ONLY",
+          "ExternalTask and Job queries significantly affected"
+        ]
+      },
+      {
+        "number": 3962,
+        "title": "Task polling performance in External Task Client",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": ["type:enhancement"],
+        "description": "Separate fetch-and-lock from handler execution for parallel processing",
+        "technical_details": [
+          "Sequential polling creates performance bottleneck",
+          "TopicSubscriptionManager needs parallelization",
+          "Single-threaded fetch-and-lock, multi-threaded handler execution",
+          "Maintain consistency while improving throughput"
+        ]
+      },
+      {
+        "number": 5190,
+        "title": "Runtime validation for boundary and message events",
+        "state": "closed",
+        "created": "2025-06-02",
+        "closed": "2025-07-21",
+        "labels": ["type:feature", "version:data-migrator 0.1.0"],
+        "description": "Allow boundary and message events with user responsibility for migration behavior",
+        "technical_details": [
+          "Documentation added for limitations",
+          "User must ensure events don't interfere with migrations",
+          "Avoidance strategies documented",
+          "Balance between flexibility and safety"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "number": 4791,
+        "title": "Session management with cookie based consistent hashing",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": [],
+        "description": "Clustered environment session state preservation requirements",
+        "discussion_points": [
+          "Load balancer configuration with consistent hashing",
+          "Cookie naming restrictions (cannot use JSESSIONID)",
+          "Session state management in distributed deployments",
+          "Documentation needs for cluster setup"
+        ]
+      },
+      {
+        "number": 2887,
+        "title": "Transaction retry with CockroachDB",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": [],
+        "description": "Optimization of retry logic for CockroachDB backend",
+        "discussion_points": [
+          "Classification of transient vs retryable SQL errors",
+          "SQL error code 40001 handling",
+          "Decision-making based on SQL error codes vs exception types",
+          "Database-specific transaction semantics"
+        ]
+      },
+      {
+        "number": 3231,
+        "title": "REST API persistence connection exception logging",
+        "state": "closed",
+        "created": "Unknown",
+        "labels": [],
+        "description": "Distinguish connection errors from other persistence issues",
+        "discussion_points": [
+          "ProcessEnginePersistenceException type introduction",
+          "SQL state 08 for connection errors",
+          "ERROR vs WARN logging levels",
+          "Exception type hierarchy design"
+        ]
+      }
+    ],
+    "documentation": [
+      {
+        "number": 5507,
+        "title": "Make Camunda 7 community end of life (EOL)",
+        "state": "closed",
+        "created": "2025-11-03",
+        "closed": "2025-11-04",
+        "labels": [],
+        "description": "Updated version badges and communicated Camunda 7 EOL status"
+      },
+      {
+        "number": 5380,
+        "title": "Platform point latest docs to LTS version",
+        "state": "closed",
+        "created": "2025-08-27",
+        "closed": "2025-10-30",
+        "labels": ["type:task"],
+        "description": "Documentation redirects so /latest points to version 7.24 (LTS)"
+      }
+    ]
+  },
+  "key_insights": [
+    {
+      "id": "bpmn-execution-state-consistency",
+      "insight": "BPMN execution state management is particularly challenging with complex flow patterns like parallel gateways and event subprocesses. Migration and persistence of execution state requires careful handling of token positions, gateway convergence conditions, and event subscription states.",
+      "source_issues": [5455, 5436, 5500],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design execution state model that explicitly captures token positions and gateway states",
+        "Implement robust serialization/deserialization of process instance state",
+        "Consider event subscription lifecycle management separate from main execution state",
+        "Plan for process instance migration scenarios from early architecture stage"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "history-cleanup-strategy",
+      "insight": "History and audit data management requires sophisticated cleanup strategies that understand process instance boundaries and call activity relationships. Simple time-based cleanup can create orphan records and compliance issues.",
+      "source_issues": [4980, 5436, 5420],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design cleanup strategy that respects process instance hierarchies",
+        "Implement removal_time propagation through all related entities",
+        "Ensure cleanup doesn't break audit trail completeness",
+        "Consider compliance requirements in cleanup design"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "query-performance-patterns",
+      "insight": "Query performance is heavily influenced by database-specific pagination and JOIN strategies. Modern databases support more efficient pagination syntax, and JOIN type selection (INNER vs OUTER) significantly impacts both performance and correctness.",
+      "source_issues": [5358, 3182, 5362],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Use database-agnostic query abstraction that can optimize for specific backends",
+        "Implement proper JOIN type selection based on query semantics (AND vs OR)",
+        "Design query builder with correct parameter binding for all edge cases",
+        "Consider query performance in initial data model design"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "external-task-resilience",
+      "insight": "External task pattern requires robust network resilience, connection management, and polling strategies. Long polling creates challenges with connection loss detection and recovery.",
+      "source_issues": [3385, 3962, 5334],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement heartbeat mechanism for long-lived connections",
+        "Design automatic reconnection with exponential backoff",
+        "Separate fetch-and-lock from task execution for better concurrency",
+        "Consider at-least-once vs at-most-once execution semantics"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "integration-framework-compatibility",
+      "insight": "Framework integration (Spring Boot, Quarkus, WildFly) requires continuous compatibility maintenance as frameworks evolve. Breaking changes in framework internals (like Spring Boot's JAR scanning) can break integrations.",
+      "source_issues": [4292, 5043, 2471, 4165],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design plugin architecture with clear framework abstraction boundaries",
+        "Use framework APIs that are marked as stable/public",
+        "Implement comprehensive integration tests for supported frameworks",
+        "Monitor framework roadmaps for breaking changes"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "variable-handling-edge-cases",
+      "insight": "Variable handling must gracefully handle edge cases like empty variable sets, variable scope boundaries (task-local vs process-level), and variable lifecycle through task completion and process migration.",
+      "source_issues": [5396, 5502, 4487],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design variable model with clear scope semantics",
+        "Handle empty variable collections without errors",
+        "Define variable persistence strategy across task lifecycle",
+        "Consider variable serialization format for long-term storage"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "migration-tooling-patterns",
+      "insight": "Data migration between platform versions requires instance tracking, skip reason management, pagination support for large datasets, and ability to resume interrupted migrations. Migration validation must account for model differences.",
+      "source_issues": [4981, 5420, 5439, 5453, 5454, 5455],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Build migration tooling alongside core engine from start",
+        "Track migration state per entity with detailed skip reasons",
+        "Implement pagination for large dataset migrations",
+        "Provide clear error messages for configuration issues",
+        "Document migration limitations upfront"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "observability-integration",
+      "insight": "Modern workflow engines need deep integration with observability stacks (Micrometer, Actuator, metrics). Exposing engine internals through standard monitoring interfaces is crucial for production operations.",
+      "source_issues": [2771, 3966],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design metrics collection from the beginning",
+        "Integrate with standard observability frameworks (Micrometer/OpenTelemetry)",
+        "Expose meaningful engine metrics (execution counts, durations, queue depths)",
+        "Enable metric aggregation and grouping for analysis"
+      ],
+      "refined_count": 0
+    }
+  ],
+  "pain_points": [
+    {
+      "category": "Process State Management",
+      "description": "Complex BPMN constructs like parallel gateways and event subprocesses have nuanced state management requirements that are difficult to migrate and persist correctly",
+      "severity": "high",
+      "user_impact": "Process instances can hang or fail to complete after migration or restart, requiring manual intervention"
+    },
+    {
+      "category": "Database Performance",
+      "description": "Query performance varies significantly across database backends, particularly for pagination and complex joins",
+      "severity": "high",
+      "user_impact": "10-40x performance degradation on some databases without optimization, affecting external task polling and job execution"
+    },
+    {
+      "category": "Network Resilience",
+      "description": "Long polling and external task patterns struggle with connection loss detection and recovery",
+      "severity": "high",
+      "user_impact": "External task clients can become stuck and unable to resume after network interruptions or server restarts"
+    },
+    {
+      "category": "Framework Integration",
+      "description": "Maintaining compatibility with evolving frameworks (Spring Boot, Quarkus) requires continuous updates",
+      "severity": "medium",
+      "user_impact": "Users blocked from upgrading to newer framework versions until compatibility is restored"
+    },
+    {
+      "category": "History Cleanup",
+      "description": "Cleanup strategies must navigate complex relationships between process instances, call activities, and event subprocesses",
+      "severity": "medium",
+      "user_impact": "Orphan records or incomplete audit trails affecting compliance requirements"
+    },
+    {
+      "category": "Migration Complexity",
+      "description": "Migrating between platform versions is complex with many edge cases and limitations",
+      "severity": "high",
+      "user_impact": "Users must manually handle certain process patterns, skip problematic instances, or accept data loss"
+    },
+    {
+      "category": "Error Messages",
+      "description": "Configuration and validation errors often produce cryptic messages that don't guide users to solutions",
+      "severity": "low",
+      "user_impact": "Increased support burden and user frustration during setup and debugging"
+    }
+  ],
+  "feature_requests": [
+    {
+      "feature": "Spring Boot Actuator Integration",
+      "status": "implemented",
+      "priority": "high",
+      "description": "Expose engine metrics through Micrometer/Actuator for monitoring",
+      "business_value": "Enable operations teams to monitor workflow engine health alongside application metrics"
+    },
+    {
+      "feature": "Enhanced External Task Querying",
+      "status": "implemented",
+      "priority": "medium",
+      "description": "Query external tasks by process variables and definition keys",
+      "business_value": "Align external task pattern with user task capabilities"
+    },
+    {
+      "feature": "Variable Fetching in Task Queries",
+      "status": "implemented",
+      "priority": "medium",
+      "description": "Fetch task-local and process variables in single API call",
+      "business_value": "Reduce API round trips for common task processing patterns"
+    },
+    {
+      "feature": "C7 to C8 Migration Tool",
+      "status": "implemented",
+      "priority": "high",
+      "description": "Comprehensive migration tool for runtime and history data",
+      "business_value": "Enable platform upgrades while preserving compliance audit trails"
+    }
+  ],
+  "architectural_decisions": [
+    {
+      "decision": "Micrometer Integration for Metrics",
+      "rationale": "Standard observability framework integration provides better operational visibility and aligns with modern monitoring stacks",
+      "status": "implemented",
+      "date": "2025-10-30",
+      "impact": "Enables comprehensive engine monitoring through industry-standard tools"
+    },
+    {
+      "decision": "Root Process Instance Cleanup Strategy",
+      "rationale": "Cleanup must respect process instance hierarchies to prevent orphan records from call activities",
+      "status": "implemented",
+      "date": "2025-09-26",
+      "impact": "More complex cleanup logic but maintains data integrity and audit completeness"
+    },
+    {
+      "decision": "Database-Specific Query Optimization",
+      "rationale": "Modern database versions support more efficient pagination syntax that should be leveraged",
+      "status": "implemented",
+      "date": "Unknown",
+      "impact": "40x performance improvement on DB2, demonstrates need for database-aware query generation"
+    },
+    {
+      "decision": "Separate Fetch-and-Lock from Task Execution",
+      "rationale": "External task client performance requires parallelizing task execution while maintaining fetch consistency",
+      "status": "implemented",
+      "date": "Unknown",
+      "impact": "Better throughput for external task pattern without compromising at-most-once semantics"
+    },
+    {
+      "decision": "Framework Version Support Matrix",
+      "rationale": "Supporting multiple framework versions (Spring Boot, Quarkus, WildFly, Tomcat) requires explicit compatibility matrix and testing",
+      "status": "ongoing",
+      "impact": "Significant testing burden but enables broad ecosystem adoption"
+    }
+  ],
+  "common_patterns": [
+    {
+      "pattern": "State Persistence Edge Cases",
+      "observation": "Complex BPMN constructs (parallel gateways, event subprocesses, boundary events) have state management edge cases that surface during migration, restart, or cleanup",
+      "frequency": "recurring",
+      "examples": ["Parallel gateway migration failures", "Event subprocess history cleanup", "Timer boundary event reopening"]
+    },
+    {
+      "pattern": "Database Dialect Differences",
+      "observation": "Query performance and syntax vary significantly across database backends, requiring dialect-specific optimizations",
+      "frequency": "recurring",
+      "examples": ["DB2 pagination syntax", "PostgreSQL vs DB2 performance", "SQL error code handling for CockroachDB"]
+    },
+    {
+      "pattern": "Empty Collection Handling",
+      "observation": "Code often assumes non-empty collections leading to errors when variables, tasks, or other entities are absent",
+      "frequency": "recurring",
+      "examples": ["No variables provided error", "Empty variable set migration", "Null parameter bindings in queries"]
+    },
+    {
+      "pattern": "Framework Evolution Breaking Changes",
+      "observation": "Framework upgrades introduce breaking changes in internal APIs (JAR scanning, component loading) that break integrations",
+      "frequency": "occasional",
+      "examples": ["Spring Boot 3.2 nested JAR scanning", "Jakarta EE namespace migration", "Servlet API version changes"]
+    },
+    {
+      "pattern": "Network Resilience Gaps",
+      "observation": "Long-lived connections and polling patterns struggle with connection loss detection and graceful recovery",
+      "frequency": "occasional",
+      "examples": ["External task client TCP termination", "Long polling connection loss", "Server restart recovery"]
+    },
+    {
+      "pattern": "Configuration Validation Gaps",
+      "observation": "Missing or incorrect configuration produces cryptic errors rather than clear guidance",
+      "frequency": "recurring",
+      "examples": ["NoSuchBeanDefinitionException for datasource", "Path assumption in authentication filter", "Hidden file deployment attempts"]
+    }
+  ],
+  "actionable_items_for_uml_codex": [
+    {
+      "item": "Explicit Execution State Model",
+      "priority": "high",
+      "description": "Design execution state model that explicitly captures all aspects of process instance state: token positions, gateway synchronization state, event subscriptions, and timer states. Ensure this state can be serialized, migrated, and restored.",
+      "learning": "Complex flow patterns like parallel gateways and event subprocesses have state that's difficult to reconstruct if not explicitly modeled. Migration and persistence failures stem from implicit state assumptions."
+    },
+    {
+      "item": "Database-Agnostic Query Layer",
+      "priority": "high",
+      "description": "Build query abstraction that can generate database-specific optimizations (pagination syntax, JOIN strategies) while maintaining correctness across all supported databases.",
+      "learning": "Query performance varies 40x across databases without optimization. Database dialect support is critical for production performance."
+    },
+    {
+      "item": "Observability from Day One",
+      "priority": "high",
+      "description": "Integrate with standard observability frameworks (Micrometer/OpenTelemetry) from initial implementation. Expose meaningful engine metrics for execution counts, durations, queue depths, and error rates.",
+      "learning": "Production operations require deep visibility into engine behavior. Retrofit observability is harder than designing it in from the start."
+    },
+    {
+      "item": "Network Resilience Patterns",
+      "priority": "high",
+      "description": "Implement heartbeat, connection pooling, automatic reconnection with exponential backoff, and circuit breaker patterns for all network interactions including external task patterns.",
+      "learning": "Long-lived connections and polling patterns fail in production without robust connection management and recovery."
+    },
+    {
+      "item": "History and Cleanup Strategy",
+      "priority": "high",
+      "description": "Design history data model with explicit cleanup semantics. Implement removal_time propagation through entity hierarchies. Ensure cleanup respects process instance boundaries and call activity relationships.",
+      "learning": "History cleanup is complex and affects compliance. Simple time-based cleanup creates orphan records and incomplete audit trails."
+    },
+    {
+      "item": "Migration Tooling as First-Class Feature",
+      "priority": "medium",
+      "description": "Build migration tools alongside core engine. Support instance tracking, skip reason management, pagination for large datasets, and resumable migrations. Document limitations upfront.",
+      "learning": "Version migration is inevitable and complex. Building migration support after the fact is much harder than planning for it."
+    },
+    {
+      "item": "Variable Scope and Lifecycle Semantics",
+      "priority": "medium",
+      "description": "Define clear variable scope semantics (task-local vs process-level vs global). Handle empty variable sets gracefully. Design variable persistence through complete task and process lifecycle.",
+      "learning": "Variable handling edge cases cause runtime failures. Clear scope semantics prevent confusion and bugs."
+    },
+    {
+      "item": "Framework Integration Boundaries",
+      "priority": "medium",
+      "description": "Define clear abstraction boundaries for framework integrations. Use only stable/public framework APIs. Implement comprehensive integration tests with matrix of supported framework versions.",
+      "learning": "Framework evolution breaks integrations that depend on internal APIs. Clear boundaries and extensive testing are essential."
+    },
+    {
+      "item": "Defensive Configuration Validation",
+      "priority": "low",
+      "description": "Validate all configuration at startup with clear error messages. Provide actionable guidance for common configuration mistakes. Fail fast with helpful diagnostics.",
+      "learning": "Cryptic errors frustrate users and increase support burden. Clear configuration validation improves user experience."
+    },
+    {
+      "item": "Empty Collection Defensive Programming",
+      "priority": "low",
+      "description": "Never assume collections are non-empty. Handle null and empty cases gracefully throughout the codebase as standard practice.",
+      "learning": "Empty collection assumptions cause runtime failures in edge cases. Defensive programming prevents these common bugs."
+    }
+  ],
+  "repository_health": {
+    "activity_level": "completed",
+    "issue_closure_rate": "100%",
+    "average_time_to_close": "variable, from same day to multiple years",
+    "community_engagement": "active until archival",
+    "maintenance_status": "archived",
+    "notes": [
+      "Repository archived on 2025-11-04 as Camunda 7 reached end of life",
+      "Final release was 7.24.0 with deprecation notices",
+      "Focus shifted to Camunda 8 platform",
+      "Community Edition discontinued, Enterprise Edition remains supported until LTS end date",
+      "Data migrator tools built to support C7 to C8 migration",
+      "Active development until archival with major features like Spring Boot Actuator integration"
+    ]
+  }
+}

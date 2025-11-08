@@ -1,0 +1,1095 @@
+{
+  "version": 1,
+  "repository": "flowable/flowable-engine",
+  "reviewed_date": "2025-11-08",
+  "last_updated": "2025-11-08T00:00:00Z",
+  "change_history": [],
+  "license": "Apache License 2.0",
+  "reuse_decision": "HYBRID",
+  "reuse_rationale": "Apache License 2.0 is a permissive open source license allowing commercial use, modification, distribution, and sublicensing with proper attribution. Flowable Engine is actively maintained (latest release 7.2.0 in August 2024) with 8.9k stars and 2.8k forks, demonstrating strong community support. The repository has 277 contributors and 13,785 commits, indicating mature, battle-tested code. HYBRID approach recommended because: (1) Direct code lifting is legally permitted and technically feasible for specific components (BPMN model API, expression evaluation, builder patterns), (2) Full engine adoption would be excessive for UML modeling tool requirements, (3) Architecture patterns (agenda-based execution, service-oriented API, manager-based persistence) are more valuable than wholesale code reuse. KEY ADVANTAGE OVER CAMUNDA: Flowable is actively developed while Camunda Platform 7 is archived/EOL. Flowable also has superior CMMN and DMN support. For UML-Codex: Adapt BPMN model API patterns for UML XMI handling, study agenda pattern for Activity Diagram execution, adopt service-oriented API design, but avoid unnecessary complexity (async job executor, multi-tenancy, distributed deployment features).",
+  "project_status": "ACTIVE",
+  "project_status_notes": "Actively maintained with regular releases. Version 7.2.0 released August 2024. Dual version support maintained: V7 requires Java 17+, V6 supports Java 8+. Community of 277 contributors with 358 open issues and 28 pull requests indicating healthy development. Free cloud-based design tool available. Forum active at forum.flowable.org. Flowable is a fork of Activiti (2016) by original Activiti core developers Joram Barrez and Tijs Rademakers. Related to Camunda (which forked from Activiti in 2013), but has diverged significantly with improved architecture (v6 engine) while Camunda stayed on Activiti 5 architecture before being archived.",
+  "components": [
+    {
+      "name": "flowable-engine",
+      "type": "core_engine",
+      "description": "Native BPMN 2.0 process engine executing on JVM. Provides process definition management, instance execution, and comprehensive service APIs. Implements agenda-based execution pattern with operation queue for flow control. Supports BPMN, CMMN, and DMN standards with first-class CMMN support (advantage over Camunda).",
+      "value_proposition": "Production-grade workflow engine demonstrating complete BPMN 2.0 implementation with state persistence, transaction management, and flexible deployment. Uses modern agenda pattern for execution (cleaner than Camunda's PVM). Actively maintained unlike archived Camunda Platform 7.",
+      "key_files": [
+        "modules/flowable-engine/src/main/java/org/flowable/engine/ProcessEngine.java",
+        "modules/flowable-engine/src/main/java/org/flowable/engine/impl/ProcessEngineImpl.java",
+        "modules/flowable-engine/src/main/java/org/flowable/engine/impl/persistence/entity/ExecutionEntityManager.java",
+        "modules/flowable-engine/src/main/java/org/flowable/engine/impl/persistence/entity/ExecutionEntityManagerImpl.java",
+        "modules/flowable-engine/src/main/java/org/flowable/engine/impl/agenda/",
+        "modules/flowable-engine/src/main/java/org/flowable/engine/impl/bpmn/parser/BpmnParser.java"
+      ],
+      "key_services": [
+        "RepositoryService - deployment and process definition management",
+        "RuntimeService - process instance creation, execution, and variable management",
+        "TaskService - user task operations, claiming, completing, assigning",
+        "HistoryService - historical process data and audit trail access",
+        "IdentityService - user and group management",
+        "ManagementService - administrative operations and maintenance",
+        "DynamicBpmnService - runtime BPMN modification capabilities",
+        "ProcessMigrationService - process instance migration between versions"
+      ],
+      "key_patterns": [
+        "Agenda pattern for operation-based execution (vs Camunda's PVM)",
+        "Service-oriented API design with 8 specialized services",
+        "Command pattern for all engine operations with CommandContext",
+        "Execution tree model for concurrent execution via parent-child relationships",
+        "Wait state pattern for asynchronous operations and human tasks",
+        "Manager-based persistence layer with entity managers per type",
+        "Separation of execution state (ExecutionEntity) from execution logic (operations)"
+      ],
+      "dependencies": [
+        "org.mybatis:mybatis (persistence framework)",
+        "org.springframework:spring-beans",
+        "org.apache.groovy:groovy-jsr223 (scripting, provided)",
+        "joda-time:joda-time",
+        "com.fasterxml.uuid:java-uuid-generator (provided)",
+        "org.slf4j:slf4j-api (logging)"
+      ],
+      "complexity": "very_high",
+      "recommendation": "STUDY",
+      "notes": "Agenda pattern provides cleaner execution model than Camunda's PVM. ExecutionEntityManager reveals sophisticated state management with hierarchical execution trees, multi-instance support, and process-level locking for distributed environments. BPMN engine is 'local' - examines current state and continues forward rather than global evaluation."
+    },
+    {
+      "name": "flowable-bpmn-model",
+      "type": "model_parsing",
+      "description": "Comprehensive BPMN 2.0 model API providing rich object representation of process definitions. Complete class hierarchy from BaseElement through FlowNode, Activity, Gateway, Event, and Task specializations. Supports all BPMN elements including subprocesses, event subprocesses, multi-instance activities, and data objects.",
+      "value_proposition": "Reference implementation for BPMN 2.0 specification compliance. Clean object-oriented model with proper inheritance hierarchies. Interface-based extensibility (HasExecutionListeners, HasExtensionAttributes). Directly applicable to UML metamodel implementation.",
+      "key_classes": [
+        "BaseElement - foundation for all BPMN elements with ID and attributes",
+        "FlowElement - parent for elements within process flows",
+        "FlowNode - base for nodes with incoming/outgoing sequence flows",
+        "Activity - abstract class for executable activities",
+        "Process - main process container and FlowElementsContainer",
+        "UserTask, ServiceTask, ScriptTask, BusinessRuleTask - task specializations",
+        "ExclusiveGateway, ParallelGateway, InclusiveGateway, EventGateway - decision logic",
+        "StartEvent, IntermediateCatchEvent, EndEvent - event handling",
+        "MessageEventDefinition, TimerEventDefinition, SignalEventDefinition - event types",
+        "SequenceFlow - process flow connections",
+        "SubProcess, EventSubProcess - nested processes",
+        "MultiInstanceLoopCharacteristics - repetition patterns"
+      ],
+      "key_patterns": [
+        "Class hierarchy with clear base classes and specializations",
+        "Interface-based extensibility for cross-cutting concerns",
+        "Container pattern for nested elements (FlowElementsContainer)",
+        "Definition objects for reusable elements (Message, Signal, Escalation)",
+        "Extension mechanism for vendor-specific attributes",
+        "Type-safe model element access and navigation"
+      ],
+      "complexity": "high",
+      "recommendation": "ADAPT",
+      "notes": "Excellent model for UML metamodel implementation. Clean separation of concerns with Activity base class, specialized task types, and event definitions. The use of interfaces (HasExecutionListeners, HasExtensionAttributes) enables flexible cross-cutting capabilities similar to UML's need for stereotypes and tagged values."
+    },
+    {
+      "name": "flowable-bpmn-converter",
+      "type": "xml_parsing",
+      "description": "XML converter handling bidirectional transformation between BPMN 2.0 XML and object model. Includes BpmnXMLConverter for parsing and serialization with proper namespace handling. Supports extension elements and vendor-specific attributes.",
+      "value_proposition": "Demonstrates production-quality XML parsing with namespace awareness, extension preservation, and lossless round-trip serialization. Pattern directly applicable to UML XMI handling.",
+      "key_patterns": [
+        "Bidirectional conversion (XML to model, model to XML)",
+        "Namespace-aware XML processing for BPMN 2.0 and extensions",
+        "Converter pattern with specialized handlers per element type",
+        "Extension element preservation for tool interoperability",
+        "Validation during parsing with error collection"
+      ],
+      "complexity": "high",
+      "recommendation": "ADAPT",
+      "notes": "Critical component for UML-Codex XMI handling. Shows how to preserve unknown elements and vendor extensions during round-trip serialization."
+    },
+    {
+      "name": "flowable-cmmn-engine",
+      "type": "case_management",
+      "description": "Complete Case Management Model and Notation (CMMN) 1.1 engine with event-driven execution model. Uses EvaluateCriteriaOperation for data-driven case progression. First-class CMMN support is key differentiator from Camunda (which recommends BPMN workarounds).",
+      "value_proposition": "Demonstrates event-driven, data-centric execution model different from activity-centric BPMN. Shows how single platform supports multiple modeling standards. Relevant for UML supporting Activity Diagrams, State Machines, and Interaction Diagrams.",
+      "key_classes": [
+        "CmmnEngineConfiguration - CMMN engine setup",
+        "CaseInstanceBuilder - case creation API",
+        "PlanItemInstanceEntity - runtime case elements",
+        "CriteriaEvaluator - entry/exit criteria evaluation",
+        "EvaluateCriteriaOperation - data change processing"
+      ],
+      "key_patterns": [
+        "Event-driven execution where data changes trigger evaluations",
+        "Criteria-based activation instead of sequence flow",
+        "Sentries for entry and exit conditions",
+        "Plan item lifecycle independent of parent case",
+        "Frequent criteria evaluation via EvaluateCriteriaOperation on agenda"
+      ],
+      "complexity": "high",
+      "recommendation": "STUDY",
+      "notes": "CMMN architecture different from BPMN: data plays central role and changes trigger cascading evaluations. EvaluateCriteriaOperation planned whenever changes occur. Shows how to support fundamentally different execution semantics (data-driven vs flow-driven) in unified platform. Valuable lesson for UML supporting both control flow (Activity) and event-driven (State Machine) semantics."
+    },
+    {
+      "name": "flowable-dmn-engine",
+      "type": "decision_engine",
+      "description": "Decision Model and Notation (DMN) 1.3 execution engine for decision tables and literal expressions. Lightweight standalone engine that integrates with BPMN via decision tasks. Includes DMN model API and XML converter following same pattern as BPMN.",
+      "value_proposition": "Demonstrates separation of decision logic from process orchestration. Shows how to evaluate decision tables with hit policies (FIRST, UNIQUE, ANY, COLLECT). Integration pattern via decision tasks in BPMN.",
+      "modules": [
+        "flowable-dmn-engine - core decision execution",
+        "flowable-dmn-model - DMN 1.3 object model",
+        "flowable-dmn-xml-converter - XML parsing/serialization",
+        "flowable-dmn-image-generator - decision table visualization"
+      ],
+      "key_patterns": [
+        "Decision table evaluation with hit policies",
+        "FEEL expression language support",
+        "Standalone engine with BPMN integration",
+        "Input/output variable mapping",
+        "Decision service pattern for reusable decisions"
+      ],
+      "complexity": "medium",
+      "recommendation": "STUDY",
+      "notes": "Decision table evaluation interesting for complex guard conditions in UML State Machines and Activity Diagrams. Not core requirement but valuable pattern for separating complex logic from diagram structure."
+    },
+    {
+      "name": "agenda-based-execution",
+      "type": "execution_pattern",
+      "description": "Core architectural innovation replacing Camunda's Process Virtual Machine (PVM). CommandContextUtil.getAgenda() manages operation queue that manipulates execution state. Clear separation between state (ExecutionEntity) and logic (operations). Operations planned sequentially and executed in order.",
+      "value_proposition": "Cleaner architecture than Camunda's PVM. Operation queue pattern enables better debugging, testing, and extension. Explicit operation types (ContinueProcessOperation, TakeOutgoingSequenceFlowsOperation, EndExecutionOperation) make execution flow transparent.",
+      "key_classes": [
+        "Agenda interface - operation queue abstraction",
+        "AgendaOperation - base for all execution operations",
+        "ContinueProcessOperation - activity execution initiation",
+        "TakeOutgoingSequenceFlowsOperation - sequence flow traversal",
+        "EndExecutionOperation - execution completion",
+        "TriggerExecutionOperation - event handling",
+        "EvaluateCriteriaOperation (CMMN) - data-driven evaluation",
+        "CommandContextUtil.getAgenda() - agenda access"
+      ],
+      "key_patterns": [
+        "Operation queue pattern for execution control",
+        "Separation of state from execution logic",
+        "Explicit operation types for different execution steps",
+        "Stack-based operation ordering",
+        "Debuggable via logging agenda package",
+        "Extensible through custom operations"
+      ],
+      "complexity": "high",
+      "recommendation": "ADAPT",
+      "notes": "HIGHLY APPLICABLE to UML-Codex. Agenda pattern cleaner than Camunda's PVM state machine. For UML Activity Diagram execution: operations could include ExecuteActionOperation, EvaluateDecisionOperation, ForkExecutionOperation, JoinExecutionOperation. For State Machine: EnterStateOperation, EvaluateTransitionOperation, ExitStateOperation, TriggerEventOperation. Operation queue enables clear execution trace for debugging and provides natural extension points."
+    },
+    {
+      "name": "execution-tree-model",
+      "type": "state_management",
+      "description": "Hierarchical execution model using parent-child relationships in ExecutionEntity. Process instance creates child executions for concurrent branches, subprocesses, and multi-instance activities. Tree structure enables proper scope isolation and concurrent execution management.",
+      "value_proposition": "Elegant solution for concurrent execution, scope management, and subprocess isolation. Parent-child relationships naturally model fork/join semantics. Each execution maintains independent variable scope.",
+      "execution_entity_state": [
+        "id - unique execution identifier",
+        "processInstanceId - root process instance reference",
+        "parentId - parent execution for hierarchy",
+        "activityId - current BPMN activity",
+        "isActive - execution active flag",
+        "isEnded - completion marker",
+        "isConcurrent - concurrent branch indicator",
+        "isScope - scope boundary marker",
+        "isMultiInstanceRoot - multi-instance parent marker",
+        "variables - execution-scoped variables",
+        "lockTime - distributed locking timestamp"
+      ],
+      "key_patterns": [
+        "Tree structure for concurrent execution with parent-child links",
+        "Scope-based variable isolation via execution hierarchy",
+        "Multi-instance root execution with child executions per instance",
+        "Process-level locking for distributed engine deployments",
+        "ExecutionEntityManager methods for tree navigation (findFirstScope, findFirstMultiInstanceRoot, collectChildren)",
+        "Cascade deletion maintaining tree integrity"
+      ],
+      "complexity": "high",
+      "recommendation": "STUDY",
+      "notes": "Directly applicable to UML Activity Diagram concurrent execution (fork/join nodes) and State Machine orthogonal regions. Tree model provides natural scope isolation and enables debugging by examining execution hierarchy. More intuitive than Camunda's execution replacement chain. Lock management critical for distributed deployments."
+    },
+    {
+      "name": "manager-based-persistence",
+      "type": "data_persistence",
+      "description": "MyBatis-based persistence with specialized entity manager per entity type. ExecutionEntityManager, TaskEntityManager, JobEntityManager, DeploymentEntityManager, etc. Managers handle CRUD operations, queries, and entity-specific business logic. Lazy initialization via factory pattern.",
+      "value_proposition": "Clear separation of persistence from business logic. Specialized managers enable entity-specific optimizations. Consistent manager interface across all entity types. Demonstrates enterprise persistence patterns.",
+      "key_classes": [
+        "EntityManager<T> - base manager interface",
+        "ExecutionEntityManager - process execution persistence",
+        "TaskEntityManager - task persistence and queries",
+        "DeploymentEntityManager - process definition deployments",
+        "JobEntityManager - async job persistence",
+        "VariableInstanceEntityManager - variable storage",
+        "HistoricActivityInstanceEntityManager - audit trail persistence"
+      ],
+      "database_support": [
+        "PostgreSQL",
+        "MySQL/MariaDB",
+        "Oracle",
+        "Microsoft SQL Server",
+        "H2 (testing)",
+        "IBM DB2"
+      ],
+      "key_patterns": [
+        "Manager-per-entity-type architecture",
+        "EntityManager interface for common CRUD operations",
+        "Specialized methods in entity-specific managers",
+        "MyBatis for SQL mapping and database abstraction",
+        "Lazy manager initialization via factory",
+        "Session-per-command pattern with flush before commit",
+        "Cascade operations maintaining referential integrity",
+        "Optimistic locking via version fields (assumed)",
+        "Native SQL query support alongside object queries"
+      ],
+      "complexity": "high",
+      "recommendation": "STUDY",
+      "notes": "Manager pattern scales well for complex domain with many entity types. Each manager encapsulates entity-specific query logic (ExecutionEntityManager has 20+ specialized query methods). For UML-Codex: ClassManager, AssociationManager, PackageManager, DiagramManager, etc. would provide focused persistence logic. However, consider JPA/Hibernate instead of MyBatis for better ecosystem integration."
+    },
+    {
+      "name": "service-oriented-api",
+      "type": "api_design",
+      "description": "ProcessEngine provides access to 8 specialized service interfaces, each with focused responsibility. Services delegate to command execution maintaining consistency. Thread-safe singleton design intended for application-wide sharing.",
+      "value_proposition": "Clean API boundaries with single responsibility per service. Easy to understand, use, and test. Services can be mocked independently. Clear separation between API and implementation.",
+      "services": [
+        {
+          "name": "RepositoryService",
+          "responsibility": "Deployment and process definition management, model repository",
+          "key_operations": "deploy, undeploy, query definitions, activate/suspend definitions"
+        },
+        {
+          "name": "RuntimeService",
+          "responsibility": "Process instance lifecycle, execution management, variable operations",
+          "key_operations": "start process, signal, delete instance, set/get variables, query executions"
+        },
+        {
+          "name": "TaskService",
+          "responsibility": "User task operations, assignments, comments",
+          "key_operations": "claim, complete, assign, add comment, query tasks"
+        },
+        {
+          "name": "HistoryService",
+          "responsibility": "Historical data access for completed processes",
+          "key_operations": "query historic process instances, activities, variables, details"
+        },
+        {
+          "name": "IdentityService",
+          "responsibility": "User and group management, authentication",
+          "key_operations": "create/update/delete users and groups, membership management"
+        },
+        {
+          "name": "ManagementService",
+          "responsibility": "Administrative operations, job management, database queries",
+          "key_operations": "execute jobs, query database tables, custom SQL, get properties"
+        },
+        {
+          "name": "DynamicBpmnService",
+          "responsibility": "Runtime process definition modification",
+          "key_operations": "change service task class, modify variables, update user task assignments"
+        },
+        {
+          "name": "ProcessMigrationService",
+          "responsibility": "Process instance migration between versions",
+          "key_operations": "migrate process instances, map activities, handle boundary events"
+        }
+      ],
+      "key_patterns": [
+        "Service-oriented architecture with focused interfaces",
+        "Single responsibility per service",
+        "Services as facades over command execution",
+        "Thread-safe singleton engine instance",
+        "Builder pattern for complex operations (process instance creation)",
+        "Query objects for flexible data retrieval",
+        "Fluent API for readability"
+      ],
+      "complexity": "medium",
+      "recommendation": "ADOPT",
+      "notes": "HIGHLY APPLICABLE to UML-Codex. Recommended service organization: ModelService (package/class/association CRUD), DiagramService (diagram creation/layout), ValidationService (constraint checking), TransformationService (model transformations), GenerationService (code generation), RepositoryService (model storage/versioning), QueryService (model queries). Each service focused on specific domain concern."
+    },
+    {
+      "name": "flowable-rest",
+      "type": "rest_api",
+      "description": "Comprehensive RESTful API exposing all engine services over HTTP. Resource-oriented design with JSON serialization. Separate REST modules for BPMN, CMMN, DMN, and Form engines. Supports authentication, error handling, and API versioning.",
+      "value_proposition": "Complete REST API design for workflow engine showing resource modeling, serialization patterns, error handling, and documentation. Enables remote access and integration.",
+      "key_patterns": [
+        "Resource-oriented API design (processes, tasks, executions, deployments)",
+        "JSON serialization of engine entities",
+        "RESTful error handling with proper HTTP status codes",
+        "Authentication and authorization integration",
+        "Pagination for collection resources",
+        "Query parameters for filtering and sorting",
+        "Separate REST modules per engine (process, case, decision, form)"
+      ],
+      "complexity": "medium",
+      "recommendation": "STUDY",
+      "notes": "Study resource modeling and error handling patterns. For UML-Codex, consider modern alternatives: Spring Boot REST for simplicity, or GraphQL for flexible querying. REST API would enable web-based UML modeling tools and remote model access."
+    },
+    {
+      "name": "flowable-spring-boot",
+      "type": "framework_integration",
+      "description": "Spring Boot starter providing auto-configuration for Flowable engines. Integrates process, case, decision, and form engines with Spring's dependency injection and transaction management. Enables embedded engine in Spring Boot applications.",
+      "value_proposition": "Demonstrates modern framework integration with auto-configuration and starter pattern. Shows how to embed workflow engine in Spring applications with minimal configuration.",
+      "key_features": [
+        "Auto-configuration for all Flowable engines",
+        "Spring transaction integration",
+        "Application.properties configuration",
+        "Actuator endpoints for engine monitoring",
+        "Embedded H2 database for development",
+        "Process definition auto-deployment from classpath"
+      ],
+      "key_patterns": [
+        "Spring Boot starter pattern",
+        "Auto-configuration based on classpath detection",
+        "Conditional bean creation",
+        "External configuration via properties",
+        "Transaction synchronization with Spring TX",
+        "Actuator integration for metrics"
+      ],
+      "complexity": "medium",
+      "recommendation": "ADOPT",
+      "notes": "HIGHLY APPLICABLE to UML-Codex Spring Boot integration. Starter pattern provides excellent developer experience. Auto-configuration reduces boilerplate. For UML-Codex: uml-codex-spring-boot-starter could auto-configure ModelService, ValidationService, GenerationService with sensible defaults."
+    },
+    {
+      "name": "flowable-bpmn-layout",
+      "type": "diagram_layout",
+      "description": "Automatic layout engine for BPMN diagrams. Calculates positions and dimensions for process elements when diagram interchange information missing. Enables programmatic process creation with visual representation.",
+      "value_proposition": "Shows automatic graph layout algorithm for workflow diagrams. Relevant for UML diagram auto-layout when creating models programmatically or importing from non-visual sources.",
+      "key_patterns": [
+        "Graph layout algorithm for flow diagrams",
+        "Automatic positioning of nodes and edges",
+        "Dimension calculation for elements",
+        "Container layout for subprocesses",
+        "Edge routing avoiding node overlap"
+      ],
+      "complexity": "medium",
+      "recommendation": "STUDY",
+      "notes": "Auto-layout valuable for UML-Codex when: (1) generating diagrams from code, (2) importing from textual DSL, (3) creating diagrams programmatically. Could adapt layout algorithms for UML Class Diagrams (tree/hierarchical layout), Activity Diagrams (flow layout), and State Machines (graph layout)."
+    },
+    {
+      "name": "expression-language",
+      "type": "expression_evaluation",
+      "description": "Integration of multiple expression/scripting languages including JUEL (default), Groovy, and Drools. Expressions used for conditions, variable assignments, and dynamic behavior. Expression resolution against execution context with variable scoping.",
+      "value_proposition": "Shows integration of expression languages into workflow engine with proper variable scoping and context management. Multiple language support provides flexibility.",
+      "supported_languages": [
+        "JUEL (Java Unified Expression Language) - default",
+        "Groovy - full scripting capabilities",
+        "Drools - business rules integration",
+        "FEEL - DMN expression language",
+        "JavaScript - via script tasks (Nashorn/GraalVM)"
+      ],
+      "key_patterns": [
+        "Expression evaluation against execution context",
+        "Variable resolver pattern for scoped variable access",
+        "Multiple language support via pluggable evaluators",
+        "Expression caching for performance",
+        "Custom function providers for domain operations"
+      ],
+      "complexity": "medium",
+      "recommendation": "ADAPT",
+      "notes": "UML needs expression language for: OCL constraints, guard conditions (State Machine, Activity Diagram), value specifications, action code. Options: (1) OCL parser/evaluator for UML compliance, (2) JUEL for Java integration, (3) SpEL for Spring applications, (4) GraalVM Polyglot for multi-language. Study Flowable's pluggable expression evaluator pattern."
+    },
+    {
+      "name": "async-executor",
+      "type": "async_processing",
+      "description": "Asynchronous job executor for timer events, async continuations, and background processing. Acquisition thread polls for due jobs, worker threads execute jobs. Includes retry logic, failure handling, and backoff strategies.",
+      "value_proposition": "Production-grade async job processing with scalability across distributed nodes. Demonstrates background processing patterns, scheduling, and failure recovery.",
+      "key_features": [
+        "Separation of acquisition and execution",
+        "Thread pool for concurrent job processing",
+        "Timer job scheduling for timer events",
+        "Async continuations for long-running operations",
+        "Retry with exponential backoff",
+        "Exclusive locking for process instance consistency",
+        "Dead letter jobs for failed executions",
+        "History cleanup jobs"
+      ],
+      "key_patterns": [
+        "Acquisition/execution separation",
+        "Thread pool management",
+        "Job priority scheduling",
+        "Exclusive locking per process instance",
+        "Optimistic locking for job acquisition",
+        "Retry strategy with backoff",
+        "Dead letter queue for failed jobs"
+      ],
+      "complexity": "high",
+      "recommendation": "AVOID",
+      "notes": "Complex async job executor unnecessary for typical UML modeling tool. If background processing needed (code generation, validation), simpler approaches sufficient: Spring @Async, @Scheduled, or basic ExecutorService. Async executor adds significant complexity for distributed deployments not required for UML-Codex."
+    },
+    {
+      "name": "process-migration",
+      "type": "versioning",
+      "description": "ProcessMigrationService enables migrating running process instances from one process definition version to another. Activity mapping, variable transformation, and boundary event handling during migration.",
+      "value_proposition": "Shows how to handle model versioning with running instances. Demonstrates migration strategies, activity mapping, and state transformation.",
+      "key_features": [
+        "Process instance migration between versions",
+        "Activity ID mapping for renamed activities",
+        "Variable transformation during migration",
+        "Boundary event migration handling",
+        "Subprocess migration support",
+        "Batch migration for multiple instances"
+      ],
+      "complexity": "medium",
+      "recommendation": "STUDY",
+      "notes": "Interesting pattern for UML model versioning and evolution. Shows how to migrate instances when metamodel changes. Relevant if UML-Codex supports model transformation or refactoring with preservation of instance data (e.g., test fixtures, runtime examples)."
+    },
+    {
+      "name": "testing-infrastructure",
+      "type": "testing",
+      "description": "Comprehensive testing framework with JUnit 5 integration. Test categories for API, BPMN/CMMN/DMN engines, persistence, concurrency, and integration. Extensive use of AssertJ for fluent assertions. H2 in-memory database for fast tests.",
+      "value_proposition": "Production testing patterns for workflow engines including process testing, engine initialization, and database interaction validation. Demonstrates testing best practices.",
+      "test_organization": [
+        "Unit tests with H2 in-memory database",
+        "Integration tests with real databases (MySQL, PostgreSQL)",
+        "Concurrency tests for multi-threaded scenarios",
+        "API tests for service interfaces",
+        "BPMN/CMMN/DMN semantic tests",
+        "Migration tests for versioning",
+        "Performance tests for scalability"
+      ],
+      "testing_tools": [
+        "JUnit Jupiter (JUnit 5)",
+        "AssertJ for fluent assertions",
+        "Mockito for mocking",
+        "Awaitility for async testing",
+        "H2 for in-memory database",
+        "HikariCP for connection pooling",
+        "JSON Unit for REST API testing"
+      ],
+      "key_patterns": [
+        "Test fixtures with process deployments",
+        "Fluent assertions for process state",
+        "In-memory database for speed",
+        "Concurrency testing utilities",
+        "Mock external services",
+        "Test categories for organization"
+      ],
+      "complexity": "medium",
+      "recommendation": "ADAPT",
+      "notes": "Excellent testing organization. AssertJ fluent assertions particularly valuable for complex domain models. For UML-Codex: ModelAssertions with fluent API for validating model structure, constraints, and transformations. In-memory model repository for fast tests."
+    }
+  ],
+  "design_patterns": [
+    {
+      "pattern": "Agenda-Based Execution Pattern",
+      "description": "Core architectural innovation replacing traditional state machine approach. Operations planned on agenda queue and executed sequentially. CommandContextUtil.getAgenda() provides operation queue. Each operation manipulates execution state and may plan additional operations.",
+      "implementation": "Agenda interface with operation queue. Operation types include ContinueProcessOperation (start activity execution), TakeOutgoingSequenceFlowsOperation (follow sequence flows), EndExecutionOperation (complete execution), TriggerExecutionOperation (handle events). Operations planned via agenda.planOperation(). Execution continues until agenda empty.",
+      "benefit": "Cleaner separation of state from logic compared to Camunda's PVM. Explicit operation types make execution flow transparent and debuggable. Operations are testable in isolation. Easy to extend with custom operations. Logging agenda package shows exact execution sequence.",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML Activity Diagram execution could use operations like ExecuteActionOperation, EvaluateDecisionOperation, ForkExecutionOperation, JoinExecutionOperation. State Machine execution: EnterStateOperation, EvaluateTransitionOperation, ExitStateOperation, TriggerEventOperation. Operation queue provides natural debugging trace and extension mechanism."
+    },
+    {
+      "pattern": "Execution Tree for Concurrent Execution",
+      "description": "Process instances modeled as tree of ExecutionEntity instances with parent-child relationships. Root execution is process instance, child executions created for concurrent branches, subprocesses, and multi-instance activities. Tree structure enables proper scope isolation and concurrency management.",
+      "implementation": "ExecutionEntity contains parentId and processInstanceId fields. Parent execution spawns child executions for fork operations. ExecutionEntityManager provides tree navigation methods: findFirstScope(), findFirstMultiInstanceRoot(), collectChildren(). Each execution maintains independent variable scope. Cascade deletion maintains tree integrity.",
+      "benefit": "Natural model for concurrent execution and scope management. Parent-child relationships explicit and queryable. Variable scoping through execution hierarchy. Multi-instance execution cleanly modeled. Easier to understand than Camunda's execution replacement chain.",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML Activity Diagram fork/join nodes create child executions for concurrent branches. Join synchronization waits for all children to complete. State Machine orthogonal regions modeled as concurrent child executions. Subprocess execution creates child with independent scope."
+    },
+    {
+      "pattern": "Manager-Based Persistence Layer",
+      "description": "Specialized manager classes for each entity type coordinate database operations. Managers provide CRUD operations, queries, and entity-specific business logic. EntityManager<T> interface ensures consistency. Lazy initialization via factory pattern.",
+      "implementation": "EntityManager<T> base interface. Specialized managers: ExecutionEntityManager, TaskEntityManager, DeploymentEntityManager, JobEntityManager, VariableInstanceEntityManager, etc. Each manager handles entity-specific queries and operations. MyBatis for SQL mapping. Managers created on-demand by factory and cached in CommandContext.",
+      "benefit": "Clear separation of persistence from business logic. Specialized managers enable entity-specific optimizations. Consistent interface across entity types. Easy to add new entity types. Manager pattern provides database abstraction layer.",
+      "applicability_to_uml": "APPLICABLE - UML model persistence could use managers: ClassManager, AssociationManager, PackageManager, DiagramManager, StereotypeManager, ConstraintManager. Each manager handles entity-specific queries and business rules. However, consider JPA/Hibernate instead of MyBatis for modern Java development."
+    },
+    {
+      "pattern": "Service-Oriented API Design",
+      "description": "ProcessEngine provides access to 8 specialized service interfaces, each focused on specific domain. Services are stateless facades delegating to command execution. Thread-safe singleton design for engine instance.",
+      "implementation": "ProcessEngine interface with getters for RepositoryService, RuntimeService, TaskService, HistoryService, IdentityService, ManagementService, DynamicBpmnService, ProcessMigrationService. Each service delegates to command execution via CommandExecutor. Services use builder pattern for complex operations and query objects for data retrieval.",
+      "benefit": "Clean API boundaries with single responsibility per service. Easy to understand and use. Services independently mockable for testing. Clear separation between API and implementation. Stable interface contracts enable versioning.",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML-Codex should organize functionality into focused services: ModelService (CRUD), DiagramService (creation/layout), ValidationService (constraints), TransformationService (model-to-model), GenerationService (model-to-code), RepositoryService (storage/versioning), QueryService (model queries). Service orientation provides clear API structure."
+    },
+    {
+      "pattern": "Wait State Pattern for Asynchronous Operations",
+      "description": "BPMN activities can be wait states where engine stops execution and returns API call. Process waits until external trigger (task completion, signal, message). Wait state persisted in database enabling long-running processes across server restarts.",
+      "implementation": "Activity behaviors determine if activity is wait state. User tasks create task entity and become wait state. Process execution pauses until TaskService.complete() called. Intermediate catch events wait for signal/message. Engine looks at current state, checks ahead, continues until wait state.",
+      "benefit": "Enables long-running processes spanning hours/days/weeks. Process state persisted and survives server restarts. Clear separation between automated activities (execute immediately) and wait states (external trigger needed). Supports human tasks, external integrations, timer events.",
+      "applicability_to_uml": "APPLICABLE - UML Activity Diagram accept event actions could be wait states. State Machine waiting for event triggers. Interaction Diagram message receive. Wait state pattern enables UML execution to integrate with external systems and user interaction."
+    },
+    {
+      "pattern": "Command Pattern with CommandContext",
+      "description": "All engine operations encapsulated as Command objects executed within CommandContext. Context manages transaction, sessions, and entity managers. Command execution through interceptor chain for cross-cutting concerns.",
+      "implementation": "Command<T> interface with execute(CommandContext) method. CommandContext provides access to entity managers, configuration, and shared state. CommandExecutor manages command lifecycle and interceptor chain. Commands reusable and testable.",
+      "benefit": "Consistent transaction management across all operations. Commands are composable and reusable. Clear unit of work boundaries. Interceptors enable AOP-like cross-cutting concerns without cluttering command logic.",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML model operations should use Command pattern: CreateClassCommand, AddAssociationCommand, ValidateModelCommand, TransformModelCommand, GenerateCodeCommand. CommandContext manages transaction, model repository access, and validation state. Interceptors handle authorization, logging, event publishing."
+    },
+    {
+      "pattern": "Event-Driven Execution (CMMN)",
+      "description": "CMMN engine uses event-driven model where data changes trigger criteria evaluation. EvaluateCriteriaOperation planned frequently to check entry/exit sentries. Contrasts with BPMN's sequence flow-driven execution.",
+      "implementation": "Case instance monitors data changes via event listeners. Data change triggers EvaluateCriteriaOperation on agenda. Criteria evaluator checks all sentries for affected plan items. Entry criteria satisfied triggers plan item activation. Exit criteria satisfied triggers completion/termination.",
+      "benefit": "Natural model for data-driven processes where data changes trigger work. Supports complex dependencies between case activities. Flexible execution not constrained by predefined flow. Shows alternative execution paradigm to activity-centric BPMN.",
+      "applicability_to_uml": "APPLICABLE - UML State Machine change events could trigger guard evaluation. Activity Diagram streaming data could trigger downstream actions. Event-driven pattern complements flow-driven execution for reactive scenarios."
+    },
+    {
+      "pattern": "Process-Level Locking for Distributed Execution",
+      "description": "ExecutionEntity includes lockTime field for optimistic locking at process instance level. Prevents concurrent modification of same process instance by multiple engine nodes in cluster. Updates lock timestamp during execution.",
+      "implementation": "ExecutionEntityManager.updateProcessInstanceLockTime() updates lock timestamp. Acquisition logic checks lock age before claiming work. Stale locks indicate node failure and can be reclaimed. Process-level locking coarser than row-level but sufficient for process instance isolation.",
+      "benefit": "Enables distributed engine deployment with multiple nodes processing different instances. Prevents race conditions in clustered environment. Process instance isolation maintains consistency. Lock timeout enables recovery from node failures.",
+      "applicability_to_uml": "MODERATELY_APPLICABLE - If UML-Codex deployed in distributed/clustered configuration, process-level locking pattern applicable for model editing sessions. Prevents concurrent edits to same model by multiple users/nodes. Optimistic locking detects conflicts."
+    },
+    {
+      "pattern": "Bidirectional Model-XML Conversion",
+      "description": "BPMN/CMMN/DMN converters support both XML to model and model to XML transformation. Object model preserves all information for lossless round-trip. Extension elements and attributes preserved even if not in object model.",
+      "implementation": "BpmnXMLConverter.convertToModel() parses XML to object model. BpmnXMLConverter.convertToXML() serializes model back to XML. Extension elements stored in ExtensionElement objects. Unknown attributes preserved in element attribute maps. Namespace-aware processing for BPMN standard and vendor extensions.",
+      "benefit": "Lossless round-trip enables tool interoperability. Programmatic model manipulation with XML persistence. Unknown extensions preserved for multi-tool workflows. Standards-compliant XML output.",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML XMI serialization must support bidirectional conversion with lossless round-trip. Preserve tool-specific extensions, profile applications, and diagram layout. Namespace handling for UML, XMI, and profile namespaces. Study Flowable converter pattern for UML metamodel serialization."
+    },
+    {
+      "pattern": "Spring Boot Auto-Configuration",
+      "description": "Spring Boot starter provides auto-configuration for Flowable engines based on classpath detection. Minimal configuration required - engines configured from application.properties with sensible defaults.",
+      "implementation": "FlowableAutoConfiguration detects Flowable on classpath and creates ProcessEngine bean. Conditional bean creation based on properties. DataSource auto-configured or user-provided. Process definitions auto-deployed from classpath resources/processes/. Actuator endpoints added automatically.",
+      "benefit": "Excellent developer experience with minimal boilerplate. Convention over configuration. Externalized configuration via properties. Easy to override defaults. Production-ready with Actuator monitoring.",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML-Codex Spring Boot starter should follow same pattern: UmlCodexAutoConfiguration creates ModelService, ValidationService, GenerationService beans. Auto-deploy UML profiles from classpath. Configure from application.properties. Actuator endpoints for model metrics."
+    },
+    {
+      "pattern": "Builder Pattern for Complex Object Creation",
+      "description": "Complex operations use builder pattern for fluent API. ProcessInstanceBuilder creates process instances with business key, variables, tenant ID, etc. Query builders for flexible data retrieval.",
+      "implementation": "RuntimeService.createProcessInstanceBuilder() returns builder. Fluent methods: businessKey(), variables(), tenantId(), processDefinitionKey(). Terminal method start() executes operation. Similar builders for queries, migrations, dynamic modifications.",
+      "benefit": "Readable fluent API. Optional parameters handled cleanly. Builder validates before execution. IDE code completion guides usage. Separates object construction from usage.",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML-Codex should use builders: ClassBuilder, AssociationBuilder, DiagramBuilder, TransformationBuilder. Fluent API for model construction: classBuilder.name('Customer').addAttribute('name', String.class).addOperation('getName').build(). Validation in build() method."
+    },
+    {
+      "pattern": "History Event Stream with Configurable Detail Levels",
+      "description": "All process events published to history stream. Configurable history levels: NONE (no history), ACTIVITY (activity level), AUDIT (all details), FULL (includes variable updates). History persisted for audit and analytics.",
+      "implementation": "History level configuration determines event detail. Events include HistoricProcessInstance, HistoricActivityInstance, HistoricTaskInstance, HistoricVariableUpdate. HistoryService queries historical data. History tables separate from runtime tables enabling different retention policies.",
+      "benefit": "Complete audit trail of process execution. Configurable detail balances audit requirements with storage/performance. History queries for analytics and reporting. Separate history tables enable CQRS pattern. Support for external history event handlers.",
+      "applicability_to_uml": "APPLICABLE - UML-Codex could maintain history of model changes, transformations, and generation operations. History levels: NONE (no tracking), STRUCTURAL (major changes only), DETAILED (all changes), FULL (includes attribute updates). Enables undo/redo, audit trail, model analytics, change impact analysis."
+    },
+    {
+      "pattern": "Multi-Module Maven Project with Shared Parent POM",
+      "description": "Repository organized as Maven multi-module project with 100+ modules. Shared parent POM (flowable-parent) manages dependency versions. Module categories: engines, models, converters, services, integrations, REST APIs.",
+      "implementation": "Parent POM defines dependency management. Modules declare dependencies without versions (inherited from parent). Clear module naming: flowable-engine, flowable-bpmn-model, flowable-rest. Modules grouped by function. Internal dependencies reference other Flowable modules.",
+      "benefit": "Consistent dependency versions across modules. Modular architecture with clear boundaries. Selective module usage - embed only needed components. Independent module releases possible. Clear module responsibilities.",
+      "applicability_to_uml": "APPLICABLE - UML-Codex could use multi-module structure: uml-codex-model (metamodel), uml-codex-xmi (serialization), uml-codex-validation (constraints), uml-codex-transformation (M2M), uml-codex-generation (M2C), uml-codex-spring-boot-starter. Start with fewer modules and split as needed."
+    },
+    {
+      "pattern": "Namespace-Aware XML Processing with Extension Support",
+      "description": "XML converters use namespace-aware parsing for BPMN 2.0 standard namespace and vendor extension namespaces. Proper handling of qualified names, namespace prefixes, and schema validation.",
+      "implementation": "DOM parser configured for namespace awareness. Elements accessed with namespace URI and local name. Extension elements in separate namespace (flowable namespace). Schema validation optional. Namespace prefixes preserved during serialization where possible.",
+      "benefit": "Standards compliance for BPMN/CMMN/DMN specifications. Support for vendor extensions without conflicts. XML interoperability with other tools. Schema validation ensures correctness.",
+      "applicability_to_uml": "HIGHLY_APPLICABLE - UML XMI serialization requires namespace handling: UML 2.5 namespace, XMI 2.5 namespace, profile namespaces, tool extension namespaces. Namespace-aware parsing essential for correct element identification and validation. Study Flowable namespace handling for UML XMI implementation."
+    }
+  ],
+  "requirements_identified": [
+    {
+      "id": "REQ-FLW-001",
+      "category": "workflow_execution",
+      "description": "Support for executable workflow models with activity nodes, transitions, gateways (parallel, exclusive, inclusive), and subprocesses using agenda-based execution pattern",
+      "source": "Flowable agenda pattern with operation queue and execution tree",
+      "priority": "high",
+      "applicability": "UML Activity Diagrams require similar execution semantics. Agenda pattern cleaner than Camunda's PVM for implementing action execution, control flows, and decision/merge nodes."
+    },
+    {
+      "id": "REQ-FLW-002",
+      "category": "state_management",
+      "description": "Hierarchical execution state model using tree structure with parent-child relationships for concurrent execution, scope isolation, and subprocess management",
+      "source": "ExecutionEntity tree model with parent-child links and scope markers",
+      "priority": "high",
+      "applicability": "UML Activity Diagram concurrent execution (fork/join), State Machine orthogonal regions, and subprocess scoping require similar hierarchical state management."
+    },
+    {
+      "id": "REQ-FLW-003",
+      "category": "operation_queue",
+      "description": "Operation queue pattern for explicit execution control where operations manipulate state and plan subsequent operations. Enables debugging, testing, and extension.",
+      "source": "Agenda interface with ContinueProcessOperation, TakeOutgoingSequenceFlowsOperation, EndExecutionOperation",
+      "priority": "high",
+      "applicability": "UML execution operations (ExecuteActionOperation, EvaluateGuardOperation, ForkExecutionOperation) benefit from explicit operation queue providing execution trace and extension points."
+    },
+    {
+      "id": "REQ-FLW-004",
+      "category": "model_representation",
+      "description": "Rich object model for process/diagram definitions with proper class hierarchies, interface-based extensibility, and type-safe element access",
+      "source": "BPMN model API with BaseElement, FlowNode, Activity hierarchies and HasExecutionListeners, HasExtensionAttributes interfaces",
+      "priority": "high",
+      "applicability": "UML metamodel implementation requires similar class hierarchies (NamedElement, Classifier, Class) and interface-based cross-cutting concerns (stereotypes, tagged values)."
+    },
+    {
+      "id": "REQ-FLW-005",
+      "category": "xml_serialization",
+      "description": "Bidirectional XML conversion with lossless round-trip, namespace awareness, extension preservation, and schema validation",
+      "source": "BpmnXMLConverter with namespace-aware parsing and extension element handling",
+      "priority": "high",
+      "applicability": "UML XMI serialization must preserve all model information including tool extensions, profile applications, and diagram layout through round-trip conversion."
+    },
+    {
+      "id": "REQ-FLW-006",
+      "category": "service_api",
+      "description": "Service-oriented API with focused responsibilities (model management, execution, validation, history, administration) using thread-safe singleton pattern",
+      "source": "ProcessEngine with 8 specialized services (Repository, Runtime, Task, History, Identity, Management, DynamicBpmn, ProcessMigration)",
+      "priority": "high",
+      "applicability": "UML-Codex should organize API into focused services: ModelService, DiagramService, ValidationService, TransformationService, GenerationService, RepositoryService, QueryService."
+    },
+    {
+      "id": "REQ-FLW-007",
+      "category": "persistence",
+      "description": "Persistent storage with specialized managers per entity type, query capabilities, lazy initialization, and transaction management",
+      "source": "Manager-based persistence with ExecutionEntityManager, TaskEntityManager, DeploymentEntityManager",
+      "priority": "medium",
+      "applicability": "UML model persistence with managers: ClassManager, AssociationManager, PackageManager, DiagramManager. Each handles entity-specific queries and business rules."
+    },
+    {
+      "id": "REQ-FLW-008",
+      "category": "expression_evaluation",
+      "description": "Pluggable expression language support for dynamic conditions, value specifications, and script execution with variable scoping",
+      "source": "Multi-language expression support (JUEL, Groovy, Drools, FEEL) with variable resolvers",
+      "priority": "high",
+      "applicability": "UML requires expression evaluation for OCL constraints, guard conditions, action specifications, and value specifications. Pluggable evaluator pattern supports multiple languages."
+    },
+    {
+      "id": "REQ-FLW-009",
+      "category": "extensibility",
+      "description": "Extension points through listener pattern, custom operations, and vendor-specific attributes/elements",
+      "source": "Extension elements, execution listeners, and custom agenda operations",
+      "priority": "medium",
+      "applicability": "UML-Codex should provide hooks for custom validation, transformations, code generation, and model listeners. Extension mechanism for tool-specific features."
+    },
+    {
+      "id": "REQ-FLW-010",
+      "category": "wait_states",
+      "description": "Wait state pattern for long-running processes that pause execution pending external triggers (user input, events, timers)",
+      "source": "User tasks, intermediate catch events, and receive tasks as wait states",
+      "priority": "medium",
+      "applicability": "UML Activity Diagram accept event actions, State Machine event triggers, and Interaction Diagram message receives could be wait states enabling external integration."
+    },
+    {
+      "id": "REQ-FLW-011",
+      "category": "concurrency",
+      "description": "Concurrent execution support with fork/join semantics, proper synchronization, scope isolation, and multi-instance patterns",
+      "source": "Execution tree with concurrent branches, ParallelGateway, MultiInstanceLoopCharacteristics",
+      "priority": "high",
+      "applicability": "UML Activity Diagram fork/join nodes and State Machine orthogonal regions require concurrent execution with synchronization."
+    },
+    {
+      "id": "REQ-FLW-012",
+      "category": "builder_api",
+      "description": "Fluent builder API for programmatic model construction with constraint validation and optional parameters",
+      "source": "ProcessInstanceBuilder, query builders with fluent methods",
+      "priority": "high",
+      "applicability": "UML-Codex should provide builders: ClassBuilder, AssociationBuilder, DiagramBuilder, TransformationBuilder with fluent API and validation."
+    },
+    {
+      "id": "REQ-FLW-013",
+      "category": "history_audit",
+      "description": "Configurable audit trail with detail levels (none, structural, detailed, full) for model changes, transformations, and generation",
+      "source": "History event stream with levels NONE, ACTIVITY, AUDIT, FULL",
+      "priority": "medium",
+      "applicability": "UML model change tracking for undo/redo, audit compliance, change impact analysis, and model analytics."
+    },
+    {
+      "id": "REQ-FLW-014",
+      "category": "query_api",
+      "description": "Flexible query API for model retrieval with filtering, sorting, pagination, and both object queries and native queries",
+      "source": "Service query methods with fluent filtering and ExecutionEntityManager specialized queries",
+      "priority": "medium",
+      "applicability": "UML-Codex needs rich query capabilities: find classes by stereotype, find associations by type, find diagrams by element, find packages by namespace."
+    },
+    {
+      "id": "REQ-FLW-015",
+      "category": "framework_integration",
+      "description": "Spring Boot integration with auto-configuration, external configuration, transaction management, and monitoring",
+      "source": "flowable-spring-boot starter with auto-configuration and Actuator integration",
+      "priority": "high",
+      "applicability": "UML-Codex Spring Boot starter should auto-configure services, support externalized configuration, integrate transactions, and provide Actuator endpoints."
+    },
+    {
+      "id": "REQ-FLW-016",
+      "category": "multi_standard_support",
+      "description": "Architecture supporting multiple modeling standards (BPMN, CMMN, DMN) with shared infrastructure and separate engines",
+      "source": "Separate engines for BPMN, CMMN, DMN sharing common services and persistence",
+      "priority": "low",
+      "applicability": "UML-Codex could support multiple diagram types (Class, Activity, State Machine, Sequence) with shared metamodel and separate execution engines."
+    },
+    {
+      "id": "REQ-FLW-017",
+      "category": "migration_versioning",
+      "description": "Model migration support for moving instances between versions with activity mapping and state transformation",
+      "source": "ProcessMigrationService for instance migration between definition versions",
+      "priority": "low",
+      "applicability": "UML model refactoring and evolution with preservation of instance data (test fixtures, examples). Migration when metamodel changes."
+    },
+    {
+      "id": "REQ-FLW-018",
+      "category": "diagram_layout",
+      "description": "Automatic layout algorithm for diagrams when creating models programmatically or importing from non-visual sources",
+      "source": "flowable-bpmn-layout for automatic BPMN diagram positioning",
+      "priority": "medium",
+      "applicability": "UML auto-layout for: code-to-diagram generation, textual DSL import, programmatic diagram creation. Different algorithms per diagram type."
+    },
+    {
+      "id": "REQ-FLW-019",
+      "category": "testing_infrastructure",
+      "description": "Testing framework with fluent assertions, in-memory persistence, concurrency testing, and test categories",
+      "source": "JUnit 5, AssertJ, Mockito, Awaitility, H2 in-memory database",
+      "priority": "medium",
+      "applicability": "UML-Codex testing with ModelAssertions for fluent validation, in-memory repository for fast tests, concurrency tests for collaborative editing."
+    },
+    {
+      "id": "REQ-FLW-020",
+      "category": "distributed_locking",
+      "description": "Process-level optimistic locking for distributed deployments preventing concurrent modification conflicts",
+      "source": "ExecutionEntity lockTime field and updateProcessInstanceLockTime()",
+      "priority": "low",
+      "applicability": "UML collaborative editing with distributed nodes. Optimistic locking detects concurrent edits to same model. Lock timeout for node failure recovery."
+    },
+    {
+      "id": "REQ-FLW-021",
+      "category": "event_driven_execution",
+      "description": "Event-driven execution model where data changes trigger cascading evaluations (CMMN pattern)",
+      "source": "CMMN EvaluateCriteriaOperation triggered by data changes",
+      "priority": "low",
+      "applicability": "UML State Machine change events triggering guard evaluations. Reactive execution pattern complementing flow-driven Activity Diagrams."
+    },
+    {
+      "id": "REQ-FLW-022",
+      "category": "command_pattern",
+      "description": "Command pattern with CommandContext for transaction management, entity manager access, and interceptor chain",
+      "source": "Command<T> interface with execute(CommandContext) and interceptor chain",
+      "priority": "high",
+      "applicability": "UML operations as commands: CreateClassCommand, ValidateModelCommand, TransformModelCommand, GenerateCodeCommand. CommandContext manages transaction and repository access."
+    }
+  ],
+  "technical_debt": [
+    {
+      "category": "complexity",
+      "description": "High complexity appropriate for enterprise workflow engine but potentially excessive for UML modeling tool. 100+ modules create build complexity. Learning curve for contributors.",
+      "impact": "medium",
+      "recommendation": "UML-Codex should start with minimal modules (model, validation, generation, spring-boot-starter) and add selectively. Study patterns but simplify implementation. Avoid unnecessary enterprise features (multi-tenancy, distributed job execution)."
+    },
+    {
+      "category": "mybatis_dependency",
+      "description": "MyBatis for persistence is valid but less mainstream than JPA/Hibernate in modern Java development. Requires separate SQL mapping configuration. More manual than JPA.",
+      "impact": "medium",
+      "recommendation": "Consider JPA/Hibernate for UML-Codex if database persistence needed. JPA provides better ecosystem integration, type-safe criteria queries, and automatic schema generation. MyBatis valid choice for control over SQL but requires more configuration."
+    },
+    {
+      "category": "joda_time_dependency",
+      "description": "Joda-Time is legacy - java.time (JSR-310) is modern replacement since Java 8. Joda-Time maintained for backward compatibility but new development should use java.time.",
+      "impact": "low",
+      "recommendation": "UML-Codex targeting Java 17+ should use java.time exclusively. No reason to add Joda-Time dependency."
+    },
+    {
+      "category": "module_proliferation",
+      "description": "100+ modules create complexity in module dependencies, build order, and versioning. Some modules very small and could be merged. Module boundaries not always clear.",
+      "impact": "medium",
+      "recommendation": "UML-Codex should start with 5-10 well-defined modules and split only when clear separation needed. Document module responsibilities and dependencies. Resist temptation to create module per class."
+    },
+    {
+      "category": "multi_engine_complexity",
+      "description": "Separate engines for BPMN, CMMN, DMN add complexity. Shared infrastructure but different APIs and concepts. Learning curve to understand differences.",
+      "impact": "low",
+      "recommendation": "UML-Codex likely doesn't need separate engines per diagram type. Single model service with diagram-type-specific operations simpler. Separate engines only if execution semantics fundamentally different (e.g., flow-driven vs event-driven)."
+    },
+    {
+      "category": "rest_api_technology",
+      "description": "REST API implementation not specified but likely JAX-RS or Spring MVC. REST APIs complete but verbose for complex queries. Modern alternatives include GraphQL.",
+      "impact": "low",
+      "recommendation": "UML-Codex REST API should use Spring Boot (if already using Spring) for simplicity. Consider GraphQL for flexible model queries - better match for complex object graphs than REST. OpenAPI specification essential for documentation."
+    },
+    {
+      "category": "async_executor_complexity",
+      "description": "Async job executor is sophisticated with acquisition/execution separation, thread pools, locking, retry logic. Complex for typical UML tool requirements.",
+      "impact": "low",
+      "recommendation": "UML-Codex should avoid complex async executor unless distributed deployment required. Simple ExecutorService, Spring @Async, or @Scheduled sufficient for background code generation and validation."
+    },
+    {
+      "category": "cmmn_adoption",
+      "description": "CMMN support is differentiator from Camunda but CMMN has lower adoption than BPMN. Adds complexity supporting two execution paradigms (flow-driven BPMN, event-driven CMMN).",
+      "impact": "low",
+      "recommendation": "UML-Codex supporting both Activity Diagrams (flow-driven) and State Machines (event-driven) faces similar challenge. Study how Flowable manages two paradigms. Unified infrastructure with paradigm-specific operations."
+    },
+    {
+      "category": "expression_language_choice",
+      "description": "Multiple expression language support (JUEL, Groovy, Drools, FEEL) adds complexity. JUEL is default but dated. Each language has different capabilities and performance.",
+      "impact": "medium",
+      "recommendation": "UML-Codex should choose expression language carefully: (1) OCL for UML compliance, (2) SpEL for Spring integration, (3) GraalVM Polyglot for multi-language. Single language simpler than Flowable's multi-language approach unless business requirement."
+    },
+    {
+      "category": "history_overhead",
+      "description": "Full history level creates significant database overhead - every variable update tracked. Can impact performance and storage for high-volume scenarios.",
+      "impact": "low",
+      "recommendation": "UML-Codex history should be configurable. Most users need structural changes only (class created, association added). Attribute-level tracking (FULL) only for audit requirements. Consider event sourcing pattern for complete audit trail."
+    },
+    {
+      "category": "java_version_support",
+      "description": "Supporting both Java 8 (V6) and Java 17+ (V7) creates complexity maintaining two codebases. Modern Java features (records, pattern matching, virtual threads) not available in V6.",
+      "impact": "low",
+      "recommendation": "UML-Codex should target single modern LTS Java version (17 or 21) and use modern features. No need to support older Java versions unless business requirement."
+    }
+  ],
+  "dependencies_analysis": {
+    "core_dependencies": [
+      {
+        "name": "org.mybatis:mybatis",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "SQL mapping framework for persistence layer",
+        "notes": "Consider JPA/Hibernate for UML-Codex"
+      },
+      {
+        "name": "org.springframework:spring-beans",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "Dependency injection and bean lifecycle"
+      },
+      {
+        "name": "org.apache.groovy:groovy-jsr223",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "Groovy scripting support (provided scope)",
+        "notes": "Optional dependency for script tasks"
+      },
+      {
+        "name": "joda-time:joda-time",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "Date and time handling",
+        "notes": "Legacy - use java.time in new code"
+      },
+      {
+        "name": "com.fasterxml.uuid:java-uuid-generator",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "UUID generation for entity identifiers (provided scope)"
+      },
+      {
+        "name": "org.slf4j:slf4j-api",
+        "version": "inherited from parent",
+        "license": "MIT",
+        "purpose": "Logging facade"
+      },
+      {
+        "name": "org.apache.commons:commons-lang3",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "Common utilities (strings, collections, etc.)"
+      },
+      {
+        "name": "commons-io:commons-io",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "I/O utilities"
+      },
+      {
+        "name": "org.drools:drools-core",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "Business rules integration (provided scope)",
+        "notes": "Optional dependency for rule tasks"
+      },
+      {
+        "name": "jakarta.persistence:jakarta.persistence-api",
+        "version": "inherited from parent",
+        "license": "Eclipse Public License 2.0",
+        "purpose": "JPA annotations and interfaces (provided scope)",
+        "notes": "Used for entity annotations but MyBatis for persistence"
+      }
+    ],
+    "test_dependencies": [
+      {
+        "name": "org.junit.jupiter:junit-jupiter",
+        "version": "inherited from parent",
+        "license": "Eclipse Public License 2.0",
+        "purpose": "JUnit 5 testing framework"
+      },
+      {
+        "name": "org.assertj:assertj-core",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "Fluent assertion library"
+      },
+      {
+        "name": "org.mockito:mockito-core",
+        "version": "inherited from parent",
+        "license": "MIT",
+        "purpose": "Mocking framework"
+      },
+      {
+        "name": "com.h2database:h2",
+        "version": "inherited from parent",
+        "license": "Eclipse Public License 2.0",
+        "purpose": "In-memory database for testing"
+      },
+      {
+        "name": "org.awaitility:awaitility",
+        "version": "inherited from parent",
+        "license": "Apache 2.0",
+        "purpose": "Asynchronous testing utilities"
+      }
+    ],
+    "license_compatibility": "All core dependencies use permissive licenses (Apache 2.0, MIT, EPL 2.0) fully compatible with commercial and open source use. No copyleft licenses (GPL, LGPL) in core dependencies. Optional dependencies (Groovy, Drools) also Apache 2.0. Test dependencies include EPL 2.0 but test scope only.",
+    "dependency_concerns": [
+      "Joda-Time is legacy - java.time standard since Java 8",
+      "MyBatis less popular than JPA/Hibernate but valid choice",
+      "Jakarta persistence-api used for annotations despite MyBatis for actual persistence - confusing",
+      "Many dependencies inherit versions from parent POM - check parent for actual versions",
+      "Groovy and Drools are provided scope - users must add if needed",
+      "Multiple database drivers in test scope - ensure UML-Codex tests run on all supported databases"
+    ]
+  },
+  "complexity_assessment": {
+    "overall_complexity": "HIGH",
+    "rationale": "Enterprise-grade workflow engine with 100+ modules supporting BPMN, CMMN, and DMN standards. Sophisticated execution model (agenda pattern, execution trees), persistence layer (entity managers, MyBatis), and integration capabilities (Spring, REST, async processing). Complexity justified for workflow engine but potentially excessive for UML modeling tool. Architecture demonstrates production patterns but learning curve significant.",
+    "areas_of_high_complexity": [
+      "Agenda-based execution with operation types and execution tree management",
+      "BPMN 2.0 parser handling 40+ element types with complex semantics (boundary events, event subprocesses, compensation)",
+      "CMMN event-driven execution with criteria evaluation and sentry logic",
+      "Persistence layer with 20+ entity managers and MyBatis SQL mappings",
+      "Multi-module Maven project with 100+ modules and complex dependencies",
+      "Async executor with acquisition, execution, retry, and distributed locking",
+      "Expression language integration with multiple language support and variable scoping",
+      "Process migration with activity mapping and state transformation"
+    ],
+    "areas_of_moderate_complexity": [
+      "BPMN/CMMN/DMN model APIs with class hierarchies and converters",
+      "Service-oriented API with 8 specialized services",
+      "Command pattern with CommandContext and interceptors",
+      "DMN decision engine with decision table evaluation",
+      "Spring Boot integration with auto-configuration",
+      "REST API with resource modeling and serialization",
+      "History event stream with configurable detail levels",
+      "Automatic diagram layout algorithms"
+    ],
+    "areas_of_low_complexity": [
+      "Basic process deployment and instantiation",
+      "Simple task completion and variable operations",
+      "Identity service user/group management",
+      "Builder pattern for API operations",
+      "Query objects for data retrieval",
+      "Extension element handling in XML"
+    ]
+  },
+  "recommendations": {
+    "overall_recommendation": "HYBRID",
+    "rationale": "Flowable Engine is production-quality, actively maintained BPMN workflow engine with clean architectural patterns highly applicable to UML-Codex. Apache 2.0 license permits code reuse with attribution. KEY ADVANTAGE: Active development (unlike archived Camunda Platform 7) with modern agenda pattern (cleaner than Camunda's PVM). HYBRID approach recommended: (1) ADAPT specific components (BPMN model API patterns for UML metamodel, Spring Boot integration, builder APIs), (2) STUDY architectural patterns (agenda-based execution, execution trees, service-oriented API, manager-based persistence), (3) AVOID unnecessary complexity (async executor, multi-tenancy, multi-engine architecture). Flowable demonstrates that building production execution infrastructure is substantial undertaking - UML-Codex should carefully scope execution features and leverage proven patterns without wholesale adoption.",
+    "specific_recommendations": [
+      {
+        "area": "Agenda-Based Execution",
+        "recommendation": "ADAPT",
+        "rationale": "Agenda pattern with operation queue cleaner than Camunda's PVM state machine. Highly applicable to UML Activity Diagram and State Machine execution. Operation types (ExecuteActionOperation, EvaluateGuardOperation, ForkExecutionOperation) provide explicit execution trace for debugging. Study Flowable's implementation and adapt for UML execution semantics."
+      },
+      {
+        "area": "BPMN Model API",
+        "recommendation": "ADAPT",
+        "rationale": "Class hierarchy (BaseElement, FlowNode, Activity) and interface-based extensibility (HasExecutionListeners, HasExtensionAttributes) directly applicable to UML metamodel. Adapt object model patterns for UML classes, associations, packages. Builder pattern and bidirectional XML conversion essential for UML XMI."
+      },
+      {
+        "area": "Execution Tree Model",
+        "recommendation": "ADAPT",
+        "rationale": "Parent-child execution relationships elegant solution for concurrent execution and scope isolation. Directly applicable to Activity Diagram fork/join and State Machine orthogonal regions. More intuitive than Camunda's execution replacement chain. Adopt for UML concurrent execution."
+      },
+      {
+        "area": "Service-Oriented API",
+        "recommendation": "ADOPT",
+        "rationale": "Clean API organization with focused services excellent pattern for UML-Codex. Organize as ModelService, DiagramService, ValidationService, TransformationService, GenerationService, RepositoryService, QueryService. Thread-safe singleton engine pattern applicable."
+      },
+      {
+        "area": "Spring Boot Integration",
+        "recommendation": "ADOPT",
+        "rationale": "Auto-configuration with sensible defaults provides excellent developer experience. UML-Codex Spring Boot starter should follow same pattern: auto-configure services from classpath, external configuration via application.properties, Actuator endpoints for monitoring."
+      },
+      {
+        "area": "Manager-Based Persistence",
+        "recommendation": "STUDY",
+        "rationale": "Manager-per-entity pattern demonstrates good separation of concerns. Study pattern for UML-Codex (ClassManager, AssociationManager, etc.) but consider JPA/Hibernate instead of MyBatis. JPA provides better ecosystem integration and type-safe queries."
+      },
+      {
+        "area": "Command Pattern",
+        "recommendation": "ADOPT",
+        "rationale": "Command pattern with CommandContext provides consistent transaction management and operation logging. Highly applicable to UML operations: CreateClassCommand, ValidateModelCommand, TransformModelCommand, GenerateCodeCommand. Adopt pattern for UML-Codex operations."
+      },
+      {
+        "area": "Builder API",
+        "recommendation": "ADOPT",
+        "rationale": "Fluent builders provide readable API for complex object construction. UML-Codex should use builders: ClassBuilder, AssociationBuilder, DiagramBuilder. Validation in build() method ensures correctness. Excellent developer experience."
+      },
+      {
+        "area": "XML Converter Pattern",
+        "recommendation": "ADAPT",
+        "rationale": "Bidirectional conversion with namespace awareness and extension preservation directly applicable to UML XMI. Study BpmnXMLConverter implementation for lossless round-trip serialization preserving tool extensions."
+      },
+      {
+        "area": "CMMN Event-Driven Execution",
+        "recommendation": "STUDY",
+        "rationale": "Event-driven pattern interesting for UML State Machine where data changes trigger guard evaluations. Shows how to support fundamentally different execution paradigms (flow-driven BPMN vs event-driven CMMN) in unified platform. Study for UML supporting both Activity (flow) and State Machine (event) semantics."
+      },
+      {
+        "area": "Async Job Executor",
+        "recommendation": "AVOID",
+        "rationale": "Complex distributed async executor unnecessary for typical UML modeling tool. If background processing needed (code generation, validation), simpler approaches sufficient: Spring @Async, @Scheduled, or basic ExecutorService. Avoid complexity."
+      },
+      {
+        "area": "DMN Decision Engine",
+        "recommendation": "STUDY",
+        "rationale": "Decision table evaluation interesting for complex UML guard conditions but not core requirement. Study if advanced decision logic features planned. Separation of decision logic from diagram structure valuable pattern."
+      },
+      {
+        "area": "Process Migration",
+        "recommendation": "STUDY",
+        "rationale": "Migration pattern relevant for UML model refactoring and evolution. Shows how to transform instances when metamodel changes. Study if UML-Codex requires model transformation with instance preservation."
+      },
+      {
+        "area": "Diagram Auto-Layout",
+        "recommendation": "STUDY",
+        "rationale": "Auto-layout valuable for code-to-diagram generation and programmatic diagram creation. Study flowable-bpmn-layout algorithms. Different layout strategies needed per UML diagram type (hierarchical for Class, flow for Activity, graph for State Machine)."
+      },
+      {
+        "area": "History Event Stream",
+        "recommendation": "ADAPT",
+        "rationale": "Configurable audit trail with detail levels applicable to UML change tracking. History levels: STRUCTURAL (major changes), DETAILED (all changes), FULL (attribute updates). Enables undo/redo, audit, analytics. Adapt pattern for UML-Codex."
+      },
+      {
+        "area": "Testing Infrastructure",
+        "recommendation": "ADOPT",
+        "rationale": "Testing organization with fluent assertions (AssertJ), in-memory database (H2), and concurrency testing utilities excellent pattern. UML-Codex should adopt: ModelAssertions for fluent validation, in-memory repository for fast tests, test categories by concern."
+      },
+      {
+        "area": "Multi-Engine Architecture",
+        "recommendation": "AVOID",
+        "rationale": "Separate engines for BPMN/CMMN/DMN add complexity. UML-Codex likely doesn't need separate engines per diagram type. Single model service with diagram-type-specific operations simpler unless execution semantics fundamentally incompatible."
+      },
+      {
+        "area": "Expression Language Integration",
+        "recommendation": "STUDY",
+        "rationale": "Study pluggable expression evaluator pattern but choose single language for UML-Codex: OCL for UML compliance, SpEL for Spring integration, or GraalVM for multi-language. Multiple language support adds complexity - single language simpler."
+      }
+    ],
+    "key_learnings": [
+      "Agenda pattern with operation queue cleaner than state machine for execution control - explicit operations provide debugging trace and extension points",
+      "Execution tree with parent-child relationships elegant model for concurrent execution and scope isolation - more intuitive than execution replacement chains",
+      "Service-oriented API with focused responsibilities scales better than monolithic API - clear boundaries, testability, single responsibility",
+      "Manager-based persistence separates entity-specific logic from business logic - specialized managers enable optimizations",
+      "Command pattern with CommandContext provides consistent transaction management across operations - interceptors handle cross-cutting concerns",
+      "Builder pattern with validation creates fluent, type-safe API for complex object construction - excellent developer experience",
+      "Bidirectional XML conversion with extension preservation enables tool interoperability - lossless round-trip critical for standards compliance",
+      "Spring Boot auto-configuration with sensible defaults reduces boilerplate - convention over configuration, externalized properties",
+      "Configurable history detail levels balance audit requirements with performance - structural changes vs attribute-level tracking",
+      "Fluent assertions (AssertJ) particularly valuable for complex domain models - readable test code",
+      "Event-driven execution (CMMN) complements flow-driven (BPMN) for different use cases - data changes trigger evaluations vs sequence flows",
+      "Wait state pattern enables long-running processes with external triggers - process persisted between API calls",
+      "Process-level locking for distributed deployments prevents concurrent modification - optimistic locking with timestamp",
+      "Namespace-aware XML processing essential for standards compliance - proper qualified name handling, extension namespaces",
+      "Multi-module Maven project scales for large codebase but start with few modules - split only when clear separation needed",
+      "Supporting multiple modeling standards (BPMN, CMMN, DMN) requires careful architecture - shared infrastructure, paradigm-specific operations",
+      "Active maintenance critical for production use - Flowable actively developed while Camunda Platform 7 archived"
+    ],
+    "anti_patterns_to_avoid": [
+      "Don't create 100+ modules from start - begin with 5-10 well-defined modules and split only when needed",
+      "Don't use legacy date/time libraries (Joda-Time) - java.time standard since Java 8",
+      "Don't build complex async executor unless distributed deployment required - simple ExecutorService sufficient for most use cases",
+      "Don't support multiple expression languages unless business requirement - single language simpler to maintain",
+      "Don't create separate engines per diagram type unless execution semantics fundamentally incompatible - unified engine with operation types cleaner",
+      "Don't use MyBatis if unfamiliar - JPA/Hibernate more mainstream with better tooling despite MyBatis being valid choice",
+      "Don't track every attribute change in history unless audit requirement - configurable detail levels essential for performance",
+      "Don't build multi-tenancy features unless SaaS deployment planned - significant complexity for questionable value in many applications",
+      "Don't implement full BPMN 2.0 specification unless workflow automation required - UML execution simpler than enterprise BPM",
+      "Don't couple tightly to specific frameworks - abstraction layers enable framework changes",
+      "Don't create deep class hierarchies - prefer composition and interfaces for flexibility"
+    ],
+    "comparison_with_camunda": {
+      "architecture": "Flowable uses agenda pattern with operation queue vs Camunda's PVM state machine. Agenda pattern cleaner with explicit operation types. Flowable execution tree model with parent-child relationships more intuitive than Camunda's execution replacement chain.",
+      "cmmn_support": "Flowable has first-class CMMN support with dedicated engine. Camunda recommends BPMN workarounds for case management. Flowable advantage for complex case processing.",
+      "development_status": "Flowable actively maintained (7.2.0 August 2024) with 277 contributors. Camunda Platform 7 archived November 2025, End of Life. Flowable major advantage for ongoing support and security updates.",
+      "license": "Both Apache 2.0 - identical licensing. Flowable V7 requires Java 17+ while Camunda 7 supports older Java versions. Flowable more modern.",
+      "complexity": "Both HIGH complexity appropriate for enterprise workflow engines. Flowable 100+ modules vs Camunda dozens. Similar scope and sophistication.",
+      "api_design": "Both service-oriented with similar services (Repository, Runtime, Task, History, Identity, Management). Flowable adds DynamicBpmnService and ProcessMigrationService.",
+      "persistence": "Both use MyBatis with entity managers. Similar manager-based architecture. Both support multiple databases with vendor-specific scripts.",
+      "expression_languages": "Both support JUEL and multiple scripting languages (Groovy, JavaScript). Flowable adds Drools integration. Similar capabilities.",
+      "spring_integration": "Both have Spring Boot starters with auto-configuration. Similar developer experience. Flowable more recent Spring Boot versions.",
+      "recommendation": "Flowable preferred over Camunda for new projects due to active maintenance and modern architecture. Study both but favor Flowable patterns for UML-Codex. Agenda pattern cleaner than PVM."
+    }
+  },
+  "notes": "Flowable Engine is a mature, actively maintained open-source workflow and business process automation platform demonstrating production-quality implementation of BPMN 2.0, CMMN 1.1, and DMN 1.3 standards. The platform is under active development with version 7.2.0 released August 2024, contrasting sharply with Camunda Platform 7's End of Life status.\n\nHistorical Context:\nFlowable was forked from Activiti in October 2016 by original Activiti core developers Joram Barrez and Tijs Rademakers after direction disagreements with sponsor Alfresco. Camunda had previously forked from Activiti in 2013. This history explains similarities in architecture (all descended from Activiti) but also differences as projects evolved independently. Flowable moved to improved v6 engine architecture while Camunda stayed on Activiti 5 engine before eventual archival.\n\nKey Architectural Innovations:\n\n1. AGENDA-BASED EXECUTION: Flowable's most significant architectural innovation is the agenda pattern replacing traditional state machine approaches. CommandContextUtil.getAgenda() manages operation queue. Operations (ContinueProcessOperation, TakeOutgoingSequenceFlowsOperation, EndExecutionOperation, TriggerExecutionOperation) are planned and executed sequentially. This creates clean separation between execution state (ExecutionEntity) and execution logic (operations). Compared to Camunda's PVM, agenda pattern is more transparent and debuggable - logging the agenda package shows exact execution sequence. Operations are testable in isolation and easy to extend with custom types. For UML-Codex: agenda pattern HIGHLY APPLICABLE to Activity Diagram and State Machine execution with operation types like ExecuteActionOperation, EvaluateGuardOperation, ForkExecutionOperation, JoinExecutionOperation, EnterStateOperation, ExitStateOperation.\n\n2. EXECUTION TREE MODEL: Hierarchical execution structure using parent-child relationships in ExecutionEntity. Process instance is root execution, child executions created for concurrent branches, subprocesses, and multi-instance activities. Tree structure provides natural scope isolation and concurrent execution management. ExecutionEntityManager methods (findFirstScope, findFirstMultiInstanceRoot, collectChildren) enable tree navigation. More intuitive than Camunda's execution replacement chain. Variables scoped per execution enable proper isolation. Process-level locking (lockTime field) supports distributed deployments preventing concurrent modification. For UML-Codex: execution tree directly applicable to Activity Diagram fork/join nodes and State Machine orthogonal regions. Parent-child relationships model concurrency naturally.\n\n3. SERVICE-ORIENTED ARCHITECTURE: ProcessEngine provides access to 8 specialized services with focused responsibilities. Thread-safe singleton design for application-wide sharing. Services delegate to command execution maintaining consistency. Clean API boundaries, single responsibility, easy to understand and test. Services: RepositoryService (deployments/definitions), RuntimeService (execution/variables), TaskService (user tasks), HistoryService (audit trail), IdentityService (users/groups), ManagementService (administration), DynamicBpmnService (runtime modifications), ProcessMigrationService (version migration). For UML-Codex: HIGHLY APPLICABLE - organize as ModelService, DiagramService, ValidationService, TransformationService, GenerationService, RepositoryService, QueryService.\n\n4. MANAGER-BASED PERSISTENCE: Specialized entity manager per entity type (ExecutionEntityManager, TaskEntityManager, DeploymentEntityManager, JobEntityManager, VariableInstanceEntityManager, etc.). EntityManager<T> interface provides consistency. Managers handle CRUD, queries, and entity-specific business logic. MyBatis for SQL mapping with multi-database support (PostgreSQL, MySQL, Oracle, SQL Server, H2, DB2). Lazy manager initialization via factory. Session-per-command pattern with flush before commit. For UML-Codex: manager pattern applicable (ClassManager, AssociationManager, PackageManager, DiagramManager) but consider JPA/Hibernate instead of MyBatis for better ecosystem integration.\n\n5. CMMN EVENT-DRIVEN EXECUTION: First-class CMMN support differentiates Flowable from Camunda (which recommends BPMN workarounds). CMMN uses event-driven model where data changes trigger criteria evaluation. EvaluateCriteriaOperation planned frequently to check entry/exit sentries. Contrasts with BPMN's sequence flow-driven execution. Shows how to support fundamentally different execution paradigms in unified platform. For UML-Codex: valuable lesson supporting both Activity Diagrams (flow-driven) and State Machines (event-driven). Event-driven pattern applicable to State Machine change events triggering guard evaluations.\n\n6. BPMN MODEL API: Comprehensive object model with proper class hierarchies (BaseElement, FlowElement, FlowNode, Activity, Gateway, Event, Task specializations). Interface-based extensibility (HasExecutionListeners, HasExtensionAttributes). Complete BPMN 2.0 element coverage including subprocesses, event subprocesses, multi-instance, data objects, message/signal/error/escalation/timer/conditional events. BpmnXMLConverter handles bidirectional transformation with namespace awareness and extension preservation. For UML-Codex: HIGHLY APPLICABLE - adapt class hierarchy patterns for UML metamodel (NamedElement, Classifier, Class hierarchies). Bidirectional XMI conversion critical for tool interoperability.\n\n7. COMMAND PATTERN: All operations encapsulated as Command<T> objects executed within CommandContext. Context manages transaction, sessions, entity managers, and shared state. Commands reusable, testable, composable. CommandExecutor manages lifecycle and interceptor chain for cross-cutting concerns. For UML-Codex: HIGHLY APPLICABLE - UML operations as commands (CreateClassCommand, ValidateModelCommand, TransformModelCommand, GenerateCodeCommand). CommandContext provides transaction management and repository access.\n\n8. SPRING BOOT INTEGRATION: Auto-configuration starter (flowable-spring-boot) provides excellent developer experience. Minimal configuration - engines configured from application.properties with sensible defaults. Process definitions auto-deployed from classpath. Actuator endpoints for monitoring. Transaction synchronization with Spring TX. For UML-Codex: HIGHLY APPLICABLE - create uml-codex-spring-boot-starter following same pattern.\n\n9. WAIT STATE PATTERN: Activities can be wait states where engine pauses execution pending external trigger. User tasks create task entity and wait until TaskService.complete(). Intermediate catch events wait for signal/message. Process state persisted enabling long-running processes across server restarts. Engine is 'local' - examines current state and continues until wait state. For UML-Codex: applicable to Activity Diagram accept event actions, State Machine event triggers, Interaction Diagram message receives.\n\n10. EXPRESSION LANGUAGE: Multiple language support (JUEL default, Groovy, Drools, FEEL for DMN, JavaScript via Nashorn/GraalVM). Expressions evaluated against execution context with variable scoping. Custom function providers for domain operations. Expression caching for performance. For UML-Codex: expression language needed for OCL constraints, guard conditions, value specifications, action code. Study pluggable evaluator pattern but choose single language (OCL for UML compliance, SpEL for Spring, or GraalVM Polyglot).\n\n11. BUILDER PATTERN: Fluent builders for complex operations (ProcessInstanceBuilder, query builders). Optional parameters handled cleanly. Builder validates before execution. IDE code completion guides usage. For UML-Codex: HIGHLY APPLICABLE - ClassBuilder, AssociationBuilder, DiagramBuilder, TransformationBuilder with fluent API and validation.\n\n12. HISTORY EVENT STREAM: Configurable audit trail with detail levels (NONE, ACTIVITY, AUDIT, FULL). History persisted separately from runtime enabling different retention policies. HistoryService queries historical data. Supports CQRS pattern. For UML-Codex: applicable to model change tracking for undo/redo, audit compliance, change impact analysis. Configurable levels: STRUCTURAL (major changes), DETAILED (all changes), FULL (attribute updates).\n\nArchitecture Philosophy:\nFlowable emphasizes embeddable design - engine as library within applications or standalone server. Spring integration for dependency injection and transactions. REST API for remote access. Cloud deployment with Kubernetes configs. Docker containerization. Design tooling via Flowable Cloud (free tier for open source). Philosophy aligns with UML-Codex goals of providing library components usable in various deployment scenarios.\n\nComplexity Assessment:\nHIGH complexity appropriate for enterprise workflow engine but potentially excessive for UML modeling tool. 100+ modules create build complexity. Sophisticated execution model, persistence layer, and integration capabilities demonstrate production patterns but significant learning curve. UML-Codex should study patterns and adapt selectively rather than wholesale adoption.\n\nDependencies:\nCore dependencies use permissive licenses (Apache 2.0, MIT, EPL 2.0) fully compatible with commercial and open source use. MyBatis for persistence, Spring for DI, JUEL/Groovy/Drools for expressions, Joda-Time (legacy - use java.time), SLF4J for logging, Commons Lang/IO for utilities. Test dependencies include JUnit 5, AssertJ, Mockito, H2, Awaitility. No problematic licenses.\n\nActive Development:\nVersion 7.2.0 released August 2024 with async variable support, skip expressions, migration enhancements, secure HTTP headers. Dual version support: V7 requires Java 17+, V6 supports Java 8+. Community of 277 contributors, 358 open issues, 28 pull requests indicate healthy development. Forum active at forum.flowable.org. Free cloud-based design tool for BPMN/CMMN/DMN modeling.\n\nComparison with Camunda:\nFlowable PREFERRED over Camunda for new projects due to active maintenance (Camunda 7 archived November 2025). Flowable has modern agenda pattern (cleaner than Camunda's PVM) and first-class CMMN support (Camunda recommends BPMN workarounds). Both Apache 2.0 licensed with similar HIGH complexity and MyBatis persistence. Flowable requires Java 17+ (more modern) while Camunda 7 supports older Java. API designs similar (service-oriented). For UML-Codex: study both but favor Flowable patterns due to active development and cleaner agenda architecture.\n\nRecommendations for UML-Codex:\n1. ADAPT agenda pattern for UML Activity Diagram and State Machine execution - operation queue provides explicit execution trace\n2. ADAPT execution tree model for concurrent execution and scope isolation - parent-child relationships natural for fork/join\n3. ADOPT service-oriented API design - organize as ModelService, DiagramService, ValidationService, TransformationService, GenerationService\n4. ADOPT Spring Boot integration pattern - auto-configuration with sensible defaults\n5. ADAPT BPMN model API patterns for UML metamodel - class hierarchies and interface-based extensibility\n6. ADOPT command pattern for UML operations - consistent transaction management\n7. ADOPT builder pattern for model construction - fluent API with validation\n8. ADAPT XML converter pattern for UML XMI - bidirectional conversion with extension preservation\n9. STUDY manager-based persistence but consider JPA/Hibernate instead of MyBatis\n10. STUDY CMMN event-driven execution for State Machine semantics\n11. ADAPT history event stream for model change tracking\n12. ADOPT testing infrastructure with fluent assertions and in-memory repository\n13. AVOID complex async executor unless distributed deployment required\n14. AVOID multi-engine architecture unless execution semantics fundamentally incompatible\n15. STUDY expression language integration but choose single language for UML\n\nCritical Learnings:\n- Agenda pattern with operation queue cleaner than state machine for execution control\n- Execution tree with parent-child relationships elegant model for concurrency\n- Service-oriented API with focused responsibilities scales better than monolithic API\n- Command pattern with CommandContext provides consistent transaction management\n- Builder pattern creates fluent, type-safe API for complex construction\n- Bidirectional XML conversion with extension preservation enables tool interoperability\n- Spring Boot auto-configuration reduces boilerplate and improves developer experience\n- Configurable history detail levels balance audit requirements with performance\n- Active maintenance critical for production use - Flowable actively developed\n- Supporting multiple paradigms (flow-driven BPMN, event-driven CMMN) requires careful architecture\n- Wait state pattern enables long-running processes with external triggers\n- Process-level locking supports distributed deployments\n- Namespace-aware XML processing essential for standards compliance\n- Multi-module project scales for large codebase but start with few modules\n- Testing with fluent assertions and in-memory database enables fast, readable tests\n\nOverall: Exceptional reference implementation for workflow execution demonstrating production-quality patterns directly applicable to UML execution (Activity Diagrams, State Machines). Actively maintained (major advantage over archived Camunda 7) with clean agenda architecture and first-class CMMN support. Apache 2.0 license permits code adaptation with attribution. While HIGH complexity appropriate for enterprise workflow engine, UML-Codex should adapt patterns selectively rather than wholesale adoption. Study agenda pattern, execution trees, service-oriented API, command pattern, builder APIs, Spring Boot integration. Adapt BPMN model patterns for UML metamodel and XML converter for UML XMI. Avoid unnecessary complexity (async executor, multi-tenancy, multi-engine architecture).\n\nPrimary Value: Architectural patterns (agenda execution, execution trees, service-oriented API, command pattern) and specific components (model API, Spring Boot integration, builder APIs, XML conversion) rather than full engine adoption. Flowable demonstrates that building production-quality executable model infrastructure is substantial undertaking - UML-Codex should carefully scope execution features and leverage proven patterns without unnecessary complexity.\n\nFinal Assessment: HYBRID - legally permitted and technically feasible for code adaptation (Apache 2.0), but selective adaptation recommended over wholesale adoption. ADAPT model API, Spring Boot integration, builder patterns, XML conversion. STUDY agenda pattern, execution trees, manager-based persistence, CMMN event-driven execution. AVOID async executor, multi-tenancy, multi-engine complexity. Flowable's active maintenance and modern agenda architecture make it preferred reference over archived Camunda Platform 7 for UML-Codex architectural decisions."
+}

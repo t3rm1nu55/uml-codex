@@ -1,0 +1,597 @@
+{
+  "version": 1,
+  "last_updated": "2025-11-08T00:00:00Z",
+  "summary": "Inventory of components identified from analyzed repositories that are valuable for UML-Codex development",
+  "total_components": 28,
+  "categories": {
+    "code_generators": 4,
+    "dsl_frameworks": 3,
+    "workflow_engines": 3,
+    "model_apis": 4,
+    "ui_builders": 2,
+    "validation_frameworks": 3,
+    "persistence_layers": 2,
+    "testing_infrastructure": 3,
+    "integration_frameworks": 4
+  },
+  "components": [
+    {
+      "id": "comp-001",
+      "name": "Template Method Code Generator Pattern",
+      "source": "REGnosys/rosetta-code-generators",
+      "category": "CODE_GENERATOR",
+      "status": "EVALUATED",
+      "priority": "P0",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 9,
+      "effort_score": 4,
+      "value_proposition": "Proven pattern for multi-language code generation. Base generator with overridable hooks scales to 10+ languages. Plugin architecture enables independent development per target language.",
+      "dependencies": ["Python template engine (Jinja2)", "Intermediate model (Pydantic)"],
+      "risks": ["Need Python equivalent of Xtend templates", "Type mapping complexity per language"],
+      "notes": "Core architectural pattern. Use Python/Jinja2 instead of Java/Xtend. Return Dict[filename, content] for clean separation.",
+      "evaluation_notes": [
+        "2025-11-08: Reviewed rosetta-code-generators. Pattern is excellent but technology stack needs translation to Python. Template Method pattern directly applicable."
+      ]
+    },
+    {
+      "id": "comp-002",
+      "name": "Type Object Pattern Metamodel",
+      "source": "camunda/camunda-bpmn-model",
+      "category": "MODEL",
+      "status": "EVALUATED",
+      "priority": "P0",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 10,
+      "effort_score": 7,
+      "value_proposition": "Runtime metamodel with declarative type registration. Essential for UML's reflective metamodel. Enables generic model operations, validation, and serialization without hardcoding element types.",
+      "dependencies": ["Python metaclasses or descriptor protocol", "XML/XMI parser"],
+      "risks": ["UML has 700+ metaclasses vs BPMN's 200", "May need code generation for scale"],
+      "notes": "Consider hybrid: code generation for metaclasses, Type Object pattern for runtime. Camunda manually implemented; UML scale may require generation.",
+      "evaluation_notes": [
+        "2025-11-08: Excellent reference from Camunda. Pattern works but UML scale (700+ metaclasses) suggests code generation for initial setup, then runtime reflection."
+      ]
+    },
+    {
+      "id": "comp-003",
+      "name": "Rosetta DSL Type System",
+      "source": "REGnosys/rune-dsl",
+      "category": "DSL",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": false,
+      "reuse_approach": "STUDY",
+      "value_score": 8,
+      "effort_score": 9,
+      "value_proposition": "Rich type system with inheritance, composition, cardinality constraints, choice constraints. Grammar-driven with Xtext. Demonstrates how to build enterprise DSL with type safety and validation.",
+      "dependencies": ["Eclipse Xtext", "EMF", "Java ecosystem"],
+      "risks": ["Heavyweight Eclipse dependencies", "UML already has metamodel defined by OMG spec"],
+      "notes": "Study for patterns, not direct use. UML metamodel already exists. Learn from: separation of structure/validation/logic, constraint specification, expression language design.",
+      "evaluation_notes": [
+        "2025-11-08: Excellent DSL implementation but UML doesn't need new DSL - it has OMG specification. Value is in understanding type system patterns and validation architecture."
+      ]
+    },
+    {
+      "id": "comp-004",
+      "name": "Agenda-Based Execution Pattern",
+      "source": "flowable/flowable-engine",
+      "category": "WORKFLOW_ENGINE",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 9,
+      "effort_score": 6,
+      "value_proposition": "Operation queue pattern for transparent execution control. Cleaner than Camunda's PVM state machine. Operations: ContinueProcess, TakeOutgoingFlows, EndExecution. Excellent for UML Activity Diagram and State Machine execution.",
+      "dependencies": ["Queue data structure", "Operation interface"],
+      "risks": ["Complexity grows with operation types", "Need complete operation coverage"],
+      "notes": "Highly applicable for UML behavioral diagram execution. Start with core operations: ExecuteAction, EvaluateGuard, ForkExecution, JoinExecution, EnterState, ExitState.",
+      "evaluation_notes": [
+        "2025-11-08: Flowable's agenda pattern superior to Camunda PVM. More debuggable, clearer execution trace. Perfect for UML Activity/State execution."
+      ]
+    },
+    {
+      "id": "comp-005",
+      "name": "FINOS CDM Event Model Architecture",
+      "source": "finos/common-domain-model",
+      "category": "MODEL",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Community Specification License 1.0 / Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 10,
+      "effort_score": 5,
+      "value_proposition": "9 primitive instructions compose complex events. TradeState with validated transitions. Applicable to UML: decompose behavioral changes into primitives, track state transitions, validate state machine semantics.",
+      "dependencies": ["State type definitions", "Transition validation"],
+      "risks": ["Domain-specific (finance) - need UML equivalent primitives"],
+      "notes": "Pattern excellent. UML primitives might be: CreateElement, DeleteElement, ModifyAttribute, AddAssociation, RemoveAssociation, ChangeState, ExecuteTransition. Build complex model changes from primitives.",
+      "evaluation_notes": [
+        "2025-11-08: Event sourcing with primitives is powerful. Enables replay, audit, validation. Directly applicable to UML model change tracking and behavioral execution."
+      ]
+    },
+    {
+      "id": "comp-006",
+      "name": "Fluent Builder API with Recursive Generics",
+      "source": "camunda/camunda-bpmn-model",
+      "category": "BUILDER",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 8,
+      "effort_score": 6,
+      "value_proposition": "Type-safe method chaining: process().startEvent().serviceTask().userTask().endEvent().done(). Excellent developer experience. Reduces errors vs manual object construction.",
+      "dependencies": ["Python type hints with generics", "Return type annotations"],
+      "risks": ["Python generics less powerful than Java", "May need Protocol/TypedDict"],
+      "notes": "Python equivalent using Protocol and TypeVar. Example: class ClassBuilder(Generic[T]): ... Enables: package.class_('Person').attribute('name', str).association('employer', Company).build()",
+      "evaluation_notes": [
+        "2025-11-08: Pattern works in Python with typing.Generic and typing.Protocol. Not as clean as Java but achievable. Improves UX significantly."
+      ]
+    },
+    {
+      "id": "comp-007",
+      "name": "Command Pattern with Interceptor Chain",
+      "source": "camunda/camunda-bpm-platform, flowable/flowable-engine",
+      "category": "UTILITY",
+      "status": "EVALUATED",
+      "priority": "P0",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 10,
+      "effort_score": 3,
+      "value_proposition": "All operations as commands with interceptor chain for transactions, authorization, logging, validation. Clean separation of concerns. Enables undo/redo for model editors. Perfect for UML operations.",
+      "dependencies": ["Command interface", "Interceptor chain"],
+      "risks": ["Overhead for simple operations"],
+      "notes": "Simple to implement in Python. class Command(Protocol): def execute(self, context) -> T. Interceptors: TransactionInterceptor, ValidationInterceptor, AuditInterceptor. Chain executes before/after each command.",
+      "evaluation_notes": [
+        "2025-11-08: Both Camunda and Flowable use this pattern successfully. Low implementation cost, high value. Essential for UML model editors with undo/redo."
+      ]
+    },
+    {
+      "id": "comp-008",
+      "name": "Bidirectional XML/XMI Serialization",
+      "source": "camunda/camunda-bpmn-model, flowable/flowable-engine",
+      "category": "PARSER",
+      "status": "EVALUATED",
+      "priority": "P0",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 9,
+      "effort_score": 7,
+      "value_proposition": "Lossless round-trip: XML → Model → XML preserving extensions, comments, formatting. Namespace-aware parsing. Essential for UML tool interoperability via XMI standard.",
+      "dependencies": ["lxml or xmlschema", "Namespace registry", "Extension mechanism"],
+      "risks": ["XMI more complex than BPMN XML", "UML profiles add namespace complexity"],
+      "notes": "XMI 2.5.1 support required. Handle: UML namespace, XMI namespace, profile namespaces, vendor extensions. Preserve unknown elements for tool interoperability.",
+      "evaluation_notes": [
+        "2025-11-08: Critical for UML. Both engines handle BPMN XML well with extension preservation. UML XMI more complex but same patterns apply."
+      ]
+    },
+    {
+      "id": "comp-009",
+      "name": "Qualification Function Pattern",
+      "source": "finos/common-domain-model",
+      "category": "VALIDATOR",
+      "status": "EVALUATED",
+      "priority": "P2",
+      "license": "Community Specification License 1.0 / Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 7,
+      "effort_score": 5,
+      "value_proposition": "Structural classification: classify objects by examining structure, not explicit types. Duck typing in strongly-typed system. Applicable to UML: infer stereotypes, detect patterns, validate conformance.",
+      "dependencies": ["Pattern matching", "AST traversal"],
+      "risks": ["Can become brittle with model changes", "Needs versioning"],
+      "notes": "Use for: detecting design patterns in UML models, suggesting stereotypes, validating architectural conformance. Example: isRepository(class) checks if class has CRUD methods.",
+      "evaluation_notes": [
+        "2025-11-08: Clever pattern from FINOS. Not core priority but useful for advanced features like pattern detection and code smell detection."
+      ]
+    },
+    {
+      "id": "comp-010",
+      "name": "Multi-Layer Validation Framework",
+      "source": "REGnosys/rune-dsl, finos/common-domain-model",
+      "category": "VALIDATOR",
+      "status": "EVALUATED",
+      "priority": "P0",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 10,
+      "effort_score": 5,
+      "value_proposition": "4-layer validation: Syntax (grammar) → Type checking → Constraints (cardinality, choice) → Semantic (cross-model). Clear error messages with element paths. Essential for UML model validation.",
+      "dependencies": ["Validator interface", "Error collector", "Constraint language (OCL)"],
+      "risks": ["Performance with large models", "OCL implementation complexity"],
+      "notes": "Python validators: 1) XMI schema validation, 2) Metaclass type checking, 3) OCL constraint evaluation, 4) Well-formedness rules. Return structured ValidationResult with paths.",
+      "evaluation_notes": [
+        "2025-11-08: Standard pattern across all analyzed projects. Well-understood, proven approach. Must-have for UML tooling."
+      ]
+    },
+    {
+      "id": "comp-011",
+      "name": "Service-Oriented API Design",
+      "source": "camunda/camunda-bpm-platform, flowable/flowable-engine",
+      "category": "INTEGRATION_FRAMEWORK",
+      "status": "EVALUATED",
+      "priority": "P0",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 9,
+      "effort_score": 4,
+      "value_proposition": "8-12 focused services with single responsibilities. Better than monolithic API. Examples: ModelService (CRUD), DiagramService (layout), ValidationService, TransformationService, GenerationService.",
+      "dependencies": ["Service layer pattern", "Dependency injection"],
+      "risks": ["Over-fragmentation", "Cross-service transactions"],
+      "notes": "For UML-Codex: ModelService, DiagramService, ValidationService, TransformationService, CodeGenerationService, ProfileService, OCLService, ExportService. Each service has clear responsibility.",
+      "evaluation_notes": [
+        "2025-11-08: Both workflow engines use this successfully. Scales well, testable, clear boundaries. Standard best practice."
+      ]
+    },
+    {
+      "id": "comp-012",
+      "name": "Spring Boot Auto-Configuration",
+      "source": "flowable/flowable-engine",
+      "category": "INTEGRATION_FRAMEWORK",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 8,
+      "effort_score": 5,
+      "value_proposition": "Convention over configuration. Auto-detect components, configure datasources, setup defaults. Flowable provides flowable-spring-boot-starter. Great developer experience.",
+      "dependencies": ["Spring Boot framework"],
+      "risks": ["Tight coupling to Spring ecosystem"],
+      "notes": "Consider Python equivalent with FastAPI or Django. Create uml-codex-fastapi with auto-discovery of: models, validators, generators, services. Configuration via environment or config files.",
+      "evaluation_notes": [
+        "2025-11-08: Spring Boot integration is key to Flowable's adoption. Python equivalent would be FastAPI with dependency injection and auto-discovery."
+      ]
+    },
+    {
+      "id": "comp-013",
+      "name": "Schema-Driven UI Generation",
+      "source": "REGnosys/cdm-object-builder",
+      "category": "UI_BUILDER",
+      "status": "EVALUATED",
+      "priority": "P2",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 7,
+      "effort_score": 8,
+      "value_proposition": "Rosetta DSL → TypeScript models → Angular components → Dynamic tree UI. Type-specific editors (Boolean, Date, Enum, etc.). Real-time validation. Applicable to UML for property editors and diagram tools.",
+      "dependencies": ["Frontend framework (React/Vue)", "TypeScript", "Code generator"],
+      "risks": ["Angular 14 outdated", "Tight coupling to CDM domain"],
+      "notes": "Pattern: UML Metamodel → Python/TypeScript models → React components → Property editors + Diagram canvas. Use modern stack: React 18+, TypeScript 5+, Vite, TanStack.",
+      "evaluation_notes": [
+        "2025-11-08: Good pattern but implementation outdated. Adapt concept to modern React/TypeScript stack. Lower priority - backend more critical initially."
+      ]
+    },
+    {
+      "id": "comp-014",
+      "name": "Resource-Based Test Data Pattern",
+      "source": "REGnosys/cdm-starter",
+      "category": "TESTING_INFRASTRUCTURE",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 8,
+      "effort_score": 2,
+      "value_proposition": "Complex test objects as JSON/XMI files in resources/. Load in tests: model = load_test_model('class-diagram-01.xmi'). Version controlled, shareable, realistic data.",
+      "dependencies": ["File loading utilities", "JSON/XMI parser"],
+      "risks": ["Test data maintenance", "Brittle tests if format changes"],
+      "notes": "Simple pattern, high value. tests/resources/models/ with .xmi files. tests/resources/diagrams/ with diagram data. Helper: load_model(filename), load_diagram(filename).",
+      "evaluation_notes": [
+        "2025-11-08: Simple, proven pattern. Low implementation cost. Enables comprehensive testing with realistic UML models."
+      ]
+    },
+    {
+      "id": "comp-015",
+      "name": "Completeness Checking Pattern",
+      "source": "REGnosys/rosetta-code-generators (via issues)",
+      "category": "CODE_GENERATOR",
+      "status": "EVALUATED",
+      "priority": "P0",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 10,
+      "effort_score": 3,
+      "value_proposition": "Enumerate all possible model element types. Ensure handler for each. Fail loudly if missing. Prevents silent feature omissions. Critical for code generation correctness.",
+      "dependencies": ["Enum of all element types", "Exhaustiveness checking"],
+      "risks": ["Maintenance as metamodel evolves"],
+      "notes": "Python: Use Enum for all UML metaclasses. In handlers, use match/case (3.10+) or if/elif with final else: raise NotImplementedError(). Consider mypy exhaustiveness checking.",
+      "evaluation_notes": [
+        "2025-11-08: Critical lesson from REGnosys issues. Python generator missing features caused bugs. Must fail loudly, not silently ignore."
+      ]
+    },
+    {
+      "id": "comp-016",
+      "name": "Execution Tree Model",
+      "source": "flowable/flowable-engine",
+      "category": "WORKFLOW_ENGINE",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 8,
+      "effort_score": 5,
+      "value_proposition": "Parent-child execution tree for concurrent execution and scope isolation. Natural model for Activity Diagram fork/join and State Machine orthogonal regions. More intuitive than Camunda's approach.",
+      "dependencies": ["Tree data structure", "Execution state model"],
+      "risks": ["Complexity with nested concurrency"],
+      "notes": "For UML: Root execution for Activity Diagram. Child executions for each forked path. Join synchronizes children. State Machines: parent for composite state, children for orthogonal regions.",
+      "evaluation_notes": [
+        "2025-11-08: Flowable's tree model cleaner than Camunda. Parent-child relationships natural for UML concurrency semantics."
+      ]
+    },
+    {
+      "id": "comp-017",
+      "name": "History Event Stream",
+      "source": "camunda/camunda-bpm-platform, flowable/flowable-engine",
+      "category": "UTILITY",
+      "status": "EVALUATED",
+      "priority": "P2",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADAPT",
+      "value_score": 7,
+      "effort_score": 6,
+      "value_proposition": "Audit trail of all changes. Events: ElementCreated, AttributeChanged, AssociationAdded, etc. Enables undo/redo, change tracking, collaboration features. Useful for UML model versioning.",
+      "dependencies": ["Event sourcing infrastructure", "Event storage"],
+      "risks": ["Storage overhead", "Event replay complexity"],
+      "notes": "Start simple: event log to database. Later: event sourcing with replay. Events: ModelElementEvent with type, element ID, timestamp, user, change details.",
+      "evaluation_notes": [
+        "2025-11-08: Both engines support history. Not critical for v1.0 but important for collaboration and versioning. Design event structure early even if storage deferred."
+      ]
+    },
+    {
+      "id": "comp-018",
+      "name": "Manager-Based Persistence Pattern",
+      "source": "camunda/camunda-bpm-platform, flowable/flowable-engine",
+      "category": "PERSISTENCE_LAYER",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": false,
+      "reuse_approach": "STUDY",
+      "value_score": 6,
+      "effort_score": 7,
+      "value_proposition": "Specialized manager per entity type (ModelElementManager, DiagramManager, etc.). Encapsulates database operations. Both engines use MyBatis.",
+      "dependencies": ["MyBatis or ORM"],
+      "risks": ["MyBatis less common than JPA/Hibernate", "Hand-written SQL maintenance"],
+      "notes": "Study pattern but use SQLAlchemy (Python) or JPA (Java) instead of MyBatis. Manager pattern still useful: isolates persistence logic, enables mocking, clear responsibilities.",
+      "evaluation_notes": [
+        "2025-11-08: Pattern good, technology choice (MyBatis) less ideal. Modern ORMs (SQLAlchemy, JPA) provide better abstraction and maintenance."
+      ]
+    },
+    {
+      "id": "comp-019",
+      "name": "Expression Language Integration",
+      "source": "camunda/camunda-bpm-platform, flowable/flowable-engine",
+      "category": "VALIDATOR",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": false,
+      "reuse_approach": "STUDY",
+      "value_score": 8,
+      "effort_score": 8,
+      "value_proposition": "Runtime expression evaluation for guards, constraints, assignments. JUEL (Java), Groovy, JavaScript support. For UML: OCL constraint evaluation essential.",
+      "dependencies": ["Expression parser", "Evaluation engine"],
+      "risks": ["OCL implementation complexity", "Performance with complex expressions"],
+      "notes": "Options: 1) Custom OCL implementation, 2) Eclipse OCL (Java), 3) PyOCL (Python), 4) Subset of OCL with Python eval. Start with simple constraint language, expand to full OCL.",
+      "evaluation_notes": [
+        "2025-11-08: OCL critical for UML but complex. Both engines use existing expression libraries. Recommend: start with simple subset, use Eclipse OCL or build custom gradually."
+      ]
+    },
+    {
+      "id": "comp-020",
+      "name": "Diagram Auto-Layout Algorithms",
+      "source": "flowable/flowable-engine",
+      "category": "UI_BUILDER",
+      "status": "IDENTIFIED",
+      "priority": "P2",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "STUDY",
+      "value_score": 6,
+      "effort_score": 8,
+      "value_proposition": "Automatic layout of BPMN diagrams. Useful for UML: auto-arrange class diagrams, sequence diagrams. Improves UX for generated diagrams.",
+      "dependencies": ["Graph layout algorithms", "Geometry calculations"],
+      "risks": ["Complex algorithms", "Not always aesthetically pleasing"],
+      "notes": "Consider existing libraries: GraphViz (dot), dagre, ELK (Eclipse Layout Kernel). For UML: hierarchical layout for class diagrams, sequence for sequence diagrams, orthogonal for state machines.",
+      "evaluation_notes": [
+        "2025-11-08: Nice-to-have feature. Many existing libraries. Lower priority - manual layout sufficient for v1.0."
+      ]
+    },
+    {
+      "id": "comp-021",
+      "name": "Multi-Database Dialect Support",
+      "source": "camunda/camunda-bpm-platform, flowable/flowable-engine",
+      "category": "PERSISTENCE_LAYER",
+      "status": "EVALUATED",
+      "priority": "P2",
+      "license": "Apache-2.0",
+      "can_reuse": false,
+      "reuse_approach": "STUDY",
+      "value_score": 5,
+      "effort_score": 9,
+      "value_proposition": "Support 6+ databases with dialect-specific optimizations. Both engines hand-write SQL per database. Performance varies 10x across databases.",
+      "dependencies": ["Database-specific SQL", "Query builders"],
+      "risks": ["Maintenance nightmare", "Testing across all databases"],
+      "notes": "AVOID hand-written SQL per database. Use ORM (SQLAlchemy, JPA) for abstraction. Test on 2-3 databases (PostgreSQL, MySQL/MariaDB, SQLite). Provide migration scripts.",
+      "evaluation_notes": [
+        "2025-11-08: Both engines struggle with this. Hand-written SQL is maintenance burden. Modern ORMs solve this. Start with single database, add others via ORM if needed."
+      ]
+    },
+    {
+      "id": "comp-022",
+      "name": "Process Migration Framework",
+      "source": "camunda/camunda-bpm-platform",
+      "category": "UTILITY",
+      "status": "IDENTIFIED",
+      "priority": "P3",
+      "license": "Apache-2.0",
+      "can_reuse": false,
+      "reuse_approach": "STUDY",
+      "value_score": 4,
+      "effort_score": 9,
+      "value_proposition": "Migrate running process instances to new process definition versions. Complex but enables model evolution without disrupting running instances.",
+      "dependencies": ["Version management", "State migration"],
+      "risks": ["Very complex", "Edge cases abound"],
+      "notes": "Not applicable to UML modeling tool initially. Relevant if UML-Codex includes execution engine for Activity Diagrams / State Machines. Defer to v2.0+.",
+      "evaluation_notes": [
+        "2025-11-08: Interesting feature but not core UML need. Only relevant if building execution engine. Low priority."
+      ]
+    },
+    {
+      "id": "comp-023",
+      "name": "Pluggable Storage Abstraction",
+      "source": "flowable/flowable-engine (via issues)",
+      "category": "PERSISTENCE_LAYER",
+      "status": "IDENTIFIED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 9,
+      "effort_score": 6,
+      "value_proposition": "Innovation from Flowable issues: in-memory DataManagers using ConcurrentMap for extreme throughput (100s of processes/second). Pluggable storage enables SQL (persistent) or in-memory (performance).",
+      "dependencies": ["Storage abstraction interface", "In-memory and SQL implementations"],
+      "risks": ["Consistency between implementations", "Testing complexity"],
+      "notes": "For UML-Codex: ModelRepository interface with implementations: InMemoryModelRepository (ConcurrentMap), SQLModelRepository (SQLAlchemy). Enables fast prototyping (in-memory) and production (SQL).",
+      "evaluation_notes": [
+        "2025-11-08: Excellent idea from Flowable community. Enables flexibility: dev/test use in-memory, production uses SQL. Clean abstraction."
+      ]
+    },
+    {
+      "id": "comp-024",
+      "name": "Namespace Registry and Resolution",
+      "source": "camunda/camunda-bpmn-model",
+      "category": "PARSER",
+      "status": "EVALUATED",
+      "priority": "P0",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 9,
+      "effort_score": 4,
+      "value_proposition": "Central registry for XML namespaces. Maps namespace URIs to prefixes and element types. Essential for UML XMI parsing with multiple namespaces (UML, XMI, profiles, vendor extensions).",
+      "dependencies": ["Namespace registry", "URI to prefix mapping"],
+      "risks": ["Namespace conflicts", "Profile namespace complexity"],
+      "notes": "Python: NamespaceRegistry with register_namespace(uri, prefix, schema). Parser uses registry to resolve element types. Support for: UML namespace, XMI namespace, profile namespaces, vendor extensions.",
+      "evaluation_notes": [
+        "2025-11-08: Critical for XMI parsing. Camunda handles BPMN namespaces well. UML has more namespaces (profiles) but same pattern applies."
+      ]
+    },
+    {
+      "id": "comp-025",
+      "name": "Optimistic Locking with Version Fields",
+      "source": "camunda/camunda-bpm-platform, flowable/flowable-engine",
+      "category": "PERSISTENCE_LAYER",
+      "status": "EVALUATED",
+      "priority": "P2",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 7,
+      "effort_score": 3,
+      "value_proposition": "Version field on entities. Increment on each update. Detect concurrent modifications. Enables collaborative editing without pessimistic locks.",
+      "dependencies": ["Version field on models", "Concurrency exception handling"],
+      "risks": ["User experience with conflicts", "Merge complexity"],
+      "notes": "Standard pattern with ORMs. SQLAlchemy supports version_id_col. Detect conflicts, notify user, provide merge UI. Start simple: last-write-wins with conflict detection.",
+      "evaluation_notes": [
+        "2025-11-08: Standard pattern for collaborative editing. Both engines use successfully. Low implementation cost with ORM support."
+      ]
+    },
+    {
+      "id": "comp-026",
+      "name": "AssertJ Fluent Test Assertions",
+      "source": "flowable/flowable-engine",
+      "category": "TESTING_INFRASTRUCTURE",
+      "status": "EVALUATED",
+      "priority": "P1",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 7,
+      "effort_score": 2,
+      "value_proposition": "Fluent assertions: assertThat(model).hasElements(3).hasClass('Person').hasAttribute('name'). Better readability than plain asserts. Python equivalent: assertpy.",
+      "dependencies": ["assertpy or custom assertion library"],
+      "risks": ["Learning curve for team"],
+      "notes": "Python: use assertpy. from assertpy import assert_that. assert_that(model.classes).extracting('name').contains('Person', 'Company'). Improves test readability significantly.",
+      "evaluation_notes": [
+        "2025-11-08: Flowable tests very readable with AssertJ. Python assertpy provides similar fluent API. Low cost, high value for test quality."
+      ]
+    },
+    {
+      "id": "comp-027",
+      "name": "Good First Issue Labeling",
+      "source": "flowable/flowable-engine (via issues)",
+      "category": "INTEGRATION_FRAMEWORK",
+      "status": "IDENTIFIED",
+      "priority": "P3",
+      "license": "N/A",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 5,
+      "effort_score": 1,
+      "value_proposition": "Label simple issues 'good first issue' to encourage community contributions. Reduces maintainer burden, builds community.",
+      "dependencies": ["GitHub issue labels"],
+      "risks": ["Need to identify suitable issues"],
+      "notes": "Community building practice. Not technical but valuable for open source projects. Label issues: good-first-issue, help-wanted, documentation, testing.",
+      "evaluation_notes": [
+        "2025-11-08: Community practice from Flowable. If UML-Codex goes open source, useful for community building. Low priority until project public."
+      ]
+    },
+    {
+      "id": "comp-028",
+      "name": "Configuration Validation on Startup",
+      "source": "flowable/flowable-engine (via issues)",
+      "category": "INTEGRATION_FRAMEWORK",
+      "status": "IDENTIFIED",
+      "priority": "P2",
+      "license": "Apache-2.0",
+      "can_reuse": true,
+      "reuse_approach": "ADOPT",
+      "value_score": 8,
+      "effort_score": 3,
+      "value_proposition": "Validate configuration at startup. Fail fast with clear error messages. Issue #4066: retry configuration properties silently ignored, causing confusion. Prevent misconfiguration bugs.",
+      "dependencies": ["Configuration schema", "Validation logic"],
+      "risks": ["Over-validation prevents flexibility"],
+      "notes": "Python: use Pydantic Settings for configuration validation. Define schema with constraints. Validate on app startup. Clear error messages: 'Invalid OCL timeout: -1. Must be positive integer.'",
+      "evaluation_notes": [
+        "2025-11-08: Important lesson from Flowable issues. Silent config failures waste developer time. Validate early, fail fast, clear messages."
+      ]
+    }
+  ],
+  "priority_breakdown": {
+    "P0": 10,
+    "P1": 11,
+    "P2": 6,
+    "P3": 1
+  },
+  "status_breakdown": {
+    "IDENTIFIED": 5,
+    "EVALUATED": 23,
+    "ADOPTED": 0,
+    "REJECTED": 0
+  },
+  "reuse_approach_breakdown": {
+    "ADOPT": 11,
+    "ADAPT": 13,
+    "STUDY": 4,
+    "AVOID": 0
+  }
+}

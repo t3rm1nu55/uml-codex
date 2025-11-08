@@ -1,0 +1,841 @@
+{
+  "version": 1,
+  "repository": "flowable/flowable-engine",
+  "analysis_date": "2025-11-08",
+  "last_updated": "2025-11-08T00:00:00Z",
+  "repository_status": "active",
+  "change_history": [
+    {
+      "date": "2025-11-08",
+      "description": "Initial comprehensive analysis of flowable-engine issues focusing on workflow engine challenges and comparison with Camunda"
+    }
+  ],
+  "total_issues": 358,
+  "issues_analyzed": 45,
+  "open_issues": 358,
+  "closed_issues": 27,
+  "date_range": {
+    "from": "2018-08-17",
+    "to": "2025-11-03"
+  },
+  "categories": {
+    "bugs": [
+      {
+        "number": 4130,
+        "title": "MAJOR BUG with LongStringType cache",
+        "state": "closed",
+        "created": "2025-09-25",
+        "closed": "2025-09-26",
+        "labels": [],
+        "description": "LongStringType variable cache not refreshed when updating non-null values, only when setting to null",
+        "severity": "high",
+        "technical_details": [
+          "setValue() method only clears cache when value is null",
+          "Non-null value updates don't update cached value",
+          "Returns stale cached values after updates",
+          "Fixed via PR #4131 by storing cached value on all setValue calls",
+          "Regression introduced by specific commit"
+        ]
+      },
+      {
+        "number": 4046,
+        "title": "Parallel Gateway with Multi-Instance Task Generates Duplicate Tasks",
+        "state": "open",
+        "created": "2025-05-14",
+        "labels": ["type:bug"],
+        "description": "Using change activity state builder to move executions from multi-instance tasks back to parallel gateway creates duplicate task instances. Regression from 6.8.0 to 7.1.0",
+        "severity": "high",
+        "technical_details": [
+          "moveActivityIdsToSingleActivityId() produces duplicate tasks",
+          "Worked correctly in version 6.8.0",
+          "Affects multi-instance tasks with parallel gateways",
+          "Not yet supported in change activity state builder per maintainers",
+          "Open since May 2025 with 6 comments"
+        ]
+      },
+      {
+        "number": 4092,
+        "title": "IndexOutOfBound Exception if no entry match in decision table",
+        "state": "closed",
+        "created": "2025-08-07",
+        "closed": "2025-08-08",
+        "labels": [],
+        "description": "DMN decision table with PRIORITY hit policy throws IndexOutOfBoundsException when no rules match instead of returning null",
+        "severity": "medium",
+        "technical_details": [
+          "Only affects PRIORITY hit policy, not FIRST",
+          "Should return null gracefully when no matches",
+          "Fixed via PR #4093 within 1 day",
+          "Index bounds handling issue in priority logic",
+          "Flowable 7.1.0 with Spring Boot 3.4.2"
+        ]
+      },
+      {
+        "number": 4067,
+        "title": "moveActivityIdToSubProcessInstanceActivityId to subProcess npe bug",
+        "state": "open",
+        "created": "2025-06-24",
+        "labels": [],
+        "description": "NullPointerException when moving activity state to subprocess using moveActivityIdToSubProcessInstanceActivityId method",
+        "severity": "high",
+        "technical_details": [
+          "NPE at line 704 in AbstractDynamicStateManager.createEmbeddedSubProcessAndExecutions()",
+          "Occurs during activity state transitions to subprocess contexts",
+          "Flowable version 6.8.1",
+          "Maintainers requested unit test for reproduction",
+          "4 comments, awaiting reproducible test case"
+        ]
+      },
+      {
+        "number": 2173,
+        "title": "Delete deployment with active process instance corrupts database",
+        "state": "closed",
+        "created": "2020-02-13",
+        "closed": "2020-02-18",
+        "labels": [],
+        "description": "Deleting deployment with active process instances via REST API causes partial deletion leaving database in corrupted state",
+        "severity": "critical",
+        "technical_details": [
+          "Foreign key constraint violation: ACT_FK_EXE_PROCDEF",
+          "Deployment reference deleted but process definition orphaned",
+          "Cannot delete orphaned process definition or instances",
+          "Duplicate key constraint violations in membership table",
+          "Requires manual database intervention to recover",
+          "Should reject deletion without modifying database if instances active"
+        ]
+      },
+      {
+        "number": 2354,
+        "title": "Timer job never unlocked after an exception",
+        "state": "closed",
+        "created": "2020-05-21",
+        "closed": "2024-05-26",
+        "labels": [],
+        "description": "Timer jobs remain locked indefinitely after exceptions during job acquisition, preventing recurrence",
+        "severity": "high",
+        "technical_details": [
+          "Recurring timer cron jobs become unresponsive after acquisition exceptions",
+          "LOCK_EXP_TIME_ remains non-null, blocking future executions",
+          "ResetExpiredJobsRunnable only monitored ACT_RU_JOB, not ACT_RU_TIMER_JOB",
+          "Fixed by expanding expired jobs reset to handle timer jobs",
+          "Database timeouts could trigger the issue",
+          "15 comments over 4 years before resolution"
+        ]
+      },
+      {
+        "number": 1741,
+        "title": "Different behaviour between parallel and inclusive gateways",
+        "state": "open",
+        "created": "2019-05-13",
+        "labels": [],
+        "description": "Parallel and inclusive gateways show inconsistent behavior with identical configurations, inclusive gateways generating OptimisticLock exceptions",
+        "severity": "high",
+        "technical_details": [
+          "Inclusive gateway locks process execution entity more aggressively than parallel",
+          "Parallel gateway simpler logic creates fewer collision opportunities",
+          "Tested with 3 parallel branches including catching message event",
+          "Secondary ConcurrentModificationException from HashMap in concurrent context (fixed)",
+          "Workaround: use call activities to encapsulate branch logic",
+          "18 comments, original OptimisticLock issue remains unresolved",
+          "Affects both async and sync configurations"
+        ]
+      },
+      {
+        "number": 4065,
+        "title": "precision loss of double/float value in dmn-engine",
+        "state": "open",
+        "created": "2025-06-20",
+        "labels": [],
+        "description": "DMN engine loses precision when converting Double/Float input variables to BigDecimal",
+        "severity": "medium",
+        "technical_details": [
+          "Direct BigDecimal(Double) constructor preserves binary representation errors",
+          "Should use BigDecimal.valueOf(val) or new BigDecimal(Double.toString(val))",
+          "Located in ELExecutionContextBuilder.java",
+          "Affects Flowable 6.5.0",
+          "No comments or resolution yet"
+        ]
+      },
+      {
+        "number": 4044,
+        "title": "IdmDbSchemaManager does not honor databaseTablePrefix/tablePrefixIsSchema settings",
+        "state": "open",
+        "created": "2025-05-12",
+        "labels": [],
+        "description": "IdmDbSchemaManager ignores database schema prefix configuration, generating queries without schema prefix",
+        "severity": "medium",
+        "technical_details": [
+          "CommonDbSchemaManager and ProcessDbSchemaManager work correctly",
+          "IdmDbSchemaManager queries ACT_ID_PROPERTY instead of schema.ACT_ID_PROPERTY",
+          "Causes version mismatch errors",
+          "Workaround: add currentSchema parameter to JDBC URL",
+          "User prefers configuration-based approach",
+          "No comments or resolution"
+        ]
+      },
+      {
+        "number": 4074,
+        "title": "ExpressFunction error when JUEL contains DOT",
+        "state": "closed",
+        "created": "2025-07-15",
+        "closed": "2025-08-25",
+        "labels": ["type:bug"],
+        "description": "VariableGetExpressionFunction receives resolved value instead of literal variable name when expression contains dot notation",
+        "severity": "low",
+        "technical_details": [
+          "var:get(tableMap.date) passes resolved value '2001-01-01' instead of 'tableMap.date'",
+          "Closed as not_planned - intended functionality",
+          "Entire function argument treated as single variable name",
+          "Suggested workaround: var:exists(tableMap) ? tableMap.date : null",
+          "Flowable 7.1.0"
+        ]
+      }
+    ],
+    "features": [
+      {
+        "number": 4134,
+        "title": "Provide an official .NET SDK (REST + External Worker) on NuGet",
+        "state": "closed",
+        "created": "2025-10-31",
+        "closed": "2025-11-03",
+        "labels": ["type:feature"],
+        "description": "Request for comprehensive .NET SDK including REST client and external worker client on NuGet",
+        "priority": "high",
+        "technical_scope": "Two packages: Flowable.ExternalWorker (revitalized) and Flowable.Client (full-featured SDK)",
+        "business_value": "Compete with Camunda 8's zeebe-client-csharp, support .NET developer community"
+      },
+      {
+        "number": 3532,
+        "title": "In-Memory (non-database, non-sql) DataManagers",
+        "state": "open",
+        "created": "2022-11-23",
+        "labels": ["type:feature"],
+        "description": "Feature request for in-memory storage using ConcurrentMaps instead of SQL persistence for high-volume scenarios",
+        "priority": "high",
+        "technical_scope": "Entities in ConcurrentMap, short-lived synchronous workflows, optional DeadLetter for failures",
+        "business_value": "Eliminate database performance bottlenecks for hundreds of processes per second"
+      },
+      {
+        "number": 3687,
+        "title": "addMultiInstanceExecution method support batch operations",
+        "state": "open",
+        "created": "2023-07-24",
+        "labels": ["type:feature"],
+        "description": "Batch operation support for addMultiInstanceExecution to improve performance when adding many instances",
+        "priority": "medium",
+        "technical_scope": "Batch API for multi-instance execution creation",
+        "business_value": "Reduce execution time and prevent FlowableOptimisticLockingException in concurrent scenarios"
+      },
+      {
+        "number": 1608,
+        "title": "Add new Flowable Spring Boot starter for Camel",
+        "state": "closed",
+        "created": "2019-01-18",
+        "closed": "2020-01-18",
+        "labels": ["enhancement"],
+        "description": "Spring Boot starter for Apache Camel integration",
+        "priority": "medium",
+        "technical_scope": "Spring Boot auto-configuration for Flowable-Camel integration",
+        "business_value": "Simplify integration with Apache Camel for routing and mediation"
+      },
+      {
+        "number": 4036,
+        "title": "When can get the release for spring boot 3.4.x",
+        "state": "closed",
+        "created": "2025-03-13",
+        "closed": "2025-08-25",
+        "labels": [],
+        "description": "Request for Spring Boot 3.4.x compatibility release",
+        "priority": "high",
+        "technical_scope": "Spring Boot 3.x framework compatibility",
+        "business_value": "Support latest Spring Boot versions for modern application development"
+      }
+    ],
+    "enhancements": [
+      {
+        "number": 1923,
+        "title": "SQL performance in MS SQL when paging",
+        "state": "open",
+        "created": "2019-09-06",
+        "labels": ["enhancement"],
+        "description": "Use MS SQL Server native OFFSET/FETCH syntax instead of row_number() subquery for better pagination performance",
+        "technical_details": [
+          "Current implementation uses row_number() over subquery approach",
+          "Proposed: OFFSET xxx ROWS FETCH NEXT xxx ROWS ONLY syntax",
+          "Requires ORDER BY clause (already present in most queries)",
+          "Design may originate from DB2 compatibility (lacked OFFSET/LIMIT historically)",
+          "MS SQL testing infrastructure exists in GitHub Actions"
+        ]
+      },
+      {
+        "number": 2580,
+        "title": "ACT_RU_VARIABLE performance optimization",
+        "state": "open",
+        "created": "2020-09-19",
+        "labels": ["enhancement"],
+        "description": "Remove hardcoded setFirstResult(0) in findTasksWithRelatedEntitiesByQueryCriteria to enable proper pagination",
+        "technical_details": [
+          "MybatisTaskDataManager.findTasksWithRelatedEntitiesByQueryCriteria() resets offset",
+          "Prevents caller from controlling pagination",
+          "Forces full 20,000 row fetch regardless of requested page",
+          "LEFT OUTER JOIN between task and variable tables with complex filtering",
+          "Performance degrades with dataset growth"
+        ]
+      },
+      {
+        "number": 1642,
+        "title": "Expose querying by formKey for the TaskInfoQuery",
+        "state": "closed",
+        "created": "2019-03-17",
+        "closed": "2019-03-17",
+        "labels": ["enhancement", "good first issue"],
+        "description": "Add formKey querying capability to TaskInfoQuery",
+        "technical_details": [
+          "Enables filtering tasks by associated form key",
+          "Quick turnaround (created and closed same day)",
+          "Tagged as good first issue"
+        ]
+      },
+      {
+        "number": 1234,
+        "title": "Add CheckReturnValue to queries",
+        "state": "open",
+        "created": "2018-08-17",
+        "labels": ["enhancement"],
+        "description": "Add @CheckReturnValue annotations to query methods to catch unused query results at compile time",
+        "technical_details": [
+          "Static analysis improvement",
+          "Helps detect bugs where query results are ignored",
+          "Open since 2018"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "number": 4120,
+        "title": "executing the startProcessInstant method is too slow",
+        "state": "open",
+        "created": "2025-09-04",
+        "labels": [],
+        "description": "Performance degradation when starting process instances in high-volume scenarios with MySQL",
+        "discussion_points": [
+          "startProcessInstanceById method performance issues",
+          "Affects systems with substantial data volumes",
+          "Maintainers requested profiling data",
+          "No resolution yet, awaiting diagnostics"
+        ]
+      },
+      {
+        "number": 4066,
+        "title": "asyncFailedJobWaitTime/defaultFailedJobWaitTime don't seem to work",
+        "state": "open",
+        "created": "2025-06-20",
+        "labels": [],
+        "description": "Configuration properties for job retry wait time not taking effect",
+        "discussion_points": [
+          "Set to 1 second but actual delay remains 10 seconds",
+          "Properties appear non-deprecated",
+          "Maintainers requested complete configuration file",
+          "Functional implementation issue suspected"
+        ]
+      },
+      {
+        "number": 1886,
+        "title": "Is it possible to override arbitrary spring property?",
+        "state": "closed",
+        "created": "2019-08-12",
+        "closed": "2019-08-12",
+        "labels": ["question"],
+        "description": "Question about Spring property override capabilities in Flowable",
+        "discussion_points": [
+          "Spring configuration customization",
+          "Quick resolution (same day)"
+        ]
+      },
+      {
+        "number": 1557,
+        "title": "How to support other development languages, such as PHP development systems",
+        "state": "closed",
+        "created": "2019-01-27",
+        "closed": "2019-01-27",
+        "labels": ["question"],
+        "description": "Multi-language support question for extending system to work with PHP",
+        "discussion_points": [
+          "REST API approach for polyglot integration",
+          "External task pattern for non-Java languages"
+        ]
+      }
+    ],
+    "documentation": [
+      {
+        "number": 4089,
+        "title": "Documentation: PUT /runtime/process-instances/...",
+        "state": "open",
+        "created": "2025-07-31",
+        "labels": [],
+        "description": "Documentation improvement request for process instance REST API"
+      }
+    ]
+  },
+  "key_insights": [
+    {
+      "id": "state-caching-correctness",
+      "insight": "Variable and state caching requires careful invalidation on all state mutations, not just null assignments. Cache coherence bugs manifest as stale data being returned after updates, causing subtle business logic errors that are hard to debug.",
+      "source_issues": [4130],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement cache invalidation on all state-modifying operations, not just specific cases",
+        "Add cache coherence tests verifying reads after writes return updated values",
+        "Consider immutable state objects to eliminate cache invalidation complexity",
+        "Document caching behavior and invalidation strategies clearly"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "gateway-concurrency-patterns",
+      "insight": "Different gateway types (parallel vs inclusive) have fundamentally different locking and concurrency characteristics. Inclusive gateways require more complex state evaluation and thus more aggressive locking, leading to OptimisticLockingExceptions in concurrent scenarios where parallel gateways work fine.",
+      "source_issues": [1741],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Document concurrency characteristics of different gateway types",
+        "Design gateway evaluation to minimize lock duration",
+        "Consider optimistic concurrency control with retry for gateway convergence",
+        "Test gateway patterns under concurrent load during development",
+        "Provide guidance on choosing gateway types based on concurrency requirements"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "multi-instance-state-complexity",
+      "insight": "Multi-instance tasks with change activity state builders create complex execution token scenarios. Moving executions from multi-instance contexts back to gateways can produce duplicate task instances due to incomplete tracking of multi-instance loop state during dynamic process modifications.",
+      "source_issues": [4046, 3687],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Design explicit multi-instance execution state tracking",
+        "Ensure process migration/modification logic understands multi-instance loop variables",
+        "Document limitations of dynamic process modifications with multi-instance",
+        "Consider batch operations for multi-instance creation to avoid N+1 performance issues",
+        "Test migration scenarios with multi-instance tasks from early development"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "job-locking-recovery",
+      "insight": "Job execution patterns require robust lock timeout and recovery mechanisms. Jobs can become locked indefinitely when exceptions occur during acquisition but before execution, requiring separate cleanup processes to unlock orphaned jobs across different job types (timer, async, message).",
+      "source_issues": [2354],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement consistent lock timeout and recovery across all job types",
+        "Design cleanup processes that cover all job tables, not just some",
+        "Use database-level lock timeouts as backstop for application-level locks",
+        "Monitor and alert on locked jobs that exceed timeout thresholds",
+        "Test exception scenarios during job acquisition thoroughly"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "database-specific-pagination",
+      "insight": "Pagination performance varies dramatically across database backends. Modern databases support native OFFSET/FETCH syntax that outperforms row_number() subquery approaches, but compatibility with older database versions requires dialect-specific implementations.",
+      "source_issues": [1923, 2580],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement database-specific pagination optimizations in dialect layer",
+        "Use native OFFSET/FETCH where available, fall back to row_number() for older databases",
+        "Never hardcode pagination resets that prevent caller control",
+        "Benchmark pagination performance across all supported databases",
+        "Document database version requirements for optimal performance"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "referential-integrity-enforcement",
+      "insight": "Cascading deletes and referential integrity must be enforced at application level, not relied upon database constraints alone. Partial deletion failures can leave database in inconsistent state requiring manual intervention if not handled transactionally.",
+      "source_issues": [2173],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Validate referential integrity constraints before delete operations",
+        "Reject operations that would violate constraints without any database modifications",
+        "Implement transactional deletion of entity hierarchies",
+        "Provide clear error messages explaining why deletion failed and remediation steps",
+        "Test deletion scenarios with active references extensively"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "dmn-numeric-precision",
+      "insight": "DMN decision tables require careful handling of numeric precision. Converting floating-point to BigDecimal must use valueOf() or string conversion, not direct constructor, to avoid binary representation errors.",
+      "source_issues": [4065, 4092],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Use BigDecimal.valueOf() for numeric type conversions, not constructor",
+        "Handle edge cases like empty result sets gracefully (return null, not exception)",
+        "Test decision tables with various numeric inputs including edge values",
+        "Document numeric precision handling in decision table documentation",
+        "Consider using BigDecimal throughout for financial/precise calculations"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "schema-prefix-consistency",
+      "insight": "Database schema prefix and multi-schema support requires consistent implementation across all schema managers. Inconsistent handling breaks deployment in environments with multiple databases or schema-based isolation.",
+      "source_issues": [4044, 4095],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Implement schema prefix handling consistently across all managers",
+        "Support explicit database catalog configuration",
+        "Test multi-database and multi-schema scenarios",
+        "Document schema isolation patterns and limitations",
+        "Provide clear error messages when schema configuration is incorrect"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "in-memory-execution-option",
+      "insight": "High-throughput scenarios (hundreds of processes per second) hit database performance limits even with in-memory databases like H2. Truly in-memory execution using ConcurrentMaps without SQL persistence is needed for short-lived synchronous workflows.",
+      "source_issues": [3532],
+      "relevance": "MEDIUM",
+      "confidence": "MEDIUM",
+      "actionable": true,
+      "action_items": [
+        "Design pluggable storage abstraction allowing in-memory implementations",
+        "Implement ConcurrentMap-based DataManagers for high-throughput scenarios",
+        "Support hybrid mode: critical data persisted, transient data in-memory",
+        "Document trade-offs between persistence and performance",
+        "Provide clear guidance on when in-memory mode is appropriate"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "client-sdk-ecosystem",
+      "insight": "Polyglot client SDK support is critical for ecosystem growth. Official SDKs for .NET, Python, Node.js reduce integration friction compared to manual REST API clients. Lack of maintained SDKs hurts competitive positioning vs alternatives like Camunda.",
+      "source_issues": [4134, 1557],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Provide official SDKs for major languages (.NET, Python, JavaScript, Go)",
+        "Auto-generate REST clients from OpenAPI specification",
+        "Maintain external worker client libraries for polyglot task execution",
+        "Publish SDKs to standard package repositories (NuGet, npm, PyPI)",
+        "Document REST API thoroughly for manual client development"
+      ],
+      "refined_count": 0
+    }
+  ],
+  "pain_points": [
+    {
+      "category": "Concurrency and Locking",
+      "description": "Gateway convergence, multi-instance execution, and job locking create optimistic locking exceptions and deadlock scenarios under concurrent load",
+      "severity": "high",
+      "user_impact": "Process execution failures requiring retry, reduced throughput, complex workarounds like call activities"
+    },
+    {
+      "category": "Cache Coherence",
+      "description": "Variable and state caching doesn't invalidate correctly on all mutations, returning stale data",
+      "severity": "high",
+      "user_impact": "Silent data corruption in business logic, hard-to-debug behavior differences"
+    },
+    {
+      "category": "Database Performance",
+      "description": "Query performance varies dramatically across databases, pagination is inefficient, hardcoded query limits prevent optimization",
+      "severity": "high",
+      "user_impact": "Poor performance at scale, particularly with large variable tables and complex joins"
+    },
+    {
+      "category": "Dynamic Process Modification",
+      "description": "Change activity state builder has limitations with multi-instance tasks, subprocesses, and complex gateway scenarios",
+      "severity": "medium",
+      "user_impact": "Cannot implement some runtime process modification scenarios, must use workarounds or accept limitations"
+    },
+    {
+      "category": "Job Lock Recovery",
+      "description": "Jobs can become locked indefinitely after exceptions, requiring manual intervention or restart",
+      "severity": "high",
+      "user_impact": "Timer jobs stop firing, async tasks don't execute, manual database cleanup required"
+    },
+    {
+      "category": "Referential Integrity",
+      "description": "Cascade deletion can leave database in partially deleted state when constraints violated",
+      "severity": "high",
+      "user_impact": "Database corruption requiring manual SQL fixes, data recovery procedures"
+    },
+    {
+      "category": "Multi-Schema Support",
+      "description": "Inconsistent schema prefix handling across different schema managers breaks multi-database deployments",
+      "severity": "medium",
+      "user_impact": "Cannot deploy in some enterprise environments with schema isolation requirements"
+    },
+    {
+      "category": "Configuration Clarity",
+      "description": "Some configuration properties don't work as expected or documented, requiring workarounds",
+      "severity": "low",
+      "user_impact": "Frustration, workarounds in JDBC URLs instead of clean configuration"
+    }
+  ],
+  "feature_requests": [
+    {
+      "feature": "In-Memory DataManagers",
+      "status": "open",
+      "priority": "high",
+      "description": "Truly in-memory execution using ConcurrentMaps for high-throughput scenarios",
+      "business_value": "Enable hundreds of processes per second without database bottlenecks"
+    },
+    {
+      "feature": ".NET SDK",
+      "status": "closed",
+      "priority": "high",
+      "description": "Official .NET SDK with REST client and external worker on NuGet",
+      "business_value": "Competitive parity with Camunda, support .NET developer ecosystem"
+    },
+    {
+      "feature": "Multi-Instance Batch Operations",
+      "status": "open",
+      "priority": "medium",
+      "description": "Batch API for adding multiple multi-instance executions",
+      "business_value": "Avoid N+1 performance issues and optimistic locking exceptions"
+    },
+    {
+      "feature": "Spring Boot Camel Starter",
+      "status": "implemented",
+      "priority": "medium",
+      "description": "Auto-configuration for Flowable-Camel integration",
+      "business_value": "Simplified integration with Apache Camel routing"
+    },
+    {
+      "feature": "FormKey Querying",
+      "status": "implemented",
+      "priority": "low",
+      "description": "Query tasks by associated form key",
+      "business_value": "Enable form-based task filtering in UI applications"
+    }
+  ],
+  "architectural_decisions": [
+    {
+      "decision": "Database-Specific Pagination Optimization",
+      "rationale": "Modern database syntax (OFFSET/FETCH) significantly outperforms row_number() subqueries, but compatibility with older versions requires dialect support",
+      "status": "partial",
+      "date": "2019-09-06",
+      "impact": "Performance improvement possible but not yet implemented across all databases"
+    },
+    {
+      "decision": "Lock Timeout and Recovery for All Job Types",
+      "rationale": "Exceptions during job acquisition can leave jobs locked indefinitely; comprehensive cleanup required",
+      "status": "implemented",
+      "date": "2024-05-26",
+      "impact": "Timer jobs no longer get stuck indefinitely after exceptions"
+    },
+    {
+      "decision": "Cache Invalidation on All Mutations",
+      "rationale": "Selective cache invalidation (only on null) caused stale data bugs; must invalidate on all setValue calls",
+      "status": "implemented",
+      "date": "2025-09-26",
+      "impact": "Eliminates class of cache coherence bugs but requires careful performance testing"
+    },
+    {
+      "decision": "Multi-Instance Change Activity State Limitations",
+      "rationale": "Full support for moving multi-instance executions back to gateways not yet implemented",
+      "status": "documented",
+      "date": "2025-11-05",
+      "impact": "Users must avoid certain dynamic modification patterns or accept duplicates"
+    },
+    {
+      "decision": "Application-Level Referential Integrity Validation",
+      "rationale": "Database constraint violations during cascading deletes leave partial state; must validate before deletion",
+      "status": "needed",
+      "date": "2020-02-18",
+      "impact": "Requires implementation to prevent database corruption scenarios"
+    }
+  ],
+  "common_patterns": [
+    {
+      "pattern": "Optimistic Locking Exceptions Under Concurrent Load",
+      "observation": "Gateway convergence, multi-instance execution, and parallel task completion generate optimistic locking failures when multiple threads modify same process instance",
+      "frequency": "recurring",
+      "examples": ["Inclusive gateway vs parallel gateway behavior", "Multi-instance batch operations", "Concurrent addMultiInstanceExecution calls"]
+    },
+    {
+      "pattern": "Cache Invalidation Bugs",
+      "observation": "Selective cache invalidation (only for specific values like null) causes stale cached data to be returned after updates",
+      "frequency": "occasional",
+      "examples": ["LongStringType cache not updated on non-null values", "Variable cache coherence issues"]
+    },
+    {
+      "pattern": "Database Performance Degradation at Scale",
+      "observation": "Query performance degrades significantly with large datasets, particularly for variable joins and pagination",
+      "frequency": "recurring",
+      "examples": ["ACT_RU_VARIABLE performance", "Pagination with large offsets", "Task queries with variable filtering"]
+    },
+    {
+      "pattern": "Job Lock Orphaning",
+      "observation": "Exception during job acquisition but before execution leaves job locked indefinitely",
+      "frequency": "occasional",
+      "examples": ["Timer jobs stuck locked", "Async jobs not recovering", "Need for lock timeout cleanup"]
+    },
+    {
+      "pattern": "Hardcoded Pagination Limits",
+      "observation": "Query methods reset pagination parameters, preventing caller control and optimization",
+      "frequency": "occasional",
+      "examples": ["setFirstResult(0) in findTasksWithRelatedEntitiesByQueryCriteria", "Cannot control offset in some queries"]
+    },
+    {
+      "pattern": "Schema Configuration Inconsistency",
+      "observation": "Different schema managers handle table prefixes and schema configuration inconsistently",
+      "frequency": "occasional",
+      "examples": ["IdmDbSchemaManager ignores prefix", "Multi-database table detection issues"]
+    },
+    {
+      "pattern": "Numeric Precision Errors",
+      "observation": "Incorrect BigDecimal conversion from floating-point loses precision",
+      "frequency": "occasional",
+      "examples": ["DMN engine double/float precision loss", "BigDecimal(Double) constructor issue"]
+    },
+    {
+      "pattern": "Framework Compatibility Lag",
+      "observation": "New framework versions (Spring Boot, etc.) supported months after release",
+      "frequency": "recurring",
+      "examples": ["Spring Boot 3.4.x support request", "Spring Boot 3.5.x delivered in 7.2.0"]
+    }
+  ],
+  "actionable_items_for_uml_codex": [
+    {
+      "item": "Cache Invalidation Strategy",
+      "priority": "high",
+      "description": "Design comprehensive cache invalidation strategy that updates cache on all state mutations, not selective cases. Consider immutable state objects to eliminate invalidation complexity entirely.",
+      "learning": "Selective cache invalidation causes subtle bugs where stale data is returned after updates. All write operations must invalidate or update cached values."
+    },
+    {
+      "item": "Gateway Concurrency Design",
+      "priority": "high",
+      "description": "Design gateway evaluation with minimal lock duration. Document concurrency characteristics of different gateway types. Test under concurrent load from early development.",
+      "learning": "Inclusive gateways require more complex evaluation and more aggressive locking than parallel gateways, causing OptimisticLockingExceptions in concurrent scenarios."
+    },
+    {
+      "item": "Job Lock Timeout and Recovery",
+      "priority": "high",
+      "description": "Implement consistent job lock timeout and recovery across all job types (timer, async, message). Monitor and alert on orphaned locks. Test exception scenarios during job acquisition.",
+      "learning": "Jobs can become locked indefinitely after acquisition exceptions if cleanup processes don't cover all job types. Requires separate lock recovery mechanism."
+    },
+    {
+      "item": "Multi-Instance State Tracking",
+      "priority": "high",
+      "description": "Design explicit multi-instance execution state tracking. Ensure process migration logic understands multi-instance loop variables and token positions. Provide batch operations to avoid N+1 issues.",
+      "learning": "Multi-instance tasks with dynamic state changes create complex token scenarios. Moving executions from multi-instance contexts can produce duplicates without proper state tracking."
+    },
+    {
+      "item": "Database-Agnostic Pagination with Dialect Optimization",
+      "priority": "high",
+      "description": "Implement database-specific pagination using native OFFSET/FETCH where available, falling back to row_number() for older versions. Never hardcode pagination resets.",
+      "learning": "Pagination performance varies 10x+ across databases. Modern syntax much faster but compatibility requires dialect layer. Hardcoded pagination resets prevent optimization."
+    },
+    {
+      "item": "Application-Level Referential Integrity",
+      "priority": "high",
+      "description": "Validate referential integrity before delete operations. Reject deletions that would violate constraints without any database modifications. Implement transactional entity hierarchy deletion.",
+      "learning": "Relying on database constraints for cascading deletes can leave partial state after violations. Must validate before attempting deletion."
+    },
+    {
+      "item": "Pluggable Storage Abstraction",
+      "priority": "medium",
+      "description": "Design storage layer abstraction supporting both persistent (SQL) and in-memory (ConcurrentMap) implementations. Enable hybrid mode for different entity types.",
+      "learning": "High-throughput scenarios (100s of processes/sec) hit database limits even with in-memory databases. Truly in-memory storage needed for short-lived workflows."
+    },
+    {
+      "item": "Schema Prefix Consistency",
+      "priority": "medium",
+      "description": "Implement schema prefix and catalog configuration consistently across all schema managers. Support multi-database and multi-schema deployments. Test with schema isolation.",
+      "learning": "Inconsistent schema prefix handling across managers breaks enterprise deployments with schema-based isolation. All managers must honor prefix configuration."
+    },
+    {
+      "item": "Polyglot SDK Strategy",
+      "priority": "medium",
+      "description": "Provide official SDKs for major languages (.NET, Python, JavaScript). Auto-generate from OpenAPI spec. Maintain external worker clients. Publish to standard repositories.",
+      "learning": "Lack of maintained SDKs for popular languages hurts adoption vs competitors. Manual REST integration creates friction. Official SDKs signal production-readiness."
+    },
+    {
+      "item": "Numeric Precision Handling",
+      "priority": "low",
+      "description": "Use BigDecimal.valueOf() for numeric conversions, not direct constructor. Document precision handling. Test with edge values. Consider BigDecimal throughout for precise calculations.",
+      "learning": "BigDecimal(Double) constructor preserves binary representation errors. Must use valueOf() or string conversion for correct decimal values."
+    },
+    {
+      "item": "Configuration Validation and Error Messages",
+      "priority": "low",
+      "description": "Validate configuration at startup with clear errors. Test that documented configurations actually work. Provide error messages explaining both problem and solution.",
+      "learning": "Configuration properties that don't work as expected frustrate users. Must validate thoroughly and fail fast with helpful diagnostics."
+    }
+  ],
+  "repository_health": {
+    "activity_level": "active",
+    "issue_closure_rate": "moderate",
+    "average_time_to_close": "variable, from same-day to multi-year",
+    "community_engagement": "moderate",
+    "maintenance_status": "actively maintained",
+    "notes": [
+      "358 open issues indicates active usage but potential backlog",
+      "Quick responses to bugs (LongStringType fixed in 1 day)",
+      "Some long-standing issues remain open for years (gateway concurrency since 2019)",
+      "Regular releases with framework compatibility updates (7.2.0 with Spring Boot 3.5.x)",
+      "Community contributions marked with 'good first issue' labels",
+      "Maintainers responsive but some feature requests await implementation",
+      "Strong focus on Spring Boot ecosystem integration",
+      "Active development of new features (.NET SDK recently closed)"
+    ]
+  },
+  "comparison_with_camunda": {
+    "flowable_advantages": [
+      "More flexible in-memory execution being considered (issue #3532)",
+      "Active development of polyglot SDKs (.NET SDK request addressed)",
+      "Strong Apache Camel integration with dedicated starter",
+      "More permissive Apache 2.0 license vs Camunda's dual licensing",
+      "Faster response to some critical bugs (1-day fix for cache issue)",
+      "Better support for truly synchronous high-throughput scenarios"
+    ],
+    "flowable_challenges": [
+      "Gateway concurrency issues remain unresolved since 2019",
+      "Change activity state builder has more limitations with multi-instance",
+      "Database corruption possible with deployment deletion (referential integrity)",
+      "Inconsistent schema prefix handling across managers",
+      "Some configuration properties don't work as documented",
+      "Larger backlog of open issues (358 vs Camunda's cleaner closure)"
+    ],
+    "common_challenges": [
+      "Database performance optimization critical for both (pagination, query tuning)",
+      "Multi-instance execution state complexity",
+      "Job locking and recovery mechanisms",
+      "Framework version compatibility maintenance burden",
+      "Cache coherence and state management complexity",
+      "Query performance with variable joins",
+      "Migration tooling complexity"
+    ],
+    "architectural_differences": [
+      "Flowable exploring in-memory DataManagers, Camunda focused on database optimization",
+      "Flowable has more permissive dynamic state modification APIs",
+      "Camunda archived (EOL), Flowable actively maintained and evolving",
+      "Flowable stronger focus on Apache ecosystem (Camel), Camunda on Spring Boot",
+      "Flowable schema management more complex (multiple managers)",
+      "Camunda more mature observability (Micrometer integrated), Flowable catching up"
+    ],
+    "innovation_areas": [
+      "In-memory execution without database persistence for extreme throughput",
+      "Batch operations for multi-instance to avoid N+1 issues",
+      "Flexible schema isolation for enterprise multi-tenant scenarios",
+      "Polyglot external worker ecosystem expansion"
+    ]
+  }
+}

@@ -1,0 +1,1008 @@
+{
+  "repository": {
+    "name": "camunda-bpmn-model",
+    "url": "https://github.com/camunda/camunda-bpmn-model",
+    "description": "BPMN model API written in Java - A library for reading and writing BPMN 2.0 XML files using a Java object model",
+    "status": "archived",
+    "archived_date": "2019-12-12",
+    "migration_note": "Merged with camunda-bpm-platform project. Active development continues in camunda-bpm-platform repository under model-api/bpmn-model directory",
+    "main_branch": "master",
+    "inception_year": "2014",
+    "organization": "camunda services GmbH",
+    "website": "http://www.camunda.com"
+  },
+  "license": {
+    "type": "Apache License 2.0",
+    "spdx_id": "Apache-2.0",
+    "reusable": true,
+    "commercial_use": true,
+    "modification": true,
+    "distribution": true,
+    "patent_grant": true,
+    "conditions": [
+      "Include original license and copyright notices",
+      "Mark modifications clearly",
+      "Provide copy of license to recipients",
+      "Include readable copy of NOTICE file attributions"
+    ],
+    "limitations": [
+      "No warranty provided",
+      "No liability for damages",
+      "Trademark rights not granted"
+    ],
+    "assessment": "Highly permissive open source license suitable for reuse in both open source and commercial projects. Patent grant provides additional protection. No copyleft requirements."
+  },
+  "maven_coordinates": {
+    "groupId": "org.camunda.bpm.model",
+    "artifactId": "camunda-bpmn-model",
+    "version": "7.13.0-SNAPSHOT",
+    "packaging": "jar"
+  },
+  "dependencies": {
+    "runtime": [
+      {
+        "name": "camunda-xml-model",
+        "groupId": "org.camunda.bpm.model",
+        "artifactId": "camunda-xml-model",
+        "version": "matches project version",
+        "scope": "compile",
+        "description": "Lightweight toolkit for implementing metamodels in Java - provides the base XML processing framework",
+        "license": "Apache-2.0",
+        "repository": "https://github.com/camunda/camunda-xml-model",
+        "status": "archived, merged into camunda-bpm-platform"
+      }
+    ],
+    "test": [
+      {
+        "name": "JUnit",
+        "version": "4.12",
+        "scope": "test"
+      },
+      {
+        "name": "AssertJ Core",
+        "version": "2.9.1",
+        "scope": "test"
+      }
+    ],
+    "build_plugins": [
+      {
+        "name": "maven-bundle-plugin",
+        "provider": "Apache Felix",
+        "purpose": "Generates OSGi manifest with org.camunda.bpm.model* package exports"
+      },
+      {
+        "name": "license-maven-plugin",
+        "provider": "Codehaus Mojo",
+        "version": "1.14",
+        "purpose": "License compliance checking, excludes test scope"
+      },
+      {
+        "name": "clirr-maven-plugin",
+        "version": "2.8",
+        "purpose": "API compatibility checking against version 7.12.0"
+      }
+    ],
+    "jvm_dependencies": [
+      "Java XML processing APIs (DOM, SAX, JAXP)",
+      "W3C XML Schema validation"
+    ]
+  },
+  "architecture": {
+    "layers": [
+      {
+        "name": "Public API Layer",
+        "description": "Entry points and interfaces for client code",
+        "components": [
+          "Bpmn.java - Main facade with static factory methods",
+          "BpmnModelInstance interface - Root model container",
+          "Element interfaces (Process, Task, Event, Gateway, etc.)",
+          "Builder interfaces (ProcessBuilder, TaskBuilder, etc.)",
+          "Query interface for filtering elements"
+        ]
+      },
+      {
+        "name": "Builder Pattern Layer",
+        "description": "Fluent API for programmatic model creation",
+        "components": [
+          "80+ builder classes using recursive generics",
+          "AbstractBaseElementBuilder - Foundation for all builders",
+          "AbstractFlowNodeBuilder - Base for flow element builders",
+          "Concrete builders for each BPMN element type",
+          "BpmnDiagram positioning and layout builders"
+        ]
+      },
+      {
+        "name": "Model Implementation Layer",
+        "description": "Concrete implementations of BPMN elements",
+        "components": [
+          "200+ implementation classes in impl/instance package",
+          "Each implements corresponding interface",
+          "Uses delegation to xml-model base classes",
+          "Handles attribute and child element management"
+        ]
+      },
+      {
+        "name": "Metamodel Registration Layer",
+        "description": "Type system and schema definition",
+        "components": [
+          "Static registerType() methods in each implementation",
+          "ModelElementTypeBuilder for declarative schema definition",
+          "Attribute and child element definitions",
+          "Namespace and inheritance configuration"
+        ]
+      },
+      {
+        "name": "XML Processing Layer",
+        "description": "XML parsing, serialization, and DOM management",
+        "components": [
+          "BpmnParser - XML schema validation and parsing",
+          "ModelInstanceImpl - DOM document wrapper",
+          "Element-to-DOM binding via xml-model framework",
+          "Schema-based validation using BPMN 2.0 XSD"
+        ]
+      }
+    ],
+    "core_abstractions": [
+      {
+        "name": "Model",
+        "description": "Container for all type definitions and metamodel information"
+      },
+      {
+        "name": "ModelInstance",
+        "description": "Represents a single BPMN document with its DOM tree"
+      },
+      {
+        "name": "ModelElementType",
+        "description": "Metamodel definition for each BPMN element type"
+      },
+      {
+        "name": "ModelElementInstance",
+        "description": "Runtime instance of a BPMN element wrapping a DOM element"
+      },
+      {
+        "name": "Attribute",
+        "description": "Typed accessor for XML attributes with optional references"
+      },
+      {
+        "name": "Reference",
+        "description": "Typed relationship between elements (ID/IDREF)"
+      }
+    ]
+  },
+  "design_patterns": {
+    "metamodel_implementation": [
+      {
+        "pattern": "Type Object Pattern",
+        "description": "ModelElementType instances define the schema for element types at runtime, separating type metadata from instance data",
+        "benefits": [
+          "Runtime introspection of model structure",
+          "Dynamic type registration",
+          "Support for multiple model versions"
+        ],
+        "implementation": "Static registerType() methods build ModelElementType using fluent builder API"
+      },
+      {
+        "pattern": "Static Registration Pattern",
+        "description": "Each element implementation class registers its type definition in a static method called during model initialization",
+        "example_code": "public static void registerType(ModelBuilder bpmnModelBuilder) {\n  ModelElementTypeBuilder typeBuilder = bpmnModelBuilder\n    .defineType(Process.class, BPMN_ELEMENT_PROCESS)\n    .namespaceUri(BPMN20_NS)\n    .extendsType(CallableElement.class)\n    .instanceProvider(new ModelTypeInstanceProvider<Process>() {...});\n}"
+      },
+      {
+        "pattern": "Declarative Schema Definition",
+        "description": "Fluent builder API for defining attributes, child elements, and sequences without imperative code",
+        "benefits": [
+          "Self-documenting type definitions",
+          "Compile-time type safety",
+          "Concise and readable schema specifications"
+        ]
+      }
+    ],
+    "xml_binding": [
+      {
+        "pattern": "Wrapper Pattern",
+        "description": "ModelElementInstance wraps DOM Element, delegating XML operations while providing typed API",
+        "benefits": [
+          "Preserves DOM structure for serialization",
+          "Provides strongly-typed access",
+          "Supports bidirectional sync between object model and XML"
+        ]
+      },
+      {
+        "pattern": "Lazy Element Wrapping",
+        "description": "DOM elements are wrapped in ModelElementInstance only when accessed, with caching for subsequent access",
+        "implementation": "ModelUtil.getModelElement() checks for cached instance before creating new wrapper"
+      },
+      {
+        "pattern": "Attribute Accessor Pattern",
+        "description": "Attribute<T> objects encapsulate get/set operations on underlying DOM attributes with type conversion",
+        "benefits": [
+          "Type-safe attribute access",
+          "Centralized conversion logic",
+          "Optional reference update on change"
+        ]
+      },
+      {
+        "pattern": "Reference Management",
+        "description": "Bidirectional references using ID/IDREF with automatic synchronization",
+        "types": [
+          "AttributeReference - Single reference via attribute",
+          "ElementReferenceCollection - Multiple references",
+          "QNameAttributeReference - Namespace-qualified references"
+        ]
+      }
+    ],
+    "builder_api": [
+      {
+        "pattern": "Recursive Generic Builder",
+        "description": "Builders use self-referential generics to enable fluent method chaining while preserving concrete type",
+        "signature": "public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<B, E>, E extends FlowNode>",
+        "benefits": [
+          "Type-safe method chaining",
+          "Return concrete builder type from each method",
+          "Extensible to new builder types"
+        ]
+      },
+      {
+        "pattern": "Builder Factory Methods",
+        "description": "Each builder provides methods to create and transition to builders for related elements",
+        "example": "serviceTask(), userTask(), exclusiveGateway() create elements and return appropriate builders"
+      },
+      {
+        "pattern": "Implicit Diagram Generation",
+        "description": "Builders automatically create BpmnShape and BpmnEdge elements for visual layout",
+        "implementation": "createTarget() and createTargetBuilder() methods create both semantic and visual elements"
+      }
+    ],
+    "model_api_design": [
+      {
+        "pattern": "Facade Pattern",
+        "description": "Bpmn class provides static facade over complex initialization and parser APIs",
+        "methods": [
+          "readModelFromFile/Stream",
+          "writeModelToFile/Stream",
+          "createEmptyModel",
+          "createProcess/ExecutableProcess",
+          "validateModel",
+          "convertToString"
+        ]
+      },
+      {
+        "pattern": "Query Builder Pattern",
+        "description": "Fluent API for filtering and retrieving elements from collections",
+        "operations": [
+          "filterByType() - Type-based filtering",
+          "list() - Get all results",
+          "singleResult() - Get exactly one result",
+          "count() - Count results"
+        ]
+      },
+      {
+        "pattern": "Template Method Pattern",
+        "description": "AbstractModelParser defines parsing template with extension points for BPMN-specific behavior",
+        "customization_points": [
+          "Schema configuration",
+          "Model instance creation",
+          "Validation rules"
+        ]
+      }
+    ],
+    "validation": [
+      {
+        "pattern": "Visitor Pattern",
+        "description": "ModelElementValidator implementations visit elements during validation phase",
+        "interface": "validate(T element, ValidationResultCollector resultCollector)"
+      },
+      {
+        "pattern": "Collector Pattern",
+        "description": "ValidationResultCollector aggregates errors from multiple validators",
+        "benefits": [
+          "Separates validation logic from result handling",
+          "Enables batch validation",
+          "Allows filtering and transformation of results"
+        ]
+      },
+      {
+        "pattern": "Type-based Validation",
+        "description": "Validators register for specific element types and automatically apply to instances and subtypes"
+      }
+    ],
+    "extension_mechanism": [
+      {
+        "pattern": "Namespace-based Extensions",
+        "description": "Camunda extensions use separate XML namespace (http://camunda.org/schema/1.0/bpmn)",
+        "implementation": "Attributes registered with .namespace(CAMUNDA_NS)",
+        "examples": [
+          "camundaAsyncBefore/After",
+          "camundaClass/DelegateExpression",
+          "camundaFormKey",
+          "camundaJobPriority"
+        ]
+      },
+      {
+        "pattern": "Extension Elements",
+        "description": "BPMN extensionElements container allows custom child elements",
+        "camunda_extensions": [
+          "Connector (camunda:connector)",
+          "ExecutionListener (camunda:executionListener)",
+          "TaskListener (camunda:taskListener)",
+          "FormData (camunda:formData)",
+          "InputOutput (camunda:inputOutput)"
+        ]
+      }
+    ]
+  },
+  "key_components": {
+    "entry_points": {
+      "Bpmn": {
+        "type": "class",
+        "role": "Main API facade",
+        "methods": [
+          "readModelFromFile(File file): BpmnModelInstance",
+          "readModelFromStream(InputStream stream): BpmnModelInstance",
+          "writeModelToFile(File file, BpmnModelInstance modelInstance)",
+          "writeModelToStream(OutputStream stream, BpmnModelInstance modelInstance)",
+          "convertToString(BpmnModelInstance modelInstance): String",
+          "validateModel(BpmnModelInstance modelInstance): void",
+          "createEmptyModel(): BpmnModelInstance",
+          "createProcess(): ProcessBuilder",
+          "createProcess(String processId): ProcessBuilder",
+          "createExecutableProcess(): ProcessBuilder",
+          "createExecutableProcess(String processId): ProcessBuilder"
+        ],
+        "design": "Singleton pattern with static facade, delegates to BpmnParser and internal methods"
+      },
+      "BpmnModelInstance": {
+        "type": "interface",
+        "role": "Root container for BPMN model",
+        "methods": [
+          "getDefinitions(): Definitions",
+          "setDefinitions(Definitions definitions): void",
+          "clone(): BpmnModelInstance"
+        ],
+        "extends": "ModelInstance (from xml-model)"
+      }
+    },
+    "xml_parsing": {
+      "BpmnParser": {
+        "extends": "AbstractModelParser",
+        "schema": "BPMN 2.0 XSD",
+        "schema_namespace": "http://www.omg.org/spec/BPMN/20100524/MODEL",
+        "validation": "W3C XML Schema validation",
+        "methods": [
+          "parseModelFromStream(InputStream): BpmnModelInstanceImpl",
+          "getEmptyModel(): BpmnModelInstanceImpl",
+          "createModelInstance(DomDocument): BpmnModelInstanceImpl"
+        ],
+        "features": [
+          "Schema-based validation during parse",
+          "Namespace-aware parsing",
+          "DOM tree construction",
+          "Model instance wrapping"
+        ]
+      },
+      "BpmnModelInstanceImpl": {
+        "extends": "ModelInstanceImpl",
+        "implements": "BpmnModelInstance",
+        "holds": [
+          "Model - type system metadata",
+          "ModelBuilder - type registration",
+          "DomDocument - XML DOM tree"
+        ],
+        "capabilities": [
+          "Root element access",
+          "Element lookup by ID",
+          "Element queries by type",
+          "Model cloning"
+        ]
+      }
+    },
+    "model_elements": {
+      "base_hierarchy": [
+        "BpmnModelElementInstanceImpl (abstract base)",
+        "  └─ BaseElementImpl (id, documentation, extensions)",
+        "       └─ FlowElementImpl (name, category values)",
+        "            ├─ FlowNodeImpl (incoming/outgoing)",
+        "            │    ├─ ActivityImpl",
+        "            │    │    ├─ TaskImpl",
+        "            │    │    │    ├─ ServiceTaskImpl",
+        "            │    │    │    ├─ UserTaskImpl",
+        "            │    │    │    ├─ ScriptTaskImpl",
+        "            │    │    │    └─ ...",
+        "            │    │    ├─ SubProcessImpl",
+        "            │    │    └─ CallActivityImpl",
+        "            │    ├─ GatewayImpl",
+        "            │    │    ├─ ExclusiveGatewayImpl",
+        "            │    │    ├─ ParallelGatewayImpl",
+        "            │    │    ├─ InclusiveGatewayImpl",
+        "            │    │    └─ ...",
+        "            │    └─ EventImpl",
+        "            │         ├─ StartEventImpl",
+        "            │         ├─ EndEventImpl",
+        "            │         ├─ IntermediateCatchEventImpl",
+        "            │         └─ ...",
+        "            └─ SequenceFlowImpl"
+      ],
+      "total_element_types": "200+",
+      "coverage": "Complete BPMN 2.0 specification including process, collaboration, choreography, and conversation elements"
+    },
+    "constants": {
+      "BpmnModelConstants": {
+        "role": "Central repository for XML constants",
+        "contents": [
+          "Namespace URIs (BPMN20, BPMNDI, DC, DI, Camunda)",
+          "Element names for all BPMN types",
+          "Attribute names",
+          "Enumeration values"
+        ],
+        "namespaces": {
+          "BPMN20_NS": "http://www.omg.org/spec/BPMN/20100524/MODEL",
+          "BPMNDI_NS": "http://www.omg.org/spec/BPMN/20100524/DI",
+          "DC_NS": "http://www.omg.org/spec/DD/20100524/DC",
+          "DI_NS": "http://www.omg.org/spec/DD/20100524/DI",
+          "CAMUNDA_NS": "http://camunda.org/schema/1.0/bpmn",
+          "XSI_NS": "http://www.w3.org/2001/XMLSchema-instance",
+          "XPATH_NS": "http://www.w3.org/1999/XPath"
+        }
+      }
+    },
+    "builder_hierarchy": {
+      "base": "AbstractBpmnModelElementBuilder",
+      "levels": [
+        "AbstractBaseElementBuilder - ID and basic element creation",
+        "AbstractFlowNodeBuilder - Flow control and async/exclusive",
+        "AbstractActivityBuilder - Activity-specific (loops, multi-instance)",
+        "AbstractTaskBuilder - Task properties",
+        "Concrete builders for each element type (80+)"
+      ],
+      "features": [
+        "Recursive generics for type-safe chaining",
+        "Automatic diagram element creation",
+        "Smart positioning for visual layout",
+        "Context preservation across transitions"
+      ]
+    },
+    "diagram_support": {
+      "packages": [
+        "bpmndi - BPMN Diagram Interchange (shapes, edges, diagrams)",
+        "dc - Diagram Common (bounds, point, font)",
+        "di - Diagram Interchange (base diagram types)"
+      ],
+      "capabilities": [
+        "Visual layout information persistence",
+        "Shape and edge positioning",
+        "Label placement",
+        "Style information (fonts, colors)"
+      ],
+      "integration": "Builders automatically create and position diagram elements"
+    },
+    "camunda_extensions": {
+      "attributes": [
+        "asyncBefore/asyncAfter - Asynchronous execution",
+        "exclusive - Exclusive job execution",
+        "class/delegateExpression/expression - Service implementation",
+        "formKey/formHandlerClass - Form integration",
+        "jobPriority/taskPriority - Job scheduling",
+        "candidateStarterGroups/Users - Access control",
+        "historyTimeToLive - Data retention",
+        "versionTag - Process versioning"
+      ],
+      "extension_elements": [
+        "camunda:connector - External system integration",
+        "camunda:executionListener - Process execution events",
+        "camunda:taskListener - Task lifecycle events",
+        "camunda:formData - Form field definitions",
+        "camunda:inputOutput - Variable mapping",
+        "camunda:properties - Custom key-value pairs",
+        "camunda:script - Embedded scripts"
+      ]
+    }
+  },
+  "metamodel_structure": {
+    "type_registration": {
+      "mechanism": "Static registerType() method in each implementation class",
+      "timing": "Called during Model initialization via ModelBuilder",
+      "builder_api": [
+        "defineType(Class, elementName) - Start type definition",
+        "namespaceUri(String) - Set XML namespace",
+        "extendsType(Class) - Establish inheritance",
+        "abstractType() - Mark as abstract",
+        "instanceProvider(Provider) - Custom instantiation"
+      ]
+    },
+    "attribute_definition": {
+      "types": [
+        "stringAttribute(name)",
+        "booleanAttribute(name)",
+        "integerAttribute(name)",
+        "doubleAttribute(name)",
+        "enumAttribute(name, enumClass)",
+        "namedEnumAttribute(name, enumClass)"
+      ],
+      "modifiers": [
+        ".namespace(uri) - Non-default namespace",
+        ".defaultValue(value) - Default value",
+        ".required() - Mandatory attribute",
+        ".idAttribute() - Mark as ID"
+      ],
+      "references": [
+        ".qNameAttributeReference(targetType) - QName reference",
+        ".idAttributeReference(targetType) - ID/IDREF reference",
+        ".idsAttributeReference(targetType) - IDREFS reference"
+      ]
+    },
+    "child_element_definition": {
+      "sequence_builder": "Defines ordering of child elements per XML schema",
+      "types": [
+        "element(Class) - Single child element",
+        "elementCollection(Class) - Multiple child elements"
+      ],
+      "references": [
+        "qNameElementReference(Class) - QName child reference",
+        "qNameElementReferenceCollection(Class) - Multiple QName refs",
+        "idElementReference(Class) - IDREF child",
+        "idElementReferenceCollection(Class) - Multiple IDREF children"
+      ],
+      "ordering": "SequenceBuilder maintains schema-compliant element ordering"
+    },
+    "type_hierarchy": {
+      "inheritance": "Java inheritance mirrors BPMN type hierarchy",
+      "polymorphism": "Queries and validators operate on base types and subtypes",
+      "extension": "extendsType() establishes metamodel inheritance independent of Java inheritance"
+    }
+  },
+  "xml_schema_mapping": {
+    "approach": "Runtime metamodel with bidirectional XML binding",
+    "layers": [
+      {
+        "level": "XML DOM",
+        "technology": "Java DOM API",
+        "purpose": "Preserve exact XML structure for serialization"
+      },
+      {
+        "level": "Wrapper Layer",
+        "technology": "ModelElementInstance",
+        "purpose": "Wrap DOM elements with typed API"
+      },
+      {
+        "level": "Type System",
+        "technology": "ModelElementType",
+        "purpose": "Runtime metamodel defining schema"
+      },
+      {
+        "level": "Public API",
+        "technology": "Interfaces and Builders",
+        "purpose": "Clean, type-safe API for clients"
+      }
+    ],
+    "mapping_strategies": [
+      {
+        "xml_construct": "XML Element",
+        "java_construct": "Interface + Implementation class",
+        "example": "<bpmn:process> → Process interface + ProcessImpl class"
+      },
+      {
+        "xml_construct": "XML Attribute",
+        "java_construct": "Attribute<T> with getter/setter",
+        "example": "id=\"Process_1\" → String getId() / setId(String)"
+      },
+      {
+        "xml_construct": "Child Element",
+        "java_construct": "ChildElement or ChildElementCollection",
+        "example": "<bpmn:startEvent> → Collection<StartEvent> getFlowElements()"
+      },
+      {
+        "xml_construct": "ID/IDREF",
+        "java_construct": "Reference<T> with bidirectional sync",
+        "example": "sourceRef=\"Task_1\" → FlowNode getSource()"
+      },
+      {
+        "xml_construct": "Namespace",
+        "java_construct": "Attribute.namespace() or element namespace",
+        "example": "camunda:asyncBefore → .namespace(CAMUNDA_NS)"
+      },
+      {
+        "xml_construct": "Inheritance",
+        "java_construct": "extendsType() in type definition",
+        "example": "Task extends Activity → extendsType(Activity.class)"
+      }
+    ],
+    "schema_validation": {
+      "approach": "W3C XML Schema validation during parsing",
+      "schema_location": "Loaded from resources during BpmnParser initialization",
+      "validation_points": [
+        "During XML parsing (schema validation)",
+        "Via Bpmn.validateModel() (programmatic validation)",
+        "Custom validators via ModelElementValidator interface"
+      ]
+    }
+  },
+  "code_generation": {
+    "assessment": "No code generation detected",
+    "evidence": [
+      "All classes are hand-written Java",
+      "Static registerType() methods manually define schema",
+      "No code generation plugins in pom.xml",
+      "No generated-sources directories",
+      "No XSD-to-Java binding tools (e.g., JAXB) detected"
+    ],
+    "approach": "Manual implementation with declarative type registration",
+    "trade_offs": {
+      "pros": [
+        "Full control over API design",
+        "Custom optimizations possible",
+        "No dependency on code generation tools",
+        "Easier to understand and debug"
+      ],
+      "cons": [
+        "Manual synchronization with BPMN spec",
+        "More boilerplate code",
+        "Potential for inconsistencies",
+        "Slower to update for spec changes"
+      ]
+    },
+    "patterns_instead_of_generation": [
+      "Declarative type registration via fluent builders",
+      "Attribute and child element definitions in static methods",
+      "Convention-based getter/setter patterns",
+      "Base classes to reduce duplication"
+    ]
+  },
+  "validation_approach": {
+    "layers": [
+      {
+        "name": "Schema Validation",
+        "timing": "During XML parsing",
+        "technology": "W3C XML Schema",
+        "validates": [
+          "Element structure and ordering",
+          "Required attributes",
+          "Data types",
+          "Namespace compliance"
+        ]
+      },
+      {
+        "name": "Programmatic Validation",
+        "timing": "On demand via Bpmn.validateModel()",
+        "technology": "ModelElementValidator interface",
+        "validates": [
+          "Business rules",
+          "Semantic constraints",
+          "Reference integrity",
+          "Custom validation logic"
+        ]
+      }
+    ],
+    "validator_registration": "Validators register for specific element types and apply to all instances",
+    "result_collection": "ValidationResultCollector aggregates errors and warnings",
+    "extensibility": "Custom validators can be added by implementing ModelElementValidator<T>"
+  },
+  "type_hierarchies": {
+    "bpmn_elements": {
+      "root": "BaseElement",
+      "major_branches": [
+        {
+          "name": "FlowElement",
+          "description": "Elements that can be part of a process flow",
+          "subtypes": [
+            "FlowNode (activities, events, gateways)",
+            "SequenceFlow (connections)",
+            "DataObject (process data)"
+          ]
+        },
+        {
+          "name": "RootElement",
+          "description": "Top-level definitions",
+          "subtypes": [
+            "Process",
+            "Collaboration",
+            "Message",
+            "Signal",
+            "Error",
+            "Escalation",
+            "ItemDefinition",
+            "DataStore",
+            "Interface",
+            "Resource"
+          ]
+        },
+        {
+          "name": "Artifact",
+          "description": "Documentation and grouping",
+          "subtypes": [
+            "TextAnnotation",
+            "Group",
+            "Association"
+          ]
+        },
+        {
+          "name": "EventDefinition",
+          "description": "Event type specifications",
+          "subtypes": [
+            "MessageEventDefinition",
+            "TimerEventDefinition",
+            "ErrorEventDefinition",
+            "SignalEventDefinition",
+            "EscalationEventDefinition",
+            "TerminateEventDefinition",
+            "ConditionalEventDefinition",
+            "LinkEventDefinition",
+            "CompensateEventDefinition",
+            "CancelEventDefinition"
+          ]
+        }
+      ]
+    },
+    "activity_hierarchy": {
+      "Activity": {
+        "Task": [
+          "ServiceTask",
+          "UserTask",
+          "ScriptTask",
+          "SendTask",
+          "ReceiveTask",
+          "ManualTask",
+          "BusinessRuleTask"
+        ],
+        "SubProcess": [
+          "SubProcess",
+          "Transaction",
+          "AdHocSubProcess"
+        ],
+        "CallActivity": []
+      }
+    },
+    "event_hierarchy": {
+      "Event": {
+        "CatchEvent": [
+          "StartEvent",
+          "IntermediateCatchEvent",
+          "BoundaryEvent"
+        ],
+        "ThrowEvent": [
+          "EndEvent",
+          "IntermediateThrowEvent"
+        ]
+      }
+    },
+    "gateway_hierarchy": {
+      "Gateway": [
+        "ExclusiveGateway",
+        "ParallelGateway",
+        "InclusiveGateway",
+        "EventBasedGateway",
+        "ComplexGateway"
+      ]
+    },
+    "diagram_hierarchy": {
+      "DiagramElement": {
+        "Node": [
+          "BpmnShape"
+        ],
+        "Edge": [
+          "BpmnEdge"
+        ]
+      }
+    }
+  },
+  "complexity_assessment": {
+    "overall_complexity": "High",
+    "factors": [
+      {
+        "aspect": "Specification Coverage",
+        "level": "High",
+        "details": "Implements complete BPMN 2.0 specification with 200+ element types"
+      },
+      {
+        "aspect": "Type System",
+        "level": "Medium-High",
+        "details": "Runtime metamodel with declarative registration is sophisticated but well-designed"
+      },
+      {
+        "aspect": "Builder Pattern",
+        "level": "Medium-High",
+        "details": "Recursive generics and 80+ builder classes add complexity but provide excellent API"
+      },
+      {
+        "aspect": "XML Binding",
+        "level": "Medium",
+        "details": "Wrapper pattern with DOM delegation is straightforward once understood"
+      },
+      {
+        "aspect": "Reference Management",
+        "level": "Medium-High",
+        "details": "Bidirectional references with automatic synchronization requires careful implementation"
+      },
+      {
+        "aspect": "Extension Mechanism",
+        "level": "Medium",
+        "details": "Namespace-based extensions are clean and well-separated"
+      }
+    ],
+    "learning_curve": {
+      "using_api": "Low-Medium - Fluent builders and clear interfaces make usage straightforward",
+      "understanding_internals": "High - Metamodel, type system, and DOM binding require significant study",
+      "extending": "Medium-High - Adding new elements requires understanding type registration pattern"
+    },
+    "code_quality": {
+      "organization": "Excellent - Clear package structure, consistent naming",
+      "documentation": "Good - JavaDoc present, though examples could be more extensive",
+      "consistency": "Excellent - Patterns applied uniformly across all element types",
+      "testability": "Good - Clear separation of concerns, builder pattern aids testing"
+    },
+    "maintenance_burden": {
+      "specification_updates": "High - Manual updates required for BPMN spec changes",
+      "backward_compatibility": "Good - Uses clirr-maven-plugin for API compatibility checking",
+      "extension": "Medium - Adding new element types follows clear pattern"
+    }
+  },
+  "strengths": [
+    "Complete BPMN 2.0 specification coverage",
+    "Excellent fluent builder API with type-safe method chaining",
+    "Clean separation of public API from implementation",
+    "Flexible metamodel allowing runtime introspection",
+    "Strong support for Camunda extensions via namespaces",
+    "Bidirectional sync between object model and XML",
+    "Automatic diagram element generation",
+    "Schema-based XML validation",
+    "Extensible validation framework",
+    "Apache 2.0 license ideal for reuse",
+    "Well-organized package structure",
+    "Consistent design patterns throughout",
+    "OSGi-ready with bundle plugin",
+    "API compatibility checking in build"
+  ],
+  "weaknesses": [
+    "Archived repository - no active development in standalone repo",
+    "No code generation - all classes hand-written",
+    "Manual synchronization with BPMN specification required",
+    "High complexity for understanding internals",
+    "Limited examples and documentation beyond JavaDoc",
+    "Recursive generics in builders can be confusing",
+    "DOM-based approach has memory overhead for large models",
+    "No streaming API for very large files",
+    "Tight coupling between semantic model and diagram info"
+  ],
+  "recommendations": {
+    "for_reuse": [
+      {
+        "recommendation": "Study the metamodel pattern for UML implementation",
+        "rationale": "The declarative type registration pattern is elegant and could be adapted for UML metamodel",
+        "applicability": "High - Similar needs for complex type hierarchies and XML binding"
+      },
+      {
+        "recommendation": "Adopt the builder pattern approach",
+        "rationale": "Fluent API with recursive generics provides excellent developer experience",
+        "applicability": "High - UML model construction would benefit from similar pattern"
+      },
+      {
+        "recommendation": "Leverage the attribute and reference abstraction",
+        "rationale": "Clean separation of typed accessors from DOM operations",
+        "applicability": "High - UML has similar attribute and reference needs"
+      },
+      {
+        "recommendation": "Consider separating semantic model from diagram information",
+        "rationale": "Current tight coupling could be problematic for non-visual use cases",
+        "applicability": "Medium - UML diagrams are separate concern from metamodel"
+      },
+      {
+        "recommendation": "Evaluate code generation vs. manual implementation",
+        "rationale": "Manual implementation gives control but increases maintenance",
+        "applicability": "High - UML 2.5 is large specification, code generation might be beneficial"
+      },
+      {
+        "recommendation": "Use namespace-based extension pattern",
+        "rationale": "Clean way to add tool-specific extensions without polluting core model",
+        "applicability": "High - UML profiles and tool extensions need similar mechanism"
+      }
+    ],
+    "architecture_lessons": [
+      {
+        "lesson": "Separation of Concerns",
+        "description": "Clear layers: API → Builder → Implementation → Type System → XML",
+        "apply_to_uml": "Similar layering would benefit UML implementation"
+      },
+      {
+        "lesson": "Type Object Pattern",
+        "description": "Runtime metamodel separate from instances enables introspection",
+        "apply_to_uml": "Essential for UML's reflective metamodel architecture"
+      },
+      {
+        "lesson": "Wrapper over DOM",
+        "description": "Preserves XML fidelity while providing clean API",
+        "apply_to_uml": "Balance between XMI compatibility and usable API"
+      },
+      {
+        "lesson": "Static Registration",
+        "description": "Type registration via static methods called during initialization",
+        "apply_to_uml": "Could work for UML but consider generated registration for large metamodel"
+      },
+      {
+        "lesson": "Validation Layers",
+        "description": "Schema validation + programmatic validation + custom validators",
+        "apply_to_uml": "UML needs similar multi-layer validation (syntactic + well-formedness + semantic)"
+      }
+    ],
+    "implementation_guidance": [
+      {
+        "area": "Metamodel Definition",
+        "camunda_approach": "Declarative registration via fluent builders in static methods",
+        "for_uml": "Consider code generation from UML metamodel XMI for consistency and maintainability"
+      },
+      {
+        "area": "API Design",
+        "camunda_approach": "Interface + Implementation + Builder for each element type",
+        "for_uml": "Similar pattern appropriate, but consider partial builders given UML's size"
+      },
+      {
+        "area": "XML Binding",
+        "camunda_approach": "Wrapper pattern with lazy element wrapping and DOM delegation",
+        "for_uml": "XMI has more complex requirements (XMI IDs, hrefs, etc.) but pattern is applicable"
+      },
+      {
+        "area": "Extension Mechanism",
+        "camunda_approach": "Namespace attributes + extensionElements container",
+        "for_uml": "Map to UML profiles and stereotypes, plus tool-specific extensions"
+      },
+      {
+        "area": "Reference Management",
+        "camunda_approach": "Bidirectional sync with automatic update",
+        "for_uml": "UML has more complex containment/reference semantics but pattern is sound"
+      }
+    ],
+    "risks_and_mitigations": [
+      {
+        "risk": "Manual implementation becomes unmaintainable for UML's larger metamodel",
+        "mitigation": "Invest in code generation from UML metamodel, use Camunda patterns as templates"
+      },
+      {
+        "risk": "DOM-based approach has memory overhead",
+        "mitigation": "Consider hybrid approach with streaming for large documents"
+      },
+      {
+        "risk": "Recursive generics complexity",
+        "mitigation": "Document pattern well, provide examples, consider simplified builders for common cases"
+      },
+      {
+        "risk": "Tight coupling to XML representation",
+        "mitigation": "Consider additional abstraction layer if alternative serializations needed (JSON, database, etc.)"
+      }
+    ]
+  },
+  "analysis_metadata": {
+    "analysis_date": "2025-11-08",
+    "repository_commit": "49cb65c9ee96bb171b3df4a6c79510d9166278ce",
+    "files_examined": [
+      "README.md",
+      "LICENSE",
+      "pom.xml",
+      "src/main/java/org/camunda/bpm/model/bpmn/Bpmn.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/BpmnModelInstance.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/BpmnModelInstanceImpl.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/BpmnParser.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/BpmnModelConstants.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/builder/AbstractFlowNodeBuilder.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/builder/ProcessBuilder.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/builder/AbstractBaseElementBuilder.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/instance/Process.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/instance/FlowNode.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/instance/StartEvent.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/instance/ProcessImpl.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/instance/BaseElementImpl.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/instance/FlowNodeImpl.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/instance/ServiceTaskImpl.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/instance/DefinitionsImpl.java",
+      "src/main/java/org/camunda/bpm/model/bpmn/impl/QueryImpl.java",
+      "src/test/java/org/camunda/bpm/model/bpmn/CreateModelTest.java",
+      "xml-model: ModelBuilder.java",
+      "xml-model: ModelElementTypeBuilder.java",
+      "xml-model: ModelElementInstance.java",
+      "xml-model: ModelInstanceImpl.java",
+      "xml-model: ModelUtil.java",
+      "xml-model: Attribute.java",
+      "xml-model: Reference.java",
+      "xml-model: SequenceBuilder.java",
+      "xml-model: ModelElementValidator.java"
+    ],
+    "analysis_depth": "Deep - Examined architecture, patterns, implementation details, and key classes",
+    "confidence": "High - Comprehensive analysis of public API, implementation patterns, and metamodel structure"
+  }
+}

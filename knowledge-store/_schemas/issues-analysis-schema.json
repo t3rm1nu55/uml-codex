@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Issues Analysis Schema",
+  "description": "Schema for storing deep issue analysis with versioning",
+  "type": "object",
+  "properties": {
+    "version": {"type": "integer"},
+    "repository": {"type": "string"},
+    "analysis_date": {"type": "string"},
+    "last_updated": {"type": "string"},
+    "change_history": {"type": "array"},
+    "total_issues": {"type": "integer"},
+    "issues_analyzed": {"type": "integer"},
+    "date_range": {
+      "type": "object",
+      "properties": {
+        "from": {"type": "string"},
+        "to": {"type": "string"}
+      }
+    },
+    "categories": {
+      "type": "object",
+      "properties": {
+        "bugs": {"type": "array"},
+        "features": {"type": "array"},
+        "enhancements": {"type": "array"},
+        "questions": {"type": "array"},
+        "documentation": {"type": "array"}
+      }
+    },
+    "key_insights": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "insight": {"type": "string"},
+          "source_issues": {"type": "array"},
+          "relevance": {
+            "type": "string",
+            "enum": ["HIGH", "MEDIUM", "LOW"]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["HIGH", "MEDIUM", "LOW"],
+            "description": "Confidence level (may change with more learning)"
+          },
+          "actionable": {"type": "boolean"},
+          "action_items": {"type": "array"},
+          "refined_count": {
+            "type": "integer",
+            "description": "Number of times this insight was refined"
+          }
+        }
+      }
+    },
+    "pain_points": {"type": "array"},
+    "feature_requests": {"type": "array"},
+    "architectural_decisions": {"type": "array"},
+    "common_patterns": {"type": "array"}
+  }
+}

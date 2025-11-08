@@ -1,0 +1,716 @@
+{
+  "version": 1,
+  "repository": "REGnosys/cdm-object-builder",
+  "reviewed_date": "2025-11-08",
+  "last_updated": "2024-12-15T00:00:00Z",
+  "change_history": [
+    {
+      "date": "2025-11-08",
+      "reviewer": "Claude Code Analysis",
+      "summary": "Initial comprehensive analysis of cdm-object-builder repository focusing on object building and validation patterns"
+    }
+  ],
+  "license": "Apache-2.0",
+  "reuse_decision": "CAN_LIFT",
+  "reuse_rationale": "The repository is licensed under Apache License 2.0, which is highly permissive and allows commercial use, modification, distribution, and sublicensing. All major dependencies (FINOS CDM Java, Rosetta DSL, Angular, Eclipse Xtext) use compatible permissive licenses (Apache-2.0, EPL-2.0, MIT). The code can be freely reused, adapted, or studied. The project is part of FINOS (Fintech Open Source Foundation) incubating portfolio, indicating community support and governance.",
+  "components": [
+    {
+      "name": "TypescriptObjectBuilderModelGenerator",
+      "type": "Java Code Generator",
+      "path": "setup/src/main/java/org/finos/objectbuilder/TypescriptObjectBuilderModelGenerator.java",
+      "purpose": "Generates TypeScript model definitions from Rosetta CDM specifications by parsing Rosetta model files and exporting structured type information as JSON for consumption by the UI builder",
+      "value_proposition": "Enables dynamic UI generation from CDM schema definitions; bridges Java-based CDM specification with TypeScript frontend; automates model synchronization between backend specification and frontend application",
+      "dependencies": [
+        "com.google.inject.Inject",
+        "org.eclipse.xtext.resource.XtextResourceSet",
+        "com.regnosys.rosetta.types.TypeSystem",
+        "com.fasterxml.jackson.databind.ObjectMapper",
+        "com.rosetta.model.lib.ModelSymbolId"
+      ],
+      "complexity": "MEDIUM-HIGH",
+      "recommendation": "STUDY - Excellent example of schema-to-code generation; demonstrates visitor pattern for type hierarchy traversal; shows proper handling of inheritance, cardinality, and metadata"
+    },
+    {
+      "name": "BuilderApiService",
+      "type": "Angular Service",
+      "path": "ui/src/app/modules/builder/services/builder-api.service.ts",
+      "purpose": "Manages CDM object retrieval through lazy-loaded model data; provides reactive API for accessing root types, attributes, model name/version",
+      "value_proposition": "Abstracts model data access with RxJS observables; implements caching via shareReplay to prevent redundant imports; provides type-safe access to CDM metadata",
+      "dependencies": [
+        "rxjs",
+        "builder-api.model (dynamic import)"
+      ],
+      "complexity": "LOW-MEDIUM",
+      "recommendation": "ADOPT - Clean service layer pattern; excellent use of lazy loading and caching; good separation of concerns"
+    },
+    {
+      "name": "NodeDatabaseService",
+      "type": "Angular Service",
+      "path": "ui/src/app/modules/builder/services/node-database.service.ts",
+      "purpose": "Manages hierarchical tree structure of CDM objects; maintains root node and bidirectional parent-child relationships via lookup map",
+      "value_proposition": "Efficient tree traversal without recursive searches; reactive state management via RxJS ReplaySubject; handles node insertion with duplicate detection; supports deep cloning with ID regeneration",
+      "dependencies": [
+        "rxjs",
+        "IdentityService",
+        "builder.model"
+      ],
+      "complexity": "MEDIUM",
+      "recommendation": "STUDY - Excellent example of tree data structure management with reactive updates; shows proper use of lookup tables for performance optimization"
+    },
+    {
+      "name": "JsonImportService",
+      "type": "Angular Service",
+      "path": "ui/src/app/modules/builder/services/json-import.service.ts",
+      "purpose": "Imports and validates JSON objects against structured type definitions; converts external JSON to internal node structure",
+      "value_proposition": "Validates incoming data against CDM schema; filters excluded metadata fields; enforces cardinality constraints; provides descriptive error messages for validation failures",
+      "dependencies": [
+        "BuilderApiService",
+        "IdentityService",
+        "type-guards.util",
+        "node.util"
+      ],
+      "complexity": "MEDIUM-HIGH",
+      "recommendation": "STUDY - Demonstrates comprehensive validation pattern; shows recursive object traversal with type checking; good error handling example"
+    },
+    {
+      "name": "JsonExportService",
+      "type": "Angular Service",
+      "path": "ui/src/app/modules/builder/services/json-export.service.ts",
+      "purpose": "Converts internal tree structure to CDM-compliant JSON through recursive traversal",
+      "value_proposition": "Handles metadata wrapping ({ value: val } format); respects cardinality for array vs single value serialization; produces clean, CDM-compliant output",
+      "dependencies": [
+        "builder.model",
+        "type-guards.util",
+        "node.util"
+      ],
+      "complexity": "MEDIUM",
+      "recommendation": "ADOPT - Clean serialization pattern; demonstrates proper handling of object graphs"
+    },
+    {
+      "name": "Node Utility Functions",
+      "type": "Utility Library",
+      "path": "ui/src/app/modules/builder/utils/node.util.ts",
+      "purpose": "Provides validation and categorization functions for model attributes and nodes",
+      "value_proposition": "Core validation logic: isAttributeExhausted checks cardinality limits, isInfiniteCardinality/isMultiCardinality handle unbounded collections, isListBasedBasicType categorizes compatible types",
+      "dependencies": [
+        "builder.model",
+        "type-guards.util"
+      ],
+      "complexity": "LOW-MEDIUM",
+      "recommendation": "ADOPT - Reusable validation utilities; clean functional design; well-focused responsibilities"
+    },
+    {
+      "name": "Type Guard Utilities",
+      "type": "Utility Library",
+      "path": "ui/src/app/modules/builder/utils/type-guards.util.ts",
+      "purpose": "Provides TypeScript type guard functions for runtime type checking",
+      "value_proposition": "Seven type guards (isBasicType, isEnumType, isStructuredType, isJsonRootNode, isJsonAttribute, isStringArray, isNumberArray); leverages TypeScript's type predicate syntax for type narrowing; includes defensive checks for invalid data",
+      "dependencies": [
+        "builder.model"
+      ],
+      "complexity": "LOW",
+      "recommendation": "ADOPT - Essential pattern for TypeScript runtime type safety; clean implementation"
+    },
+    {
+      "name": "Builder Component",
+      "type": "Angular Component",
+      "path": "ui/src/app/modules/builder/components/builder/builder.component.ts",
+      "purpose": "Main orchestration component managing JSON object construction through hierarchical tree UI",
+      "value_proposition": "Integrates FlatTreeControl with MatTreeFlattener for Angular Material tree visualization; subscribes to NodeDatabaseService for reactive updates; handles file import/export; manages user interactions (clear, export, import)",
+      "dependencies": [
+        "@angular/cdk/tree",
+        "@angular/material/tree",
+        "NodeDatabaseService",
+        "LocalStorageService",
+        "NodeSelectionService",
+        "FileImportService",
+        "JsonExportService"
+      ],
+      "complexity": "MEDIUM-HIGH",
+      "recommendation": "STUDY - Shows Angular Material tree integration; demonstrates reactive state management; good example of component orchestration"
+    },
+    {
+      "name": "StructuredTypeNodeComponent",
+      "type": "Angular Component",
+      "path": "ui/src/app/modules/builder/components/structured-type-node/structured-type-node.component.ts",
+      "purpose": "Renders and manages structured type nodes in the UI; handles node duplication and file import",
+      "value_proposition": "Supports node cloning via duplicateSubTree; auto-scrolls to newly created nodes; manages file upload with FormControl; exposes exhaustion and cardinality state as observables",
+      "dependencies": [
+        "NodeDatabaseService",
+        "NodeSelectionService",
+        "FileImportService",
+        "@fortawesome/fontawesome-free"
+      ],
+      "complexity": "MEDIUM",
+      "recommendation": "STUDY - Good example of node-specific UI logic; shows proper service integration"
+    },
+    {
+      "name": "AddAttributeComponent",
+      "type": "Angular Component",
+      "path": "ui/src/app/modules/builder/components/add-attribute/add-attribute.component.ts",
+      "purpose": "Provides UI for adding new attributes to objects with validation of cardinality constraints",
+      "value_proposition": "Filters exhausted attributes (at max cardinality); highlights mandatory attributes (lower bound > 0); generates unique IDs via IdentityService; sets initial values based on type; auto-selects and scrolls to new nodes",
+      "dependencies": [
+        "NodeDatabaseService",
+        "NodeSelectionService",
+        "IdentityService",
+        "node.util"
+      ],
+      "complexity": "MEDIUM",
+      "recommendation": "STUDY - Excellent example of constraint-based UI validation; demonstrates filtering based on business rules"
+    },
+    {
+      "name": "Type-Specific Node Components",
+      "type": "Angular Component Collection",
+      "path": "ui/src/app/modules/builder/components/[boolean-node, date-node, enum-node, int-node, number-node, string-node, zoned-date-time-node]/",
+      "purpose": "Provides specialized UI controls for each CDM basic type (boolean, date, datetime, enum, integer, number, string)",
+      "value_proposition": "Type-specific validation and input controls; proper data binding for each type; enforces type constraints at UI level",
+      "dependencies": [
+        "@angular/forms",
+        "@angular/material",
+        "date-fns (for date handling)"
+      ],
+      "complexity": "LOW-MEDIUM",
+      "recommendation": "STUDY - Shows pattern for type-specific UI components; demonstrates proper form control integration"
+    },
+    {
+      "name": "Builder Module",
+      "type": "Angular Module",
+      "path": "ui/src/app/modules/builder/builder.module.ts",
+      "purpose": "Module aggregating all builder components, services, and directives",
+      "value_proposition": "Encapsulates entire object builder feature; imports Angular Material modules; declares all components; provides services",
+      "dependencies": [
+        "@angular/core",
+        "@angular/common",
+        "@angular/material/*",
+        "@angular/cdk/tree"
+      ],
+      "complexity": "MEDIUM",
+      "recommendation": "STUDY - Good example of Angular feature module organization"
+    },
+    {
+      "name": "Builder Data Model",
+      "type": "TypeScript Interfaces",
+      "path": "ui/src/app/modules/builder/models/builder.model.ts",
+      "purpose": "Defines core type system interfaces: RosettaBasicType enum (7 primitives), RosettaTypeCategory, EnumType, StructuredType, ModelAttribute with cardinality, JsonRootNode, JsonAttributeNode",
+      "value_proposition": "Provides strong typing for entire application; defines tree node structure; specifies cardinality constraints; enables TypeScript compiler validation",
+      "dependencies": [],
+      "complexity": "MEDIUM",
+      "recommendation": "ADOPT - Clean domain model; good separation of concerns; reusable type definitions"
+    },
+    {
+      "name": "Local Storage Service",
+      "type": "Angular Service",
+      "path": "ui/src/app/modules/builder/services/local-storage.service.ts",
+      "purpose": "Persists constructed objects to browser local storage with keys formatted as rootNode:{typeName}",
+      "value_proposition": "Enables session persistence; allows users to resume work; simple key-value interface",
+      "dependencies": [],
+      "complexity": "LOW",
+      "recommendation": "ADAPT - Simple persistence pattern; can be extended for backend storage"
+    },
+    {
+      "name": "File Import Service",
+      "type": "Angular Service",
+      "path": "ui/src/app/modules/builder/services/file-import.service.ts",
+      "purpose": "Handles file upload and parsing for JSON import",
+      "value_proposition": "Abstracts file reading; delegates to JsonImportService for validation; provides user feedback",
+      "dependencies": [
+        "JsonImportService"
+      ],
+      "complexity": "LOW",
+      "recommendation": "ADAPT - Standard file import pattern"
+    },
+    {
+      "name": "Identity Service",
+      "type": "Angular Service",
+      "path": "ui/src/app/modules/builder/services/identity.service.ts",
+      "purpose": "Generates unique IDs for nodes",
+      "value_proposition": "Ensures collision-free identifiers; supports node duplication; simple incrementing counter",
+      "dependencies": [],
+      "complexity": "LOW",
+      "recommendation": "ADAPT - Simple ID generation; consider UUID for distributed systems"
+    },
+    {
+      "name": "Node Selection Service",
+      "type": "Angular Service",
+      "path": "ui/src/app/modules/builder/services/node-selection.service.ts",
+      "purpose": "Tracks selected nodes and provides scroll-to-node functionality",
+      "value_proposition": "Centralizes selection state; enables cross-component communication; supports UI navigation",
+      "dependencies": [],
+      "complexity": "LOW",
+      "recommendation": "ADOPT - Good state management pattern"
+    }
+  ],
+  "design_patterns": [
+    {
+      "pattern": "Builder Pattern",
+      "description": "Core pattern for constructing CDM objects incrementally through user interactions. Users start with a root type and progressively add attributes, set values, and build nested structures.",
+      "benefit": "Separates object construction from representation; allows step-by-step building of complex objects; enforces validation at each step; provides flexibility in construction order",
+      "files": [
+        "ui/src/app/modules/builder/components/builder/builder.component.ts",
+        "ui/src/app/modules/builder/components/add-attribute/add-attribute.component.ts",
+        "ui/src/app/modules/builder/services/node-database.service.ts"
+      ]
+    },
+    {
+      "pattern": "Composite/Tree Pattern",
+      "description": "Hierarchical tree structure for representing CDM objects. JsonRootNode contains JsonAttributeNodes which can contain children, forming a recursive tree structure matching the CDM schema hierarchy.",
+      "benefit": "Uniform treatment of simple and complex attributes; enables recursive traversal; supports arbitrary nesting; mirrors CDM structure naturally",
+      "files": [
+        "ui/src/app/modules/builder/models/builder.model.ts",
+        "ui/src/app/modules/builder/services/node-database.service.ts",
+        "ui/src/app/modules/builder/services/json-export.service.ts"
+      ]
+    },
+    {
+      "pattern": "Visitor Pattern",
+      "description": "TypescriptObjectBuilderModelGenerator recursively traverses Rosetta type hierarchy to collect attributes from parent types, visiting each node in the inheritance chain.",
+      "benefit": "Separates traversal algorithm from data structure; enables different operations on same structure; handles inheritance gracefully",
+      "files": [
+        "setup/src/main/java/org/finos/objectbuilder/TypescriptObjectBuilderModelGenerator.java"
+      ]
+    },
+    {
+      "pattern": "Strategy Pattern",
+      "description": "Type-specific handling in code generator (RDataType vs REnumType) and UI components (boolean-node, enum-node, string-node, etc.). Different strategies for different types.",
+      "benefit": "Extensible type system; easy to add new types; type-specific validation and rendering; clean separation of concerns",
+      "files": [
+        "setup/src/main/java/org/finos/objectbuilder/TypescriptObjectBuilderModelGenerator.java",
+        "ui/src/app/modules/builder/components/*/",
+        "ui/src/app/modules/builder/utils/type-guards.util.ts"
+      ]
+    },
+    {
+      "pattern": "Observer/Reactive Pattern",
+      "description": "RxJS observables throughout the Angular application for reactive state management. NodeDatabaseService emits nodeDataChange$ events; services expose data as observables; components subscribe for reactive updates.",
+      "benefit": "Loose coupling between components; automatic UI updates on data changes; composable data streams; efficient change propagation",
+      "files": [
+        "ui/src/app/modules/builder/services/node-database.service.ts",
+        "ui/src/app/modules/builder/services/builder-api.service.ts",
+        "ui/src/app/modules/builder/components/*/"
+      ]
+    },
+    {
+      "pattern": "Service Layer Pattern",
+      "description": "Angular services encapsulate business logic and data access. BuilderApiService for model data, NodeDatabaseService for tree management, JsonImportService for validation, etc.",
+      "benefit": "Separation of concerns; reusable business logic; testable services; consistent API across components",
+      "files": [
+        "ui/src/app/modules/builder/services/*/"
+      ]
+    },
+    {
+      "pattern": "Dependency Injection",
+      "description": "Both Java (Google Guice) and Angular (native DI) use dependency injection. TypescriptObjectBuilderModelGenerator injects XtextResourceSet and TypeSystem; Angular components inject services.",
+      "benefit": "Loose coupling; testability via mock injection; flexible configuration; inversion of control",
+      "files": [
+        "setup/src/main/java/org/finos/objectbuilder/TypescriptObjectBuilderModelGenerator.java",
+        "ui/src/app/modules/builder/components/*/",
+        "ui/src/app/modules/builder/services/*/"
+      ]
+    },
+    {
+      "pattern": "Type Guard Pattern",
+      "description": "TypeScript type guards (isBasicType, isEnumType, isStructuredType, etc.) provide runtime type checking with compile-time type narrowing.",
+      "benefit": "Type-safe runtime checks; compiler-enforced type narrowing; eliminates type casting; prevents type errors",
+      "files": [
+        "ui/src/app/modules/builder/utils/type-guards.util.ts"
+      ]
+    },
+    {
+      "pattern": "Facade Pattern",
+      "description": "BuilderApiService provides simplified interface to complex lazy-loaded model data; abstracts import mechanism and data transformation.",
+      "benefit": "Simplified client code; hides complexity; single point of access; easier to modify implementation",
+      "files": [
+        "ui/src/app/modules/builder/services/builder-api.service.ts"
+      ]
+    },
+    {
+      "pattern": "Lazy Loading Pattern",
+      "description": "Model data is dynamically imported only when needed via import() statement; Angular Material tree uses virtual scrolling for large trees.",
+      "benefit": "Reduced initial bundle size; faster application startup; on-demand resource loading; better performance",
+      "files": [
+        "ui/src/app/modules/builder/services/builder-api.service.ts"
+      ]
+    },
+    {
+      "pattern": "Caching Pattern",
+      "description": "RxJS shareReplay(1) operator caches model data observable, preventing redundant dynamic imports and data processing.",
+      "benefit": "Performance optimization; reduced network/IO; consistent data across subscribers; automatic cache invalidation on completion",
+      "files": [
+        "ui/src/app/modules/builder/services/builder-api.service.ts"
+      ]
+    },
+    {
+      "pattern": "Command Pattern",
+      "description": "User actions (add attribute, delete node, duplicate node) are encapsulated as method calls that modify state and emit events, enabling undo/redo potential.",
+      "benefit": "Decouples action invocation from execution; supports undo/redo; enables logging/auditing; consistent action handling",
+      "files": [
+        "ui/src/app/modules/builder/services/node-database.service.ts",
+        "ui/src/app/modules/builder/components/add-attribute/add-attribute.component.ts"
+      ]
+    },
+    {
+      "pattern": "Factory Pattern",
+      "description": "Node creation logic in AddAttributeComponent.addAttribute() creates appropriate JsonAttributeNode instances based on attribute definition, including type-specific initial values.",
+      "benefit": "Centralized creation logic; consistent initialization; easy to extend with new types; encapsulates construction complexity",
+      "files": [
+        "ui/src/app/modules/builder/components/add-attribute/add-attribute.component.ts"
+      ]
+    },
+    {
+      "pattern": "Adapter Pattern",
+      "description": "TypescriptObjectBuilderModelGenerator adapts Rosetta model classes (RDataType, REnumType) to TypeScript/JSON model format; JsonImportService adapts external JSON to internal node structure.",
+      "benefit": "Bridges incompatible interfaces; enables integration; maintains separation; allows independent evolution",
+      "files": [
+        "setup/src/main/java/org/finos/objectbuilder/TypescriptObjectBuilderModelGenerator.java",
+        "ui/src/app/modules/builder/services/json-import.service.ts"
+      ]
+    },
+    {
+      "pattern": "Template Method Pattern",
+      "description": "Recursive methods (getDataAttributes, getRosettaEnumValues) define algorithm skeleton, delegating specific steps to helper methods or recursion.",
+      "benefit": "Code reuse; consistent algorithm structure; extensible via method override; clear separation of steps",
+      "files": [
+        "setup/src/main/java/org/finos/objectbuilder/TypescriptObjectBuilderModelGenerator.java"
+      ]
+    },
+    {
+      "pattern": "Validation Chain Pattern",
+      "description": "JsonImportService chains validation steps: field filtering → attribute verification → type checking → cardinality validation → recursive processing.",
+      "benefit": "Comprehensive validation; early failure detection; clear validation flow; reusable validation rules",
+      "files": [
+        "ui/src/app/modules/builder/services/json-import.service.ts",
+        "ui/src/app/modules/builder/utils/node.util.ts"
+      ]
+    }
+  ],
+  "requirements_identified": [
+    {
+      "category": "Runtime Environment - Backend",
+      "requirement": "Java 17",
+      "priority": "CRITICAL",
+      "rationale": "Required by pom.xml for building TypescriptObjectBuilderModelGenerator and processing Rosetta models"
+    },
+    {
+      "category": "Runtime Environment - Frontend",
+      "requirement": "Node.js (compatible with npm ci)",
+      "priority": "CRITICAL",
+      "rationale": "Required to install dependencies and run the Angular development server"
+    },
+    {
+      "category": "Build System - Backend",
+      "requirement": "Apache Maven 3.x",
+      "priority": "CRITICAL",
+      "rationale": "Used to build Java code generator and manage dependencies (Rosetta DSL, CDM Java, Guava, Xtext)"
+    },
+    {
+      "category": "Build System - Frontend",
+      "requirement": "npm (Node Package Manager)",
+      "priority": "CRITICAL",
+      "rationale": "Manages Angular dependencies and build scripts (npm ci, npm start, npm run build)"
+    },
+    {
+      "category": "Core Dependency - Backend",
+      "requirement": "FINOS CDM Java [7.0.0-dev.13, 8.0.0)",
+      "priority": "CRITICAL",
+      "rationale": "Provides CDM type definitions that the model generator processes",
+      "license": "Apache-2.0",
+      "artifact": "org.finos.cdm:cdm-java"
+    },
+    {
+      "category": "Core Dependency - Backend",
+      "requirement": "Regnosys Rosetta DSL 9.47.0",
+      "priority": "CRITICAL",
+      "rationale": "Core DSL framework for parsing and processing Rosetta model files",
+      "license": "Apache-2.0",
+      "artifact": "com.regnosys.rosetta:com.regnosys.rosetta"
+    },
+    {
+      "category": "Core Dependency - Backend",
+      "requirement": "Eclipse Xtext 2.27.0",
+      "priority": "CRITICAL",
+      "rationale": "Language workbench for parsing DSL files and providing type system",
+      "license": "Eclipse Public License 2.0",
+      "artifact": "org.eclipse.xtext"
+    },
+    {
+      "category": "Core Dependency - Backend",
+      "requirement": "Google Guava 32.1.3-jre",
+      "priority": "HIGH",
+      "rationale": "Utility library used in model generator",
+      "license": "Apache-2.0",
+      "artifact": "com.google.guava:guava"
+    },
+    {
+      "category": "Core Dependency - Backend",
+      "requirement": "Logback Classic & Core 1.4.14",
+      "priority": "MEDIUM",
+      "rationale": "Logging framework for Java code generator",
+      "license": "Eclipse Public License 2.0",
+      "artifact": "ch.qos.logback:logback-classic"
+    },
+    {
+      "category": "Core Framework - Frontend",
+      "requirement": "Angular 14.1.3",
+      "priority": "CRITICAL",
+      "rationale": "Core framework for the UI application including compiler, router, forms, animations, CDK",
+      "license": "MIT",
+      "artifacts": "@angular/*"
+    },
+    {
+      "category": "UI Library - Frontend",
+      "requirement": "Angular Material 14.1.3",
+      "priority": "CRITICAL",
+      "rationale": "Provides Material Design components for tree, forms, buttons, dialogs, etc.",
+      "license": "MIT",
+      "artifact": "@angular/material"
+    },
+    {
+      "category": "Core Library - Frontend",
+      "requirement": "RxJS 7.8.1",
+      "priority": "CRITICAL",
+      "rationale": "Reactive programming library for observables, state management, and async operations",
+      "license": "Apache-2.0",
+      "artifact": "rxjs"
+    },
+    {
+      "category": "Utility Library - Frontend",
+      "requirement": "date-fns 2.29.2",
+      "priority": "HIGH",
+      "rationale": "Date manipulation library for handling DATE and ZONED_DATE_TIME types",
+      "license": "MIT",
+      "artifact": "date-fns"
+    },
+    {
+      "category": "Icon Library - Frontend",
+      "requirement": "FontAwesome Icons 6.1.1",
+      "priority": "MEDIUM",
+      "rationale": "Icon library for UI elements (copy, delete, menu, etc.)",
+      "license": "MIT (for free icons)",
+      "artifact": "@fortawesome/fontawesome-free"
+    },
+    {
+      "category": "Utility Library - Frontend",
+      "requirement": "lodash-es",
+      "priority": "MEDIUM",
+      "rationale": "Utility functions for data manipulation",
+      "license": "MIT",
+      "artifact": "lodash-es"
+    },
+    {
+      "category": "Development Tool - Frontend",
+      "requirement": "TypeScript 4.7.2",
+      "priority": "CRITICAL",
+      "rationale": "Type-safe language for frontend development; enables compile-time type checking",
+      "license": "Apache-2.0",
+      "artifact": "typescript"
+    },
+    {
+      "category": "Testing Framework - Frontend",
+      "requirement": "Jasmine 5.1.0 + Karma 6.4.2",
+      "priority": "HIGH",
+      "rationale": "Testing framework and test runner for unit tests",
+      "license": "MIT",
+      "artifacts": "jasmine-core, karma"
+    },
+    {
+      "category": "Testing Framework - Backend",
+      "requirement": "JUnit 4.13.2",
+      "priority": "HIGH",
+      "rationale": "Testing framework for Java code",
+      "license": "Eclipse Public License 2.0",
+      "artifact": "junit:junit"
+    },
+    {
+      "category": "Code Quality - Frontend",
+      "requirement": "Prettier 3.5.2",
+      "priority": "MEDIUM",
+      "rationale": "Code formatter for consistent style",
+      "license": "MIT",
+      "artifact": "prettier"
+    },
+    {
+      "category": "Development Tool - Frontend",
+      "requirement": "webpack-bundle-analyzer",
+      "priority": "LOW",
+      "rationale": "Analyzes bundle size and composition for optimization",
+      "license": "MIT"
+    },
+    {
+      "category": "Model Update Process",
+      "requirement": "CDM Model Update Scripts",
+      "priority": "HIGH",
+      "rationale": "npm run update-model script automates CDM version updates; requires Maven and Java for advanced method",
+      "details": "Basic: 'npm run update-model' | Advanced: update pom.xml, run 'mvn clean install', execute JAR"
+    },
+    {
+      "category": "Development Workflow",
+      "requirement": "FINOS Contribution License Agreement",
+      "priority": "MEDIUM",
+      "rationale": "Contributors must have executed ICLA or be covered under CCLA with FINOS",
+      "note": "Required only for contributing back to the project, not for using it"
+    },
+    {
+      "category": "Browser Compatibility",
+      "requirement": "Modern Browser with ES2015+ Support",
+      "priority": "CRITICAL",
+      "rationale": "Angular 14 requires modern browser with ES2015 support; zone.js for change detection"
+    },
+    {
+      "category": "Browser Storage",
+      "requirement": "Local Storage API",
+      "priority": "HIGH",
+      "rationale": "Used by LocalStorageService to persist constructed objects across sessions"
+    },
+    {
+      "category": "Fixed CDM Version",
+      "requirement": "CDM version fixed at build time",
+      "priority": "HIGH",
+      "rationale": "Application is compiled against a specific CDM version; requires rebuild to update model",
+      "note": "Trade-off between version flexibility and bundle size/complexity"
+    }
+  ],
+  "technical_debt": [
+    {
+      "issue": "Angular Version Outdated",
+      "severity": "MEDIUM",
+      "description": "Application uses Angular 14.1.3 (from 2022). Current stable is Angular 17+",
+      "impact": "Missing performance improvements, new features, security patches; potential security vulnerabilities",
+      "recommendation": "Upgrade to Angular 17+ for production use; migration guide available at angular.io/guide/update",
+      "files": [
+        "ui/package.json"
+      ]
+    },
+    {
+      "issue": "TypeScript Version Outdated",
+      "severity": "MEDIUM",
+      "description": "Uses TypeScript 4.7.2 (2022). Current stable is TypeScript 5.x",
+      "impact": "Missing modern language features, performance improvements, better type inference",
+      "recommendation": "Upgrade to TypeScript 5.x when upgrading Angular",
+      "files": [
+        "ui/package.json"
+      ]
+    },
+    {
+      "issue": "No Error Boundary Implementation",
+      "severity": "MEDIUM",
+      "description": "No global error handling or error boundaries for graceful degradation",
+      "impact": "Application may crash entirely on unexpected errors; poor user experience",
+      "recommendation": "Implement Angular ErrorHandler service for global error catching and user-friendly error display",
+      "files": []
+    },
+    {
+      "issue": "Limited Validation Error Messages",
+      "severity": "LOW-MEDIUM",
+      "description": "Validation errors in JsonImportService throw generic errors without field path context",
+      "impact": "Difficult for users to locate and fix validation errors in complex objects",
+      "recommendation": "Include full field path in error messages (e.g., 'trade.tradeDate.value')",
+      "files": [
+        "ui/src/app/modules/builder/services/json-import.service.ts"
+      ]
+    },
+    {
+      "issue": "No Undo/Redo Functionality",
+      "severity": "MEDIUM",
+      "description": "NodeDatabaseService has Command pattern foundation but no undo/redo implementation",
+      "impact": "Users cannot recover from mistakes; must manually recreate deleted nodes",
+      "recommendation": "Implement command history and undo/redo stack for better UX",
+      "files": [
+        "ui/src/app/modules/builder/services/node-database.service.ts"
+      ]
+    },
+    {
+      "issue": "Simple ID Generation Strategy",
+      "severity": "LOW",
+      "description": "IdentityService uses simple incrementing counter for IDs; not suitable for distributed/collaborative scenarios",
+      "impact": "ID collisions if multiple users work on same object or if objects are merged",
+      "recommendation": "Use UUID/GUID for distributed systems; current approach fine for single-user client-side app",
+      "files": [
+        "ui/src/app/modules/builder/services/identity.service.ts"
+      ]
+    },
+    {
+      "issue": "No Backend Integration",
+      "severity": "MEDIUM",
+      "description": "Purely client-side application with no server backend; uses local storage only",
+      "impact": "No collaboration, versioning, sharing, or centralized storage; data loss if browser storage cleared",
+      "recommendation": "Consider backend API for persistence, sharing, and collaboration features",
+      "files": []
+    },
+    {
+      "issue": "No Export Format Options",
+      "severity": "LOW",
+      "description": "JsonExportService only exports to CDM JSON format; no XML, YAML, or other format support",
+      "impact": "Limited interoperability with non-JSON systems",
+      "recommendation": "Add format selection if other formats needed",
+      "files": [
+        "ui/src/app/modules/builder/services/json-export.service.ts"
+      ]
+    },
+    {
+      "issue": "Limited Test Coverage",
+      "severity": "MEDIUM",
+      "description": "Spec files exist but test implementation status unclear; no test coverage reports",
+      "impact": "Risk of regressions; difficult to refactor safely",
+      "recommendation": "Expand test coverage to 80%+ for critical services; add E2E tests for user workflows",
+      "files": [
+        "ui/src/app/modules/builder/**/*.spec.ts"
+      ]
+    },
+    {
+      "issue": "No CI/CD Pipeline",
+      "severity": "MEDIUM",
+      "description": "No GitHub Actions or CI/CD configuration in repository",
+      "impact": "No automated testing, building, or deployment; manual process error-prone",
+      "recommendation": "Add GitHub Actions workflow for build, test, lint on PR and commits",
+      "files": []
+    },
+    {
+      "issue": "Hardcoded Excluded Fields",
+      "severity": "LOW",
+      "description": "JsonImportService has hardcoded EXCLUDED_FIELDS array for filtering metadata",
+      "impact": "Must modify code to change excluded fields; not configurable",
+      "recommendation": "Consider making excluded fields configurable if flexibility needed",
+      "files": [
+        "ui/src/app/modules/builder/services/json-import.service.ts"
+      ]
+    },
+    {
+      "issue": "No Accessibility (a11y) Audit",
+      "severity": "MEDIUM",
+      "description": "No evidence of accessibility testing or ARIA attributes in components",
+      "impact": "May not be usable by screen reader users or keyboard-only navigation",
+      "recommendation": "Audit with axe-core or Lighthouse; add ARIA labels; ensure keyboard navigation works",
+      "files": [
+        "ui/src/app/modules/builder/components/*/"
+      ]
+    },
+    {
+      "issue": "No Internationalization (i18n)",
+      "severity": "LOW",
+      "description": "All text is hardcoded in English; no Angular i18n support",
+      "impact": "Not usable in non-English locales",
+      "recommendation": "Add Angular i18n if multi-language support needed",
+      "files": []
+    },
+    {
+      "issue": "Maven Shade Plugin Configuration",
+      "severity": "LOW",
+      "description": "Shade plugin creates fat JAR which may have dependency conflicts or large size",
+      "impact": "Larger artifact size; potential for dependency shadowing issues",
+      "recommendation": "Ensure transformers handle META-INF correctly; document JAR usage",
+      "files": [
+        "setup/pom.xml"
+      ]
+    },
+    {
+      "issue": "No Performance Monitoring",
+      "severity": "LOW",
+      "description": "No performance metrics, timing, or monitoring for large tree operations",
+      "impact": "Difficult to identify performance bottlenecks with large CDM objects",
+      "recommendation": "Add performance marks for critical operations; consider virtual scrolling limits",
+      "files": []
+    }
+  ],
+  "notes": "## Overall Assessment\n\nThe **cdm-object-builder** is a sophisticated, well-architected utility for visually constructing ISDA Common Domain Model (CDM) objects through an interactive web interface. It successfully bridges the gap between complex financial domain modeling and user-friendly visual object construction.\n\n## Key Strengths\n\n1. **Excellent Architecture**: Clean separation of concerns with service layer, reactive state management, and modular components\n2. **Strong Type Safety**: TypeScript with comprehensive type guards; generated models from Rosetta DSL ensure schema alignment\n3. **Rich Pattern Usage**: Implements 15+ design patterns appropriately (Builder, Composite, Observer, Strategy, Visitor, etc.)\n4. **Schema-Driven UI**: Dynamic UI generation from CDM schema enables automatic adaptation to model changes\n5. **Comprehensive Validation**: Cardinality enforcement, type checking, mandatory attribute highlighting\n6. **Good User Experience**: Auto-scrolling, duplicate detection, file import/export, local persistence\n7. **License Friendly**: Apache-2.0 with permissive dependency licenses enables commercial reuse\n8. **FINOS Incubating**: Part of established open-source foundation with governance\n\n## Primary Value Propositions\n\n1. **Visual CDM Object Construction**: Non-developers can build valid CDM objects through point-and-click interface\n2. **Schema Validation**: Ensures constructed objects conform to CDM schema with cardinality and type constraints\n3. **Model Synchronization**: TypeScript models auto-generated from Java CDM definitions ensure consistency\n4. **Practical Use Case**: Demonstrates real-world application for Eligible Collateral Schedule selection\n5. **Educational Resource**: Excellent example of enterprise Angular application with Material Design\n6. **Code Generation Pattern**: Shows robust approach to generating TypeScript from DSL using Xtext and Rosetta\n7. **Tree Data Structure Management**: Demonstrates efficient tree operations with lookup tables and reactive updates\n8. **Import/Export Workflow**: Enables loading existing CDM JSON, editing, and re-exporting\n\n## Architecture Highlights\n\n### Backend (Java)\n- **Purpose**: Generate TypeScript model from Rosetta CDM definitions\n- **Technology**: Java 17, Maven, Rosetta DSL, Xtext, Guava\n- **Pattern**: Visitor pattern for type hierarchy traversal; Dependency Injection with Guice\n- **Output**: TypeScript file with JSON-serialized model metadata (root types, attributes, cardinality)\n\n### Frontend (Angular)\n- **Purpose**: Interactive UI for building CDM objects as trees\n- **Technology**: Angular 14, Material Design, RxJS, TypeScript 4.7\n- **State Management**: Reactive with RxJS observables and services\n- **UI Pattern**: Tree view with type-specific node components\n- **Validation**: Real-time cardinality checking, type validation, mandatory field highlighting\n- **Persistence**: Browser local storage for session continuity\n\n### Key Design Decisions\n\n1. **Fixed CDM Version**: Model baked into bundle at build time (trade-off: smaller runtime, less flexible)\n2. **Tree Structure**: Composite pattern for arbitrary nesting matching CDM schema\n3. **Type-Specific Components**: Strategy pattern for rendering different data types\n4. **Lazy Loading**: Model data dynamically imported with caching\n5. **Bidirectional Lookup**: Parent-child map for O(1) parent lookups\n6. **Observable State**: Reactive updates propagate automatically through component tree\n\n## Complexity Assessment\n\n**Overall Complexity: MEDIUM-HIGH**\n\n- **Frontend Complexity**: Medium-High (Angular, RxJS, Material, tree management)\n- **Backend Complexity**: Medium (Xtext, Rosetta DSL, type system traversal)\n- **Domain Complexity**: High (ISDA CDM is complex financial domain model)\n- **Integration Complexity**: Medium (two-phase build: Java generator → TypeScript bundle)\n- **Learning Curve**: Medium for Angular developers; High for understanding CDM and Rosetta DSL\n\n**Lines of Code Estimate**:\n- Backend: ~400-500 lines (single Java file)\n- Frontend Services: ~1500-2000 lines\n- Frontend Components: ~2000-3000 lines\n- Frontend Models/Utils: ~500-800 lines\n- **Total**: ~4500-6000 lines of production code\n\n## Use Cases\n\n1. **Eligible Collateral Selection**: Primary use case mentioned in README\n2. **Trade Construction**: Build trade objects interactively\n3. **Event Modeling**: Construct business events visually\n4. **Prototyping**: Rapid CDM object creation for testing\n5. **Training**: Educational tool for learning CDM structure\n6. **Data Entry**: User-friendly alternative to manual JSON editing\n\n## Integration Patterns Demonstrated\n\n1. **Schema-to-UI Generation**: Rosetta DSL → TypeScript models → Dynamic UI\n2. **Type System Mapping**: Rosetta types → TypeScript enums/interfaces\n3. **Validation Pipeline**: Import → Filter → Verify → Type Check → Cardinality → Process\n4. **Tree Serialization**: Internal nodes → CDM JSON with metadata wrapping\n5. **Reactive State**: Service emits events → Components subscribe → UI updates\n\n## Recommended Adoption Strategy\n\n### For UML-Codex Project\n\n**Primary Recommendation: STUDY + ADAPT**\n\n**STUDY** these aspects:\n1. **Object Builder Pattern**: How to build complex domain objects through UI interaction\n2. **Schema-Driven UI**: Generating UI from schema definitions (applicable to UML models)\n3. **Tree Management**: Efficient hierarchical data structure handling\n4. **Validation Framework**: Cardinality and type constraint enforcement\n5. **Code Generation**: TypeScript model generation from DSL (adaptable to UML metamodel)\n6. **Type System Mapping**: Bridging DSL types to runtime types\n7. **Reactive Architecture**: RxJS-based state management for complex UIs\n\n**ADAPT** these components:\n1. **NodeDatabaseService**: Tree structure management with lookup tables\n2. **Type Guard Pattern**: Runtime type checking with TypeScript predicates\n3. **Validation Utilities**: Cardinality checking, attribute exhaustion logic\n4. **Import/Export Services**: JSON import with validation, export with serialization\n5. **Service Layer Pattern**: Clean separation of business logic from UI\n6. **Lazy Loading**: On-demand model data loading with caching\n\n**AVOID** direct lifting:\n1. Domain-specific CDM components (unless working with ISDA CDM)\n2. Outdated Angular version (upgrade to 17+ if adopting)\n3. Simple ID generation for distributed scenarios\n\n### Adaptation for UML Modeling\n\nThe object builder architecture is **highly transferable** to UML model construction:\n\n1. **Replace**: Rosetta DSL → UML Metamodel (XMI, Ecore, or custom)\n2. **Replace**: TypescriptObjectBuilderModelGenerator → UML Metamodel Parser\n3. **Reuse**: Tree structure (Class → Attribute → Type hierarchy)\n4. **Reuse**: Validation pattern (UML constraints, cardinality, type checking)\n5. **Adapt**: Type-specific components (Class, Interface, Enum, Attribute, Operation)\n6. **Extend**: Add UML-specific features (stereotypes, tagged values, associations)\n\n## Production Readiness\n\n**Status: PROOF OF CONCEPT / INCUBATING**\n\n**Ready for Production With**:\n- Angular upgrade to v17+\n- Comprehensive test coverage (unit + E2E)\n- Accessibility audit and fixes\n- Error handling and user feedback improvements\n- CI/CD pipeline setup\n- Backend integration if collaboration needed\n- Security audit (XSS, injection, etc.)\n\n**Current State Best For**:\n- Internal tools\n- Prototyping\n- Educational purposes\n- Single-user scenarios\n- Reference implementation\n\n## License Analysis\n\n**Reuse Clearance: GREEN (CAN_LIFT)**\n\n### Main Repository\n- **License**: Apache-2.0\n- **Copyright**: ISDA (2022-2023)\n- **Governance**: FINOS (Fintech Open Source Foundation)\n- **Commercial Use**: ✅ Permitted\n- **Modification**: ✅ Permitted\n- **Distribution**: ✅ Permitted\n- **Sublicensing**: ✅ Permitted\n- **Patent Grant**: ✅ Included\n- **Attribution**: ✅ Required (NOTICE file)\n\n### Dependencies - Backend (Java)\n| Dependency | License | Status |\n|------------|---------|--------|\n| FINOS CDM Java | Apache-2.0 | ✅ Compatible |\n| Rosetta DSL | Apache-2.0 | ✅ Compatible |\n| Eclipse Xtext | EPL-2.0 | ✅ Compatible |\n| Guava | Apache-2.0 | ✅ Compatible |\n| Logback | EPL-2.0 | ✅ Compatible |\n| JUnit | EPL-2.0 | ✅ Compatible (test only) |\n\n### Dependencies - Frontend (TypeScript/Angular)\n| Dependency | License | Status |\n|------------|---------|--------|\n| Angular | MIT | ✅ Compatible |\n| Angular Material | MIT | ✅ Compatible |\n| RxJS | Apache-2.0 | ✅ Compatible |\n| TypeScript | Apache-2.0 | ✅ Compatible |\n| date-fns | MIT | ✅ Compatible |\n| FontAwesome | MIT | ✅ Compatible |\n| lodash-es | MIT | ✅ Compatible |\n| Jasmine/Karma | MIT | ✅ Compatible (test only) |\n| Prettier | MIT | ✅ Compatible (dev only) |\n\n**All dependencies use permissive open-source licenses compatible with commercial use.**\n\n## Performance Considerations\n\n1. **Tree Size**: Angular Material tree with virtual scrolling handles large trees well\n2. **Model Size**: Lazy loading reduces initial bundle; generated model is ~hundreds of KB\n3. **Validation**: Real-time validation may be expensive for very large objects\n4. **Local Storage**: Browser limits (~5-10MB); large objects may exceed\n5. **Memory**: Tree structure with lookup map uses more memory but provides O(1) lookups\n\n**Scalability**: Suitable for objects with hundreds to low thousands of nodes; may need optimization for larger models\n\n## Security Considerations\n\n1. **Client-Side Only**: No server means no server-side attacks, but also no centralized security\n2. **Local Storage**: Data persists in browser; cleared if user clears browser data\n3. **JSON Import**: Should validate/sanitize imported JSON to prevent XSS\n4. **No Authentication**: Public client-side tool with no access control\n5. **Dependency Security**: Regular updates needed to patch vulnerabilities\n\n**Recommendation**: Audit before production deployment; add CSP headers; sanitize imports; keep dependencies updated\n\n## Testing Status\n\n- **Unit Test Files**: Present (*.spec.ts files for services and components)\n- **Test Implementation**: Unclear from analysis; spec files exist but coverage unknown\n- **E2E Tests**: None evident\n- **Test Coverage Reports**: Not configured\n- **CI Testing**: No CI pipeline for automated testing\n\n**Recommendation**: Expand and run existing tests; add coverage reporting; set up CI pipeline\n\n## Documentation Quality\n\n- **README**: ✅ Good - covers installation, usage, CDM updates, contributing\n- **Code Comments**: Limited in analyzed files\n- **API Docs**: None (JSDoc/TypeDoc not configured)\n- **User Guide**: Basic usage in README; no comprehensive guide\n- **Developer Guide**: Minimal; architecture not documented\n\n**Recommendation**: Add architectural documentation; JSDoc/TypeDoc for API; user guide for complex workflows\n\n## Community and Support\n\n- **GitHub Stars**: 2 (low visibility)\n- **Forks**: 0\n- **Commits**: 232 on main branch\n- **Contributors**: Multiple (FINOS project)\n- **Issues**: Not analyzed\n- **Activity**: Moderate (last updated Dec 2024)\n- **Governance**: FINOS incubating (formal process)\n\n**Status**: Active but low external adoption; FINOS backing provides stability\n\n## Comparison to Alternatives\n\n### Similar Tools\n1. **JSON Schema Editor**: Generic, not CDM-specific; lacks domain validation\n2. **Form Builders**: Focus on data entry, not object graph construction\n3. **Model Editors**: Eclipse/EMF tools for modeling; desktop-based, heavier\n4. **Custom Implementations**: Building from scratch requires significant effort\n\n**Advantage**: Purpose-built for CDM; web-based; integrated validation; open source with permissive license\n\n## Final Recommendation by Use Case\n\n| Use Case | Recommendation | Rationale |\n|----------|----------------|----------|\n| Learning CDM object structure | **STUDY** | Excellent educational resource |\n| Learning Angular patterns | **STUDY** | Well-structured Angular app with good patterns |\n| Building similar object builder | **ADAPT** | Architecture and patterns highly transferable |\n| Production CDM object entry | **ADOPT** (with updates) | Core functionality solid; needs Angular upgrade and production hardening |\n| Internal tooling | **ADOPT** | Suitable as-is for internal use |\n| Building UML model editor | **STUDY + ADAPT** | Architecture applicable; adapt tree structure and validation |\n| Commercial product | **ADAPT** (with licensing compliance) | Apache-2.0 allows commercial use; must maintain attribution |\n\n## Risk Assessment\n\n**Technical Risks**: LOW-MEDIUM\n- Outdated Angular version requires upgrade for long-term support\n- Limited test coverage increases regression risk\n- Client-side only limits enterprise features\n\n**License Risks**: LOW\n- All licenses permissive and compatible\n- Clear attribution requirements\n- No copyleft obligations\n\n**Maintenance Risks**: MEDIUM\n- Small community means less external contribution\n- FINOS backing provides governance stability\n- Dependency updates required for security\n\n**Adoption Risks**: LOW\n- Well-documented codebase\n- Standard technologies (Angular, TypeScript)\n- Clear architecture\n\n## Keywords\n\nCDM, Common Domain Model, ISDA, object builder, visual editor, Angular, TypeScript, Rosetta DSL, FINOS, financial instruments, tree structure, cardinality validation, schema-driven UI, reactive programming, RxJS, Material Design, code generation, Xtext, builder pattern, composite pattern, eligible collateral, trade modeling, business events, domain-specific language, model synchronization, JSON import/export, type safety, type guards, dependency injection\n\n## Related Projects\n\n- **finos/cdm-object-builder**: Parent/fork source\n- **REGnosys/rosetta-dsl**: Core DSL technology\n- **finos/common-domain-model**: CDM specification\n- **REGnosys/cdm-starter**: CDM Java integration example\n- **REGnosys/rosetta-code-generators**: Code generation tools\n\n## Repository Statistics\n\n- **URL**: https://github.com/REGnosys/cdm-object-builder\n- **Fork of**: finos/cdm-object-builder\n- **Primary Language**: TypeScript (99.4%)\n- **Stars**: 2\n- **Forks**: 0\n- **Commits**: 232 (main branch)\n- **Last Updated**: December 15, 2024\n- **Created**: Unknown (forked from FINOS)\n- **License File**: ✅ LICENSE, LICENSE.spdx, NOTICE\n- **Contributing Guidelines**: ✅ CONTRIBUTING.md\n- **Code of Conduct**: ✅ .github/CODE_OF_CONDUCT.md\n"
+}

@@ -1,0 +1,500 @@
+{
+  "version": 1,
+  "repository": "REGnosys/rosetta-code-generators",
+  "analysis_date": "2025-11-08",
+  "last_updated": "2025-11-08T00:00:00Z",
+  "change_history": [
+    {
+      "date": "2025-11-08",
+      "description": "Initial comprehensive analysis of all repository issues"
+    }
+  ],
+  "total_issues": 27,
+  "issues_analyzed": 27,
+  "open_issues": 11,
+  "closed_issues": 16,
+  "date_range": {
+    "from": "2021-02-20",
+    "to": "2025-01-15"
+  },
+  "categories": {
+    "bugs": [
+      {
+        "number": 366,
+        "title": "Python generator - defects in the runtime functions",
+        "state": "open",
+        "created": "2024-11-19",
+        "labels": ["language: python"],
+        "description": "Six critical defects in Python runtime functions including frame support issues, comparison logic flaws, and operator failures",
+        "severity": "high",
+        "technical_details": [
+          "_resolve_rosetta_attr_ cannot handle frame-type objects",
+          "_check_one_of_constraint_ fails with frame-type inputs",
+          "_all_elements_ has flawed cross-element comparison logic",
+          "_flatten_list_ fails on nested lists",
+          "_map_ operator returns input without changes",
+          "_rosetta_filter_ omits 'item' variable in lambda generation"
+        ]
+      },
+      {
+        "number": 90,
+        "title": "Unknown MetaAndTemplateFields in Golang",
+        "state": "open",
+        "created": "2021-04-12",
+        "labels": ["bug"],
+        "description": "Generated Golang code references MetaAndTemplateFields type that is never generated, causing compilation failures",
+        "severity": "high",
+        "technical_details": [
+          "Missing struct definition in org_isda_cdm_metafields package",
+          "Should contain: Id, Key, Reference, Scheme, GlobalKey, ExternalKey fields",
+          "Code generation gap between references and type definitions"
+        ]
+      },
+      {
+        "number": 246,
+        "title": "Python generator does not implement all Rosetta expressions",
+        "state": "closed",
+        "created": "2023-07-03",
+        "closed": "2025-01-15",
+        "labels": ["language: python"],
+        "description": "Generator crashed when encountering unsupported expressions like 'extract' or 'distinct' in conditions",
+        "severity": "high",
+        "resolution": "Implemented RosettaExpressionSwitch class to ensure comprehensive expression support"
+      },
+      {
+        "number": 230,
+        "title": "Python generator does not handle the path operator correctly",
+        "state": "closed",
+        "created": "2023-06-28",
+        "closed": "2023-07-26",
+        "labels": ["bug", "language: python"],
+        "description": "Path operator handling issues in Python code generation",
+        "severity": "medium"
+      },
+      {
+        "number": 323,
+        "title": "Incompatible Types error thrown converting List of String(Enum Value) to List of FieldWithMetaString",
+        "state": "closed",
+        "created": "2024-06-06",
+        "closed": "2024-06-20",
+        "labels": [],
+        "description": "Type conversion error when generating Java code for fields with metadata annotations",
+        "severity": "high",
+        "technical_details": [
+          "Error: java.util.List<java.lang.String> cannot be converted to java.util.List<com.rosetta.model.metafields.FieldWithMetaString>",
+          "Triggered by [metadata scheme] annotation on string fields",
+          "Related to CDM PR#2997 changes in metadata handling"
+        ]
+      }
+    ],
+    "features": [
+      {
+        "number": 362,
+        "title": "Python Generator - Support for Rune defined functions",
+        "state": "open",
+        "created": "2024-11-08",
+        "labels": ["language: python"],
+        "description": "Request to support generating Python code from Rune defined functions. Currently incomplete and unreliable support.",
+        "priority": "high",
+        "technical_scope": "Code generation for Rune DSL functions to Python"
+      },
+      {
+        "number": 279,
+        "title": "Python Generator - Phase 2",
+        "state": "closed",
+        "created": "2024-01-12",
+        "closed": "2024-06-05",
+        "labels": ["enhancement"],
+        "description": "Major enhancement phase for Python generator with multiple improvements",
+        "deliverables": [
+          "Upgrade Pydantic from v1.x to v2.5",
+          "Complete DSL operator support implementation",
+          "Full metadata functionality",
+          "Function code generation for Rosetta-defined functions"
+        ],
+        "sponsors": ["CloudRisk", "FT Advisory", "TradeHeader"]
+      },
+      {
+        "number": 157,
+        "title": "Support JSON schema generation",
+        "state": "closed",
+        "created": "2022-06-09",
+        "closed": "2024-02-02",
+        "labels": ["new language request"],
+        "description": "Feature request to add JSON schema generation capability",
+        "outcome": "Successfully implemented"
+      },
+      {
+        "number": 46,
+        "title": "Add C# (.NET Core 3.1) support",
+        "state": "closed",
+        "created": "2021-02-20",
+        "closed": "2021-03-24",
+        "labels": [],
+        "description": "Feature request to add C# code generation support",
+        "outcome": "Successfully implemented"
+      }
+    ],
+    "enhancements": [
+      {
+        "number": 304,
+        "title": "Python code generator should support `->>` operator",
+        "state": "open",
+        "created": "2024-06-06",
+        "labels": ["language: python"],
+        "description": "Request to add support for the deep path (->>) operator in Python code generation"
+      },
+      {
+        "number": 302,
+        "title": "Python code generator should support `default` operator",
+        "state": "open",
+        "created": "2024-06-06",
+        "labels": ["language: python"],
+        "description": "Request to add support for the default operator in Python code generation"
+      },
+      {
+        "number": 251,
+        "title": "The generators should add the model name and the Rosetta version used when creating the codebase",
+        "state": "open",
+        "created": "2023-09-07",
+        "labels": [],
+        "description": "Enhancement to include metadata about model name and Rosetta version in generated code",
+        "rationale": "Improves traceability and version management of generated code"
+      },
+      {
+        "number": 301,
+        "title": "Adding native language unit tests",
+        "state": "closed",
+        "created": "2024-06-06",
+        "closed": "2024-06-24",
+        "labels": [],
+        "description": "Enhancement to add unit tests in native target languages"
+      }
+    ],
+    "questions": [
+      {
+        "number": 316,
+        "title": "Simplify the testing and release process",
+        "state": "open",
+        "created": "2024-06-13",
+        "labels": [],
+        "description": "Complex and time-consuming testing/release workflow for Python generator development",
+        "pain_points": [
+          "Requires manual POM file updates for testing",
+          "Must enable CDM generation in test configuration",
+          "Tedious manual revert process before PR submission",
+          "Configuration entanglement between development and production settings",
+          "Cross-repository testing requires additional workflow steps"
+        ],
+        "desired_outcome": "Automated approach to skip and revert local config changes without manual intervention"
+      },
+      {
+        "number": 232,
+        "title": "C#, Scala, and DAML code generators do not handle duplicate typename in different namespaces properly",
+        "state": "open",
+        "created": "2023-06-28",
+        "labels": [],
+        "description": "Code generators fail when processing types with identical names in different namespaces",
+        "error_example": "The namespace '***' already contains a definition for 'SubstitutionProvisions'",
+        "affected_generators": ["C#", "Scala", "DAML"]
+      }
+    ],
+    "documentation": [
+      {
+        "number": 149,
+        "title": "Set up for developers",
+        "state": "open",
+        "created": "2022-06-09",
+        "labels": ["documentation"],
+        "description": "Lack of comprehensive developer setup documentation",
+        "requirements_identified": [
+          "Java 11",
+          "Maven with Central and REGnosys artifactory repositories",
+          "Git",
+          "Eclipse 2021-12 (for Rosetta DSL < 5.0.0) or Eclipse 2022-06 (for >= 5.0.0)",
+          "Custom Maven settings.xml configuration"
+        ],
+        "challenges_reported": [
+          "Authentication failures with regnosys.jfrog.io",
+          "Java version compatibility issues in Eclipse",
+          "Missing or outdated setup documentation"
+        ]
+      }
+    ],
+    "data_quality": [
+      {
+        "number": 295,
+        "title": "Generated JSON schema is incorrect",
+        "state": "open",
+        "created": "2024-05-07",
+        "labels": ["language: json-schema"],
+        "description": "JSON schema generator fails to include 'value' child element for meta reference fields",
+        "technical_details": [
+          "Missing 'value' child under meta reference fields",
+          "Prevents proper reconstruction of objects from JSON",
+          "Specific issue with [meta reference] annotations in Rosetta files"
+        ]
+      },
+      {
+        "number": 289,
+        "title": "JSON schema generator does not generate the correct structure",
+        "state": "open",
+        "created": "2024-04-15",
+        "labels": ["language: json-schema"],
+        "description": "Schema generator fails to properly represent nested object properties",
+        "technical_details": [
+          "Correctly references parent types via $ref but doesn't expose nested properties",
+          "Issue with property flattening when classes extend base types",
+          "Prevents complete validation of object hierarchy"
+        ]
+      }
+    ]
+  },
+  "key_insights": [
+    {
+      "theme": "Code Generation Maturity Gaps",
+      "insight": "While the project supports multiple target languages (Python, Java, Golang, C#, Scala, DAML, TypeScript, JSON Schema), several generators have incomplete implementations. Python generator has been the focus of recent development efforts (Phase 2 completion in June 2024), but still lacks full Rune function support and some operators.",
+      "impact": "Users face runtime failures and compilation errors when using certain language features or DSL constructs",
+      "evidence": ["Issue #362", "Issue #366", "Issue #302", "Issue #304"]
+    },
+    {
+      "theme": "Type System and Metadata Handling Complexity",
+      "insight": "Proper handling of metadata annotations, meta references, and type conversions is a recurring challenge across multiple generators. The interaction between Rosetta's type system and target language type systems creates impedance mismatches.",
+      "impact": "Type conversion errors, missing type definitions, and incorrect schema generation affect code quality and usability",
+      "evidence": ["Issue #323", "Issue #295", "Issue #289", "Issue #90"]
+    },
+    {
+      "theme": "Developer Experience and Tooling Gaps",
+      "insight": "The development workflow for contributing to code generators is complex and error-prone, requiring manual configuration management and lacking automation. Setup documentation is incomplete, creating barriers to entry for new contributors.",
+      "impact": "Slows down development velocity, increases risk of configuration errors, and limits community contributions",
+      "evidence": ["Issue #316", "Issue #149"]
+    },
+    {
+      "theme": "Namespace and Naming Collision Handling",
+      "insight": "Multiple code generators lack proper namespace disambiguation when types share identical names across different namespaces. This is a fundamental architectural issue affecting C#, Scala, and DAML generators.",
+      "impact": "Prevents code generation for valid Rosetta models with certain naming patterns",
+      "evidence": ["Issue #232"]
+    },
+    {
+      "theme": "Expression and Operator Coverage",
+      "insight": "The Python generator has historically had incomplete coverage of Rosetta DSL expressions and operators, though Phase 2 addressed many gaps. Remaining issues include ->> (deep path) and default operators.",
+      "impact": "Limits the expressiveness of models that can be successfully generated to Python",
+      "evidence": ["Issue #246", "Issue #304", "Issue #302", "Issue #230"]
+    },
+    {
+      "theme": "JSON Schema Generation Quality",
+      "insight": "JSON schema generation has structural issues with nested properties and meta references not being properly exposed in the schema. This affects the ability to validate JSON data against the schema.",
+      "impact": "Generated JSON schemas cannot fully validate data structures, reducing their utility for API development and data validation",
+      "evidence": ["Issue #295", "Issue #289"]
+    }
+  ],
+  "pain_points": [
+    {
+      "category": "Code Generation Quality",
+      "description": "Runtime function defects in Python generator causing functional failures",
+      "severity": "high",
+      "user_impact": "Generated Python code fails at runtime with incorrect logic in list comparisons, map operations, and filter functions"
+    },
+    {
+      "category": "Type System Compatibility",
+      "description": "Type conversion errors when metadata annotations are used",
+      "severity": "high",
+      "user_impact": "Java code generation fails with compilation errors for valid Rosetta models"
+    },
+    {
+      "category": "Developer Workflow",
+      "description": "Complex and time-consuming testing and release process",
+      "severity": "medium",
+      "user_impact": "Developers spend excessive time on manual configuration management instead of feature development"
+    },
+    {
+      "category": "Documentation",
+      "description": "Incomplete developer setup documentation",
+      "severity": "medium",
+      "user_impact": "New contributors face authentication errors and setup failures, creating barriers to contribution"
+    },
+    {
+      "category": "Language Coverage",
+      "description": "Incomplete operator and expression support in Python generator",
+      "severity": "medium",
+      "user_impact": "Cannot generate Python code for models using certain operators (->>, default)"
+    },
+    {
+      "category": "Schema Quality",
+      "description": "JSON schema generation produces incorrect or incomplete schemas",
+      "severity": "high",
+      "user_impact": "Generated schemas cannot properly validate JSON data structures, limiting API development capabilities"
+    },
+    {
+      "category": "Multi-language Support",
+      "description": "Namespace collision handling failures in C#, Scala, and DAML generators",
+      "severity": "medium",
+      "user_impact": "Cannot generate code for models with duplicate type names in different namespaces"
+    }
+  ],
+  "feature_requests": [
+    {
+      "feature": "Rune Function Support in Python",
+      "status": "open",
+      "priority": "high",
+      "description": "Enable Python code generation from Rune-defined functions",
+      "business_value": "Expands Python generator capabilities to support functional programming constructs"
+    },
+    {
+      "feature": "Deep Path Operator (->>) in Python",
+      "status": "open",
+      "priority": "medium",
+      "description": "Support for deep path navigation operator in Python code generation",
+      "business_value": "Enables more concise navigation of nested object structures"
+    },
+    {
+      "feature": "Default Operator in Python",
+      "status": "open",
+      "priority": "medium",
+      "description": "Support for default value operator in Python code generation",
+      "business_value": "Allows specification of fallback values in generated code"
+    },
+    {
+      "feature": "Model Metadata in Generated Code",
+      "status": "open",
+      "priority": "low",
+      "description": "Include model name and Rosetta version in generated code",
+      "business_value": "Improves traceability and version management"
+    }
+  ],
+  "architectural_decisions": [
+    {
+      "decision": "Pydantic v2.5 Adoption for Python Generator",
+      "rationale": "Modernize Python generator to use latest Pydantic version for improved performance and features",
+      "status": "implemented",
+      "date": "2024-06-05",
+      "impact": "Breaking change for users of Pydantic v1.x, but provides access to modern Python tooling ecosystem"
+    },
+    {
+      "decision": "RosettaExpressionSwitch Pattern",
+      "rationale": "Centralized expression handling to ensure comprehensive coverage and prevent future gaps",
+      "status": "implemented",
+      "date": "2025-01-15",
+      "impact": "More maintainable expression handling with compile-time checks for missing implementations"
+    },
+    {
+      "decision": "Multi-Language Generator Architecture",
+      "rationale": "Support multiple target languages (Python, Java, Golang, C#, Scala, DAML, TypeScript, JSON Schema) from single Rosetta DSL",
+      "status": "ongoing",
+      "impact": "Enables broad ecosystem adoption but creates maintenance challenges across generators"
+    },
+    {
+      "decision": "Maven-Based Build System",
+      "rationale": "Use Maven for dependency management and build orchestration",
+      "status": "implemented",
+      "impact": "Standard Java tooling but creates complexity in configuration management for testing"
+    }
+  ],
+  "common_patterns": [
+    {
+      "pattern": "Incomplete Language Feature Coverage",
+      "observation": "New target languages are added but may not initially support all Rosetta DSL features",
+      "frequency": "recurring",
+      "examples": ["Python operators", "Golang metadata", "JSON schema nested properties"]
+    },
+    {
+      "pattern": "Type System Impedance Mismatches",
+      "observation": "Translation between Rosetta's type system and target language type systems creates conversion challenges",
+      "frequency": "recurring",
+      "examples": ["Java FieldWithMetaString conversions", "Golang missing types", "C# namespace collisions"]
+    },
+    {
+      "pattern": "Metadata and Annotation Handling Complexity",
+      "observation": "Special handling required for Rosetta annotations (meta, scheme, reference) across different target languages",
+      "frequency": "recurring",
+      "examples": ["JSON schema value fields", "Java metadata conversion", "Python frame support"]
+    },
+    {
+      "pattern": "Runtime vs. Compile-Time Error Detection",
+      "observation": "Some code generation issues only manifest at runtime in generated code rather than during generation",
+      "frequency": "recurring",
+      "examples": ["Python runtime function defects", "Golang compilation failures"]
+    },
+    {
+      "pattern": "Phase-Based Enhancement Approach",
+      "observation": "Major improvements delivered in coordinated phases (e.g., Python Phase 2) rather than incremental updates",
+      "frequency": "occasional",
+      "examples": ["Python Phase 2 with Pydantic v2, operators, metadata, functions"]
+    }
+  ],
+  "actionable_items_for_uml_codex": [
+    {
+      "item": "Comprehensive Type System Mapping",
+      "priority": "high",
+      "description": "Design robust type system mappings between UML and target languages from the start, with special attention to metadata, generics, and nullable types",
+      "learning": "Type conversion issues are a major source of code generation failures. Invest in comprehensive type mapping early."
+    },
+    {
+      "item": "Expression/Operator Completeness Validation",
+      "priority": "high",
+      "description": "Implement compile-time checks (like RosettaExpressionSwitch) to ensure all DSL constructs have code generation handlers",
+      "learning": "Missing operator implementations cause runtime failures. Build safeguards to catch incomplete implementations during development."
+    },
+    {
+      "item": "Developer-Friendly Testing Workflow",
+      "priority": "medium",
+      "description": "Design testing and release processes that don't require manual configuration management. Use profiles, environment variables, or automated scripts.",
+      "learning": "Complex development workflows slow velocity and introduce errors. Prioritize developer experience in tooling design."
+    },
+    {
+      "item": "Namespace and Naming Collision Strategy",
+      "priority": "high",
+      "description": "Implement robust namespace disambiguation from day one. Handle cases where UML elements share names but exist in different packages.",
+      "learning": "Namespace collisions are a fundamental architectural issue that's hard to fix retroactively."
+    },
+    {
+      "item": "Comprehensive Developer Documentation",
+      "priority": "medium",
+      "description": "Create thorough setup documentation with troubleshooting guides before opening to contributors",
+      "learning": "Incomplete documentation creates barriers to adoption and contribution. Documentation is infrastructure."
+    },
+    {
+      "item": "Metadata and Annotation Framework",
+      "priority": "high",
+      "description": "Design a clear framework for how UML stereotypes and tagged values map to target language constructs",
+      "learning": "Metadata handling is complex and affects multiple aspects of generation. Need consistent approach across languages."
+    },
+    {
+      "item": "Runtime Library Testing",
+      "priority": "high",
+      "description": "Include comprehensive runtime library tests alongside generation tests. Test the generated code, not just the generator.",
+      "learning": "Many issues only manifest when generated code executes. Need both generation-time and runtime testing."
+    },
+    {
+      "item": "Schema Generation Quality",
+      "priority": "medium",
+      "description": "If generating schemas (JSON, OpenAPI, etc.), ensure nested properties and complex types are fully represented",
+      "learning": "Schema generation requires deep understanding of target language type systems and serialization semantics."
+    },
+    {
+      "item": "Incremental Language Support",
+      "priority": "medium",
+      "description": "When adding new target languages, be explicit about feature coverage gaps and provide clear roadmap for completeness",
+      "learning": "Users expect feature parity across languages. Set clear expectations and prioritize coverage completion."
+    },
+    {
+      "item": "Traceability and Version Metadata",
+      "priority": "low",
+      "description": "Include generation metadata (tool version, source model, timestamp) in generated code as comments or constants",
+      "learning": "Generated code traceability helps debugging and version management. Small addition with significant value."
+    }
+  ],
+  "repository_health": {
+    "activity_level": "moderate",
+    "issue_closure_rate": "59%",
+    "average_time_to_close": "unknown",
+    "community_engagement": "active",
+    "maintenance_status": "maintained",
+    "notes": [
+      "Python generator has seen significant recent investment (Phase 2 completed June 2024)",
+      "Long-standing issues (e.g., #90 from 2021, #149 from 2022) remain open",
+      "Recent focus on Python generator improvements and bug fixes",
+      "Active development from multiple organizations (CloudRisk, FT Advisory, TradeHeader)"
+    ]
+  }
+}

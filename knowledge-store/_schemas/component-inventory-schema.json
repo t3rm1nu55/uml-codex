@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Component Inventory Schema",
+  "description": "Schema for tracking components we want to adopt/adapt",
+  "type": "object",
+  "properties": {
+    "version": {"type": "integer"},
+    "last_updated": {"type": "string"},
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "source": {"type": "string"},
+          "category": {
+            "type": "string",
+            "enum": [
+              "CODE_GENERATOR",
+              "DSL",
+              "BUILDER",
+              "UTILITY",
+              "WORKFLOW_ENGINE",
+              "MODEL",
+              "PARSER",
+              "VALIDATOR",
+              "OTHER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["IDENTIFIED", "EVALUATED", "ADOPTED", "REJECTED", "RECONSIDERING"]
+          },
+          "status_history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {"type": "string"},
+                "status": {"type": "string"},
+                "reason": {"type": "string"}
+              }
+            }
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["P0", "P1", "P2", "P3"]
+          },
+          "license": {"type": "string"},
+          "can_reuse": {"type": "boolean"},
+          "value_score": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "effort_score": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "dependencies": {"type": "array"},
+          "risks": {"type": "array"},
+          "notes": {"type": "string"},
+          "evaluation_notes": {
+            "type": "array",
+            "description": "Iterative evaluation notes as understanding deepens"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,288 @@
+{
+  "version": 1,
+  "repository": "REGnosys/cdm-starter",
+  "reviewed_date": "2025-11-08",
+  "last_updated": "2022-04-04T00:00:00Z",
+  "change_history": [
+    {
+      "date": "2025-11-08",
+      "reviewer": "Claude Code Analysis",
+      "summary": "Initial comprehensive analysis of cdm-starter repository"
+    }
+  ],
+  "license": "Apache-2.0",
+  "reuse_decision": "CAN_LIFT",
+  "reuse_rationale": "The repository is licensed under Apache License 2.0, which is highly permissive and allows commercial use, modification, distribution, and sublicensing. However, note that the ISDA CDM dependency itself uses Community Specification License 1.0, which should be reviewed separately for production use. The starter code can be freely reused as a reference implementation.",
+  "components": [
+    {
+      "name": "TradeStateDataLoader",
+      "type": "Interface",
+      "path": "src/main/java/com/regnosys/TradeStateDataLoader.java",
+      "purpose": "Defines contract for utility methods to load, extract, and transform data from TradeState instances",
+      "value_proposition": "Provides abstraction layer for working with ISDA CDM TradeState objects, enabling extensibility for additional data extraction methods",
+      "dependencies": [
+        "cdm.event.common.TradeState",
+        "java.time.LocalDate"
+      ],
+      "complexity": "LOW",
+      "recommendation": "ADAPT - Use as template for creating similar data extraction interfaces"
+    },
+    {
+      "name": "TradeStateDataLoaderImpl",
+      "type": "Implementation",
+      "path": "src/main/java/com/regnosys/TradeStateDataLoaderImpl.java",
+      "purpose": "Concrete implementation of TradeStateDataLoader that extracts trade date from TradeState objects",
+      "value_proposition": "Demonstrates navigation through CDM object hierarchy (TradeState -> Trade -> TradeDate -> Value -> LocalDate)",
+      "dependencies": [
+        "cdm.event.common.TradeState",
+        "java.time.LocalDate"
+      ],
+      "complexity": "LOW",
+      "recommendation": "STUDY - Shows pattern for accessing nested CDM properties"
+    },
+    {
+      "name": "TradeStateTestData",
+      "type": "Test Utility",
+      "path": "src/test/java/com/regnosys/TradeStateTestData.java",
+      "purpose": "Helper class for loading sample TradeState objects from JSON resources for testing",
+      "value_proposition": "Demonstrates proper use of RosettaObjectMapper for deserializing CDM JSON into Java objects",
+      "dependencies": [
+        "cdm.event.common.TradeState",
+        "com.fasterxml.jackson.databind.ObjectMapper",
+        "com.regnosys.rosetta.common.serialisation.RosettaObjectMapper"
+      ],
+      "complexity": "LOW",
+      "recommendation": "ADAPT - Reusable pattern for test data loading from JSON resources"
+    },
+    {
+      "name": "TradeStateDataLoaderImplTest",
+      "type": "Unit Test",
+      "path": "src/test/java/com/regnosys/TradeStateDataLoaderImplTest.java",
+      "purpose": "JUnit 5 test validating TradeStateDataLoader implementation",
+      "value_proposition": "Demonstrates testing approach for CDM data extraction logic",
+      "dependencies": [
+        "org.junit.jupiter.api.*",
+        "cdm.event.common.TradeState"
+      ],
+      "complexity": "LOW",
+      "recommendation": "ADAPT - Use as template for testing CDM data extraction"
+    },
+    {
+      "name": "equity-trade-state.json",
+      "type": "Test Resource",
+      "path": "src/test/resources/equity-trade-state.json",
+      "purpose": "Sample ISDA CDM equity swap trade state in JSON format",
+      "value_proposition": "Provides realistic example of CDM data structure including: equity swap contract, parties, trade date (2001-09-24), economic terms, payouts (equity and interest rate), and trade identifiers",
+      "complexity": "MEDIUM",
+      "recommendation": "STUDY - Valuable reference for understanding CDM data model structure"
+    },
+    {
+      "name": "Maven POM Configuration",
+      "type": "Build Configuration",
+      "path": "pom.xml",
+      "purpose": "Maven project descriptor defining dependencies, plugins, and build configuration",
+      "value_proposition": "Shows minimal setup required for ISDA CDM project: Java 17, CDM 2.155.1 dependency, standard Maven plugins with locked versions",
+      "dependencies": [
+        "com.isda.cdm:cdm:2.155.1 (Community Specification License 1.0)",
+        "org.junit.jupiter:junit-jupiter:5.8.2 (Eclipse Public License 2.0)"
+      ],
+      "complexity": "LOW",
+      "recommendation": "ADAPT - Use as template for CDM project setup"
+    },
+    {
+      "name": "Maven Settings Configuration",
+      "type": "Build Configuration",
+      "path": "settings.xml",
+      "purpose": "Maven settings defining repository locations and credentials for ISDA CDM artifacts",
+      "value_proposition": "Configures access to REGnosys JFrog Artifactory (libs-snapshot) and Sonatype snapshot repositories",
+      "security_concerns": [
+        "Contains hardcoded credentials (username: isda, password: isda)",
+        "Credentials appear to be demo/public credentials for accessing snapshot repositories"
+      ],
+      "complexity": "LOW",
+      "recommendation": "ADAPT - Use repository configuration but externalize credentials"
+    }
+  ],
+  "design_patterns": [
+    {
+      "pattern": "Interface-Implementation Separation",
+      "description": "Separates contract (TradeStateDataLoader) from implementation (TradeStateDataLoaderImpl)",
+      "benefit": "Enables dependency injection, mocking, and multiple implementations",
+      "files": [
+        "src/main/java/com/regnosys/TradeStateDataLoader.java",
+        "src/main/java/com/regnosys/TradeStateDataLoaderImpl.java"
+      ]
+    },
+    {
+      "pattern": "Test Data Builder/Helper",
+      "description": "Dedicated class (TradeStateTestData) for constructing test objects from JSON resources",
+      "benefit": "Centralizes test data creation, improves test readability, enables reusable test fixtures",
+      "files": [
+        "src/test/java/com/regnosys/TradeStateTestData.java"
+      ]
+    },
+    {
+      "pattern": "Resource-Based Test Data",
+      "description": "Stores complex test data as JSON files in test/resources rather than constructing programmatically",
+      "benefit": "More maintainable for complex domain objects, easier to update, more realistic test scenarios",
+      "files": [
+        "src/test/resources/equity-trade-state.json"
+      ]
+    },
+    {
+      "pattern": "Standard Maven Project Structure",
+      "description": "Follows Maven conventions: src/main/java for production code, src/test/java for tests, src/test/resources for test data",
+      "benefit": "Familiar structure, works with standard Maven tooling and IDEs",
+      "files": [
+        "pom.xml",
+        "Directory structure"
+      ]
+    },
+    {
+      "pattern": "Multi-Repository Maven Configuration",
+      "description": "Custom settings.xml to access artifacts from multiple repositories (JFrog Artifactory, Sonatype)",
+      "benefit": "Enables access to ISDA CDM snapshots and dependencies not available in Maven Central",
+      "files": [
+        "settings.xml"
+      ]
+    },
+    {
+      "pattern": "Jackson/Rosetta Deserialization",
+      "description": "Uses RosettaObjectMapper (specialized Jackson ObjectMapper) for CDM JSON deserialization",
+      "benefit": "Handles CDM-specific serialization requirements, type mapping, and metadata",
+      "files": [
+        "src/test/java/com/regnosys/TradeStateTestData.java"
+      ]
+    }
+  ],
+  "requirements_identified": [
+    {
+      "category": "Runtime Environment",
+      "requirement": "Java 17",
+      "priority": "CRITICAL",
+      "rationale": "Explicitly required in pom.xml properties and compiler plugin configuration"
+    },
+    {
+      "category": "Build System",
+      "requirement": "Apache Maven 3.x",
+      "priority": "CRITICAL",
+      "rationale": "Project uses Maven for dependency management and build lifecycle"
+    },
+    {
+      "category": "Repository Access",
+      "requirement": "Access to REGnosys JFrog Artifactory",
+      "priority": "CRITICAL",
+      "rationale": "ISDA CDM artifacts are hosted at https://regnosys.jfrog.io/regnosys/libs-snapshot",
+      "configuration": "settings.xml must be used with Maven (-s settings.xml)"
+    },
+    {
+      "category": "Repository Access",
+      "requirement": "Access to Sonatype Snapshots",
+      "priority": "MEDIUM",
+      "rationale": "Secondary repository configured for snapshot dependencies",
+      "url": "https://oss.sonatype.org/content/repositories/snapshots/"
+    },
+    {
+      "category": "Core Dependency",
+      "requirement": "ISDA CDM 2.155.1",
+      "priority": "CRITICAL",
+      "rationale": "Core library providing Common Domain Model classes (TradeState, Trade, etc.)",
+      "license": "Community Specification License 1.0",
+      "artifact": "com.isda.cdm:cdm:2.155.1"
+    },
+    {
+      "category": "Testing Framework",
+      "requirement": "JUnit Jupiter 5.8.2+",
+      "priority": "HIGH",
+      "rationale": "Modern JUnit 5 used for unit testing",
+      "license": "Eclipse Public License 2.0",
+      "artifact": "org.junit.jupiter:junit-jupiter:5.8.2"
+    },
+    {
+      "category": "Serialization",
+      "requirement": "Rosetta Object Mapper",
+      "priority": "HIGH",
+      "rationale": "Required for proper CDM JSON deserialization/serialization",
+      "license": "Apache-2.0",
+      "note": "Included as transitive dependency from CDM library"
+    },
+    {
+      "category": "JSON Processing",
+      "requirement": "Jackson Databind",
+      "priority": "HIGH",
+      "rationale": "Used by RosettaObjectMapper for JSON processing",
+      "note": "Included as transitive dependency"
+    },
+    {
+      "category": "Development Workflow",
+      "requirement": "Fork-then-clone Git workflow",
+      "priority": "LOW",
+      "rationale": "README recommends forking repository before cloning locally"
+    },
+    {
+      "category": "IDE Configuration",
+      "requirement": "IDE must use provided settings.xml",
+      "priority": "MEDIUM",
+      "rationale": "README explicitly states IDE must use settings.xml for proper dependency resolution"
+    }
+  ],
+  "technical_debt": [
+    {
+      "issue": "Hardcoded credentials in settings.xml",
+      "severity": "MEDIUM",
+      "description": "Username 'isda' and password 'isda' are hardcoded in settings.xml",
+      "impact": "Security risk if these are non-public credentials; best practice violation",
+      "recommendation": "Use environment variables or Maven's password encryption for credentials",
+      "files": [
+        "settings.xml"
+      ]
+    },
+    {
+      "issue": "Minimal implementation",
+      "severity": "LOW",
+      "description": "Only one utility method implemented (getTradeDate), interface suggests more methods should be added",
+      "impact": "Interface promises 'various utility methods' but delivers only one",
+      "recommendation": "This is acceptable for a starter project - expand as needed for real use",
+      "files": [
+        "src/main/java/com/regnosys/TradeStateDataLoader.java"
+      ]
+    },
+    {
+      "issue": "No CI/CD configuration",
+      "severity": "LOW",
+      "description": "No GitHub Actions, Travis CI, or other CI/CD configuration",
+      "impact": "No automated build verification on pull requests or commits",
+      "recommendation": "Add basic CI workflow for a production project",
+      "files": []
+    },
+    {
+      "issue": "Outdated dependencies",
+      "severity": "LOW",
+      "description": "JUnit 5.8.2 from 2021, CDM 2.155.1 may not be latest",
+      "impact": "Missing bug fixes and features from newer versions",
+      "recommendation": "Update to latest stable versions for production use",
+      "files": [
+        "pom.xml"
+      ]
+    },
+    {
+      "issue": "No error handling",
+      "severity": "LOW",
+      "description": "TradeStateDataLoaderImpl has no null checks or exception handling",
+      "impact": "Will throw NullPointerException if TradeState structure is incomplete",
+      "recommendation": "Add validation and meaningful error messages for production code",
+      "files": [
+        "src/main/java/com/regnosys/TradeStateDataLoaderImpl.java"
+      ]
+    },
+    {
+      "issue": "No logging",
+      "severity": "LOW",
+      "description": "No logging framework configured (SLF4J, Log4j, etc.)",
+      "impact": "Difficult to debug issues in production",
+      "recommendation": "Add logging framework for production applications",
+      "files": []
+    }
+  ],
+  "notes": "## Overall Assessment\n\nThe cdm-starter repository is a **minimal, focused starter/reference project** designed to demonstrate the basics of setting up and using the ISDA Common Domain Model (CDM) in Java. It is intentionally simple and serves as a template rather than a production-ready application.\n\n## Key Strengths\n\n1. **Clear Focus**: Single, well-defined purpose - getting started with ISDA CDM\n2. **Minimal Complexity**: Easy to understand and adapt\n3. **Proper Testing**: Demonstrates testing approach with realistic sample data\n4. **Good Documentation**: README provides clear setup instructions\n5. **Standard Structure**: Follows Maven conventions\n\n## Primary Value Propositions\n\n1. **Maven Configuration Template**: Shows how to configure Maven for ISDA CDM dependencies\n2. **Repository Access Pattern**: Demonstrates multi-repository setup for accessing CDM artifacts\n3. **CDM Object Navigation**: Shows how to navigate nested CDM objects\n4. **JSON Deserialization**: Demonstrates using RosettaObjectMapper for CDM JSON\n5. **Testing Pattern**: Provides template for testing CDM-based code with resource-based test data\n\n## Limitations\n\n1. **Not Production-Ready**: Minimal error handling, no logging, basic implementation\n2. **Dated**: Last updated April 2022, dependencies may be outdated\n3. **Narrow Scope**: Only demonstrates one simple use case (extract trade date)\n4. **Security**: Hardcoded credentials (though appear to be public demo credentials)\n\n## Recommended Usage\n\n**STUDY** the project to understand:\n- How to set up ISDA CDM dependencies\n- How to access CDM objects\n- How to test CDM-based code\n- CDM data model structure\n\n**ADAPT** these components:\n- Maven POM structure and plugin configuration\n- settings.xml repository configuration (with proper credential management)\n- Test data loading pattern\n- Interface-implementation pattern\n\n**AVOID** direct lifting of:\n- Production code without adding error handling, logging, and validation\n- settings.xml without reviewing credential security\n\n## Integration Considerations\n\n### For UML-Codex Project\n\nThis starter project is **highly relevant** for understanding how to integrate ISDA CDM into a Java-based system. Key takeaways:\n\n1. **Dependency Management**: The Maven setup patterns can be adapted for our project\n2. **CDM Data Model**: The equity-trade-state.json provides insight into CDM structure\n3. **Object Navigation**: Shows how to traverse CDM object hierarchies\n4. **Testing Approach**: Resource-based test data is a good pattern for complex domain objects\n\n### License Compatibility\n\nThe **starter code** itself (Apache-2.0) can be freely reused. However, note:\n- **ISDA CDM library**: Uses Community Specification License 1.0 (review required)\n- **Rosetta framework**: Apache-2.0 (compatible)\n- **JUnit**: Eclipse Public License 2.0 (compatible for testing)\n\n## Complexity Assessment\n\n**Overall Complexity: LOW**\n\n- **Code Volume**: ~100 lines of production code, ~50 lines of test code\n- **Dependencies**: 2 direct dependencies (CDM, JUnit)\n- **Build Complexity**: Standard Maven, minimal configuration\n- **Domain Complexity**: Low - single use case\n- **Learning Curve**: Low for Java developers, Medium for understanding CDM concepts\n\n## Final Recommendation\n\n**Classification: STUDY + ADAPT**\n\n- **STUDY**: Understand the patterns and CDM integration approach\n- **ADAPT**: Use as template for Maven configuration and project setup\n- Do **NOT** lift code directly without enhancements for production use\n- Focus on the **setup patterns** rather than the implementation code\n\n## Related Resources\n\nFor a complete understanding of ISDA CDM integration, also review:\n- FINOS CDM documentation: https://cdm.finos.org/\n- REGnosys Rosetta documentation: https://docs.rosetta-technology.io/\n- ISDA CDM specifications and examples\n- Community Specification License terms for production use\n\n## Repository Statistics\n\n- **Created**: April 1, 2022\n- **Last Updated**: April 4, 2022\n- **Size**: 18 KB\n- **Stars**: 1\n- **Forks**: 2\n- **Contributors**: 4\n- **Open Issues**: 1\n- **Status**: Active but minimal activity\n\n## Keywords\n\nISDA, CDM, Common Domain Model, Maven, Java 17, Rosetta, REGnosys, starter, reference implementation, equity swap, derivatives, financial contracts, trade state"
+}

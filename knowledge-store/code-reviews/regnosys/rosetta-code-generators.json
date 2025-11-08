@@ -1,0 +1,652 @@
+{
+  "version": 1,
+  "repository": "REGnosys/rosetta-code-generators",
+  "reviewed_date": "2025-11-08",
+  "last_updated": "2025-11-03T00:00:00Z",
+  "change_history": [],
+  "license": "Apache License 2.0",
+  "reuse_decision": "CAN_LIFT",
+  "reuse_rationale": "Apache 2.0 is a permissive open source license that allows commercial use, modification, distribution, and private use. Attribution is required but source code disclosure is not. All major dependencies (Xtext/EPL-2.0, Apache Commons, Guava, Guice) are also permissively licensed. The codebase can be reused directly with proper attribution. The only consideration is that Xtext (EPL-2.0) is a weak copyleft license, but since it's used as a framework/library rather than modified, this poses no restrictions.",
+  "recommendation": "ADAPT",
+  "recommendation_rationale": "While the code quality is good and the architecture is sound, this project is specifically designed for the Rune/Rosetta DSL ecosystem. Direct adoption would require dependency on the entire Rosetta DSL infrastructure. Instead, the architectural patterns, code generation strategies, and multi-language targeting approach should be studied and adapted to our UML-based code generation needs. The template-based generation pattern and model-to-text transformation approach are highly applicable.",
+  "components": [
+    {
+      "name": "sample",
+      "path": "sample/",
+      "language": "Java",
+      "purpose": "Reference implementation demonstrating how to create a custom code generator",
+      "key_classes": [
+        "SampleCodeGenerator",
+        "GeneratorUtils"
+      ],
+      "value_proposition": "Provides a clear, minimal example of the generator pattern that extends AbstractExternalGenerator. Shows the basic structure: parse model, transform to text, return filename-content map.",
+      "complexity": "Low",
+      "dependencies": [
+        "com.regnosys.rosetta",
+        "com.regnosys.rosetta.lib"
+      ]
+    },
+    {
+      "name": "typescript",
+      "path": "typescript/",
+      "language": "Xtend",
+      "purpose": "Generate TypeScript code from Rosetta DSL models",
+      "value_proposition": "Production-grade TypeScript code generator demonstrating type system mapping, interface generation, and modern TypeScript patterns",
+      "complexity": "Medium-High",
+      "dependencies": [
+        "com.regnosys.rosetta",
+        "com.regnosys.rosetta.lib",
+        "rosetta-common",
+        "commons-lang3",
+        "xtend.lib"
+      ]
+    },
+    {
+      "name": "python",
+      "path": "python/",
+      "language": "Xtend",
+      "purpose": "Generate Python code from Rosetta DSL models",
+      "value_proposition": "Python code generation with Pydantic support and type hints. Demonstrates handling dynamic typing in a statically-modeled system",
+      "complexity": "Medium-High",
+      "dependencies": [
+        "com.regnosys.rosetta",
+        "rosetta-common",
+        "commons-lang3",
+        "commons-text",
+        "commons-configuration2",
+        "xtend.lib",
+        "emf.codegen.ecore",
+        "guice",
+        "guava"
+      ],
+      "known_issues": [
+        "Defects in runtime functions (#366)",
+        "Missing support for Rune defined functions (#362)",
+        "Missing default operator support (#302)",
+        "Missing ->> operator support (#304)"
+      ]
+    },
+    {
+      "name": "golang",
+      "path": "golang/",
+      "language": "Xtend",
+      "purpose": "Generate Go code from Rosetta DSL models",
+      "value_proposition": "Go code generation demonstrating struct generation, pointer semantics, and Go idioms",
+      "complexity": "Medium"
+    },
+    {
+      "name": "kotlin",
+      "path": "kotlin/",
+      "language": "Xtend",
+      "purpose": "Generate Kotlin code from Rosetta DSL models",
+      "value_proposition": "Kotlin code generation with data classes and null-safety",
+      "complexity": "Medium"
+    },
+    {
+      "name": "scala",
+      "path": "scala/",
+      "language": "Xtend",
+      "purpose": "Generate Scala code from Rosetta DSL models",
+      "value_proposition": "Scala code generation with case classes and functional patterns",
+      "complexity": "Medium"
+    },
+    {
+      "name": "c-sharp",
+      "path": "c-sharp/",
+      "language": "Xtend",
+      "purpose": "Generate C# code from Rosetta DSL models (supports C# 8.0 and 9.0)",
+      "value_proposition": "C# code generation with support for modern C# features including nullable reference types",
+      "complexity": "Medium",
+      "known_issues": [
+        "Fails with duplicate typenames in different namespaces (#232)"
+      ]
+    },
+    {
+      "name": "daml",
+      "path": "daml/",
+      "language": "Xtend",
+      "purpose": "Generate DAML (Digital Asset Modeling Language) code for smart contracts",
+      "value_proposition": "Specialized generator for blockchain/distributed ledger applications",
+      "complexity": "High",
+      "known_issues": [
+        "Fails with duplicate typenames in different namespaces (#232)"
+      ]
+    },
+    {
+      "name": "json-schema",
+      "path": "json-schema/",
+      "language": "Xtend",
+      "purpose": "Generate JSON Schema definitions from Rosetta models",
+      "value_proposition": "Enables validation and documentation of JSON representations of models",
+      "complexity": "Medium",
+      "dependencies": [
+        "json-schema-validator:1.3.0",
+        "com.regnosys.rosetta.lib",
+        "rosetta-common",
+        "commons-lang3",
+        "xtend.lib"
+      ],
+      "known_issues": [
+        "Incorrect schema generation (#289, #295)"
+      ]
+    },
+    {
+      "name": "csv",
+      "path": "csv/",
+      "language": "Xtend",
+      "purpose": "Generate CSV export functionality for Rosetta models",
+      "value_proposition": "Enables data interchange with spreadsheet applications and legacy systems",
+      "complexity": "Low-Medium"
+    },
+    {
+      "name": "excel",
+      "path": "excel/",
+      "language": "Xtend",
+      "purpose": "Generate Excel export functionality for Rosetta models",
+      "value_proposition": "Direct Excel integration for business users and reporting",
+      "complexity": "Medium"
+    },
+    {
+      "name": "default-cdm-generators",
+      "path": "default-cdm-generators/",
+      "language": "Maven POM",
+      "purpose": "Orchestrates code generation for the Common Domain Model (CDM) distribution build",
+      "value_proposition": "Shows how to integrate multiple generators into a build pipeline. Provides example-generate profile for demonstration",
+      "complexity": "Low",
+      "dependencies": [
+        "All generator modules"
+      ]
+    },
+    {
+      "name": "test-helper",
+      "path": "test-helper/",
+      "language": "Java",
+      "purpose": "Shared testing utilities for all generator modules",
+      "value_proposition": "Provides common test infrastructure reducing duplication across generator test suites",
+      "complexity": "Low-Medium"
+    }
+  ],
+  "design_patterns": [
+    {
+      "pattern": "Template Method",
+      "description": "AbstractExternalGenerator defines the generator lifecycle. Concrete generators override specific methods to implement language-specific generation logic.",
+      "location": "Base pattern used by all generators",
+      "applicability_to_uml": "Highly applicable - we can use the same pattern for UML-to-code generation with different target languages"
+    },
+    {
+      "pattern": "Model-to-Text Transformation",
+      "description": "Uses Eclipse Modeling Framework (EMF) and Ecore as an intermediate representation. Parse source DSL -> Build Ecore model -> Transform to target language text.",
+      "location": "Core architecture throughout",
+      "applicability_to_uml": "Excellent fit - UML can be represented as EMF/Ecore models. This validates our approach of using an intermediate model representation."
+    },
+    {
+      "pattern": "Plugin Architecture",
+      "description": "Each generator is a separate Maven module that can be independently developed, tested, and distributed. Generators are discovered and loaded at runtime.",
+      "location": "Maven multi-module structure",
+      "applicability_to_uml": "Very applicable - allows us to support multiple target languages without coupling them together"
+    },
+    {
+      "pattern": "Dependency Injection",
+      "description": "Uses Google Guice for dependency injection, allowing flexible configuration and testing",
+      "location": "Throughout codebase",
+      "applicability_to_uml": "Applicable but we might prefer a lighter-weight approach or different DI framework"
+    },
+    {
+      "pattern": "Builder Pattern (String Building)",
+      "description": "Generators use StringBuilder extensively for efficient string concatenation during code generation. Helper methods compose larger code structures from smaller pieces.",
+      "location": "SampleCodeGenerator, GeneratorUtils",
+      "applicability_to_uml": "Applicable but consider template engines (Jinja2, Mustache) for more complex scenarios"
+    },
+    {
+      "pattern": "Strategy Pattern",
+      "description": "Type mapping strategies vary by language. Each generator implements its own type conversion logic (e.g., toGroovyType, toPythonType).",
+      "location": "GeneratorUtils classes in each module",
+      "applicability_to_uml": "Highly applicable - UML types need to map to different language type systems"
+    },
+    {
+      "pattern": "Visitor Pattern (Implicit)",
+      "description": "Generators traverse the model tree, visiting each element and generating corresponding code. Uses EMF's EObject traversal mechanisms.",
+      "location": "Model traversal in generators",
+      "applicability_to_uml": "Very applicable - UML models are tree structures that benefit from visitor traversal"
+    },
+    {
+      "pattern": "Factory Pattern",
+      "description": "Generators produce Map<String, CharSequence> of filename->content pairs. The framework handles file system I/O.",
+      "location": "Generator return types",
+      "applicability_to_uml": "Good pattern - separates generation from file I/O concerns"
+    }
+  ],
+  "architectural_decisions": [
+    {
+      "decision": "Use Xtend instead of Java for generator implementation",
+      "rationale": "Xtend provides more concise syntax for string templates and code generation. Compiles to Java bytecode. Better suited for text generation than pure Java.",
+      "trade_offs": "Adds Xtend as a dependency and compilation step. Team needs to learn Xtend syntax. 75% of codebase is Xtend.",
+      "applicability_to_uml": "Consider alternative: We could use Python with Jinja2 templates for more accessible syntax and better template support"
+    },
+    {
+      "decision": "JDK 21 requirement",
+      "rationale": "Takes advantage of modern Java features. Enforced version range [21,22) for consistency.",
+      "trade_offs": "Limits compatibility with older environments. Requires recent JDK installation.",
+      "applicability_to_uml": "Not applicable - we're using Python. But principle of using modern language features is sound."
+    },
+    {
+      "decision": "Maven multi-module project",
+      "rationale": "Allows independent development and versioning of generators. Supports selective dependency inclusion.",
+      "trade_offs": "More complex build configuration. Requires Maven knowledge.",
+      "applicability_to_uml": "Consider Python alternatives: Poetry workspace, or separate packages with shared base"
+    },
+    {
+      "decision": "Xtext for DSL parsing",
+      "rationale": "Xtext provides complete language infrastructure including parsers, IDE integration, and validation.",
+      "trade_offs": "Heavy dependency. Eclipse-based tooling. EPL-2.0 license (weak copyleft).",
+      "applicability_to_uml": "Not directly applicable - we're parsing UML/XMI, not defining a new DSL. But the parsing architecture principles apply."
+    },
+    {
+      "decision": "ANTLR-generated parsers",
+      "rationale": "Industry-standard parser generator. Excellent performance and tooling support.",
+      "trade_offs": "Generated code can be verbose. Grammar maintenance required.",
+      "applicability_to_uml": "Not needed - XMI is XML-based, use XML parsers"
+    },
+    {
+      "decision": "Eclipse Modeling Framework (EMF) as intermediate model",
+      "rationale": "EMF provides a mature, well-tested model representation. Ecore is a proven metamodel standard. Enables reuse of EMF tooling.",
+      "trade_offs": "Heavy dependency on Eclipse infrastructure. Java-centric.",
+      "applicability_to_uml": "Consider alternatives: Python-based model representation with Pydantic or dataclasses. EMF might be overkill for our needs."
+    },
+    {
+      "decision": "Google Guice for dependency injection",
+      "rationale": "Lightweight DI framework. Better than Spring for library use. Explicit about dependencies.",
+      "trade_offs": "Adds dependency. Requires understanding of DI patterns.",
+      "applicability_to_uml": "Consider alternatives: Python dependency injection libraries (injector, dependency-injector) or simpler factory patterns"
+    },
+    {
+      "decision": "Checkstyle enforcement",
+      "rationale": "Ensures consistent code quality. 120-character line length. Sun coding conventions. Currently warnings only, not build-breaking.",
+      "trade_offs": "Additional build step. Can be rigid.",
+      "applicability_to_uml": "Use Python equivalents: black, flake8, mypy, ruff"
+    },
+    {
+      "decision": "Codefresh for CI/CD",
+      "rationale": "Supports multi-language testing (Maven + Python). GPG signing for releases. Handles snapshot and release workflows.",
+      "trade_offs": "Vendor-specific pipeline configuration.",
+      "applicability_to_uml": "Use GitHub Actions or similar. Pattern of separating build/test/release stages is applicable."
+    },
+    {
+      "decision": "Apache 2.0 license",
+      "rationale": "Permissive licensing encourages adoption. Compatible with commercial use. Requires attribution but not source disclosure.",
+      "trade_offs": "Others can use in proprietary products without contribution back.",
+      "applicability_to_uml": "Good choice for maximum reusability. Consider same for our project."
+    }
+  ],
+  "requirements_identified": [
+    {
+      "id": "REQ-RCG-001",
+      "category": "Code Generation",
+      "description": "Support multiple target programming languages from a single source model",
+      "source": "Multi-module architecture with 10+ language generators",
+      "priority": "High",
+      "applicability": "Core requirement for our UML code generator"
+    },
+    {
+      "id": "REQ-RCG-002",
+      "category": "Code Generation",
+      "description": "Type system mapping between source model types and target language types",
+      "source": "GeneratorUtils.toGroovyType() and similar in each generator",
+      "priority": "High",
+      "applicability": "Essential - UML types must map to Java/Python/C# types"
+    },
+    {
+      "id": "REQ-RCG-003",
+      "category": "Code Generation",
+      "description": "Handle cardinality/multiplicity (single vs. collection types)",
+      "source": "SampleCodeGenerator.attributes() handling of List<T> for multiple cardinality",
+      "priority": "High",
+      "applicability": "UML has multiplicity on associations and attributes"
+    },
+    {
+      "id": "REQ-RCG-004",
+      "category": "Code Generation",
+      "description": "Generate documentation comments alongside code",
+      "source": "GeneratorUtils.groovyDocWithVersion() methods",
+      "priority": "Medium",
+      "applicability": "UML elements have documentation that should appear in generated code"
+    },
+    {
+      "id": "REQ-RCG-005",
+      "category": "Code Generation",
+      "description": "Preserve package/namespace structure from model",
+      "source": "SampleCodeGenerator.generateFilename() using namespace paths",
+      "priority": "High",
+      "applicability": "UML packages should map to code packages/modules"
+    },
+    {
+      "id": "REQ-RCG-006",
+      "category": "Architecture",
+      "description": "Plugin architecture for extensible generator support",
+      "source": "Maven multi-module structure allowing independent generators",
+      "priority": "Medium",
+      "applicability": "Allows community contribution of new language generators"
+    },
+    {
+      "id": "REQ-RCG-007",
+      "category": "Architecture",
+      "description": "Intermediate model representation decoupled from input and output",
+      "source": "EMF/Ecore as pivot model between DSL and generated code",
+      "priority": "High",
+      "applicability": "Validates our approach of parsing UML to intermediate representation"
+    },
+    {
+      "id": "REQ-RCG-008",
+      "category": "Testing",
+      "description": "Shared test infrastructure for all generators",
+      "source": "test-helper module",
+      "priority": "Medium",
+      "applicability": "We need common test utilities for validating generated code"
+    },
+    {
+      "id": "REQ-RCG-009",
+      "category": "Testing",
+      "description": "Sample resources for testing generators",
+      "source": "sample module with test resources",
+      "priority": "Medium",
+      "applicability": "Need reference UML models for testing"
+    },
+    {
+      "id": "REQ-RCG-010",
+      "category": "Build",
+      "description": "Version synchronization across all modules",
+      "source": "Parent POM with version properties, frequent version bump PRs",
+      "priority": "Medium",
+      "applicability": "Important for multi-module Python projects"
+    },
+    {
+      "id": "REQ-RCG-011",
+      "category": "Code Generation",
+      "description": "Generate code for multiple export formats (not just programming languages)",
+      "source": "JSON Schema, CSV, Excel generators",
+      "priority": "Low",
+      "applicability": "Could be useful for UML - generate PlantUML, Mermaid, JSON schema, etc."
+    },
+    {
+      "id": "REQ-RCG-012",
+      "category": "Code Generation",
+      "description": "Handle name collisions across namespaces",
+      "source": "Issue #232 - duplicate typename handling",
+      "priority": "Medium",
+      "applicability": "UML can have same class name in different packages"
+    },
+    {
+      "id": "REQ-RCG-013",
+      "category": "Code Generation",
+      "description": "Support for operators and expressions in models",
+      "source": "Issues #302, #304 for default and ->> operators",
+      "priority": "Low",
+      "applicability": "UML has constraint expressions (OCL) that could be generated"
+    },
+    {
+      "id": "REQ-RCG-014",
+      "category": "Code Generation",
+      "description": "Generate runtime support functions alongside data structures",
+      "source": "Python generator runtime functions (#366)",
+      "priority": "Medium",
+      "applicability": "Generated code may need helper functions for validation, serialization, etc."
+    },
+    {
+      "id": "REQ-RCG-015",
+      "category": "Distribution",
+      "description": "Orchestrate multiple generators in a build pipeline",
+      "source": "default-cdm-generators module with example-generate profile",
+      "priority": "Low",
+      "applicability": "Users may want to generate multiple languages at once"
+    },
+    {
+      "id": "REQ-RCG-016",
+      "category": "Documentation",
+      "description": "Provide clear examples for creating new generators",
+      "source": "sample module as reference implementation",
+      "priority": "High",
+      "applicability": "Essential for extensibility and community contribution"
+    },
+    {
+      "id": "REQ-RCG-017",
+      "category": "Quality",
+      "description": "Code style enforcement and quality checks",
+      "source": "Checkstyle configuration with comprehensive rules",
+      "priority": "Medium",
+      "applicability": "Use Python linting tools (black, ruff, mypy)"
+    }
+  ],
+  "technical_debt": [
+    {
+      "category": "Bugs",
+      "severity": "High",
+      "description": "Python generator has defects in runtime functions",
+      "issue": "#366",
+      "impact": "Generated Python code may not work correctly",
+      "recommendation": "Thoroughly test Python generators before adopting patterns"
+    },
+    {
+      "category": "Bugs",
+      "severity": "High",
+      "description": "JSON Schema generator produces incorrect schemas",
+      "issue": "#289, #295",
+      "impact": "Generated schemas don't accurately represent models",
+      "recommendation": "Validate generated schemas against model semantics in our implementation"
+    },
+    {
+      "category": "Bugs",
+      "severity": "Medium",
+      "description": "C#, Scala, and DAML generators fail with duplicate typenames in different namespaces",
+      "issue": "#232",
+      "impact": "Name collision handling is incomplete",
+      "recommendation": "Implement proper namespace qualification and collision detection"
+    },
+    {
+      "category": "Features",
+      "severity": "Medium",
+      "description": "Missing support for Rune-defined functions in Python generator",
+      "issue": "#362",
+      "impact": "Cannot generate methods/functions defined in models",
+      "recommendation": "Plan for method/operation generation from UML operations"
+    },
+    {
+      "category": "Features",
+      "severity": "Low",
+      "description": "Missing operator support (default, ->>)",
+      "issue": "#302, #304",
+      "impact": "Some model expressions cannot be generated",
+      "recommendation": "Plan for expression generation from UML constraints"
+    },
+    {
+      "category": "Infrastructure",
+      "severity": "Medium",
+      "description": "Testing and release process needs simplification",
+      "issue": "#316",
+      "impact": "Difficult to test and release changes",
+      "recommendation": "Keep our testing infrastructure simple from the start"
+    },
+    {
+      "category": "Documentation",
+      "severity": "Medium",
+      "description": "Developer setup documentation is incomplete",
+      "issue": "#149",
+      "impact": "High barrier to entry for new contributors",
+      "recommendation": "Prioritize comprehensive developer documentation for our project"
+    },
+    {
+      "category": "Architecture",
+      "severity": "Low",
+      "description": "Heavy dependency on Eclipse/EMF infrastructure",
+      "impact": "Large dependency footprint, Java-centric approach",
+      "recommendation": "Use lighter-weight alternatives for Python-based implementation"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "Rosetta DSL",
+      "version": "9.68.0",
+      "license": "Apache 2.0",
+      "purpose": "Core DSL framework and library",
+      "reusability": "Not applicable - specific to Rosetta ecosystem"
+    },
+    {
+      "name": "Rosetta Common Bundle",
+      "version": "11.90.3",
+      "license": "Apache 2.0",
+      "purpose": "Common utilities for Rosetta",
+      "reusability": "Not applicable - specific to Rosetta ecosystem"
+    },
+    {
+      "name": "Eclipse Xtext",
+      "version": "2.38.0",
+      "license": "EPL-2.0",
+      "purpose": "DSL parsing and language infrastructure",
+      "reusability": "Patterns applicable but framework not needed for UML parsing"
+    },
+    {
+      "name": "Eclipse Xtend",
+      "version": "2.38.0",
+      "license": "EPL-2.0",
+      "purpose": "Code generation language",
+      "reusability": "Patterns applicable but prefer Python templates"
+    },
+    {
+      "name": "Eclipse EMF",
+      "version": "implicit via Xtext",
+      "license": "EPL-2.0",
+      "purpose": "Model representation framework",
+      "reusability": "Patterns applicable but consider lighter alternatives"
+    },
+    {
+      "name": "Google Guice",
+      "version": "6.0.0",
+      "license": "Apache 2.0",
+      "purpose": "Dependency injection",
+      "reusability": "Patterns applicable, consider Python alternatives"
+    },
+    {
+      "name": "Google Guava",
+      "version": "33.3.1-jre",
+      "license": "Apache 2.0",
+      "purpose": "Utility libraries (HtmlEscapers, etc.)",
+      "reusability": "Patterns applicable, use Python equivalents"
+    },
+    {
+      "name": "Apache Commons Lang3",
+      "version": "3.13.0",
+      "license": "Apache 2.0",
+      "purpose": "Language utilities",
+      "reusability": "Use Python standard library equivalents"
+    },
+    {
+      "name": "Apache Commons Text",
+      "version": "1.11.0",
+      "license": "Apache 2.0",
+      "purpose": "Text processing utilities",
+      "reusability": "Use Python string processing"
+    },
+    {
+      "name": "Apache Commons IO",
+      "version": "2.11.0",
+      "license": "Apache 2.0",
+      "purpose": "I/O utilities",
+      "reusability": "Use Python pathlib and I/O libraries"
+    },
+    {
+      "name": "SLF4J",
+      "version": "2.0.13",
+      "license": "MIT",
+      "purpose": "Logging facade",
+      "reusability": "Use Python logging module"
+    },
+    {
+      "name": "Logback",
+      "version": "1.5.6",
+      "license": "EPL-2.0 / LGPL 2.1",
+      "purpose": "Logging implementation",
+      "reusability": "Use Python logging handlers"
+    },
+    {
+      "name": "JUnit 5",
+      "version": "5.8.1",
+      "license": "EPL-2.0",
+      "purpose": "Testing framework",
+      "reusability": "Use pytest"
+    },
+    {
+      "name": "Hamcrest",
+      "version": "2.2",
+      "license": "BSD-3-Clause",
+      "purpose": "Matcher library for assertions",
+      "reusability": "Use pytest assertions or assertpy"
+    },
+    {
+      "name": "JSON Schema Validator",
+      "version": "1.3.0",
+      "license": "Apache 2.0",
+      "purpose": "JSON schema validation",
+      "reusability": "Use jsonschema Python library"
+    }
+  ],
+  "statistics": {
+    "stars": 22,
+    "forks": 29,
+    "open_issues": 13,
+    "contributors": 26,
+    "commits": 675,
+    "created_date": "2019-06-19",
+    "last_updated": "2025-11-03",
+    "primary_language": "Xtend",
+    "language_breakdown": {
+      "Xtend": 640698,
+      "C#": 90014,
+      "Java": 56477,
+      "Python": 53224,
+      "Shell": 9714
+    },
+    "size_kb": 1893
+  },
+  "key_files": [
+    {
+      "path": "pom.xml",
+      "purpose": "Parent POM defining versions, dependencies, and modules",
+      "importance": "Critical - defines entire project structure"
+    },
+    {
+      "path": "sample/src/main/java/com/regnosys/rosetta/generators/sample/SampleCodeGenerator.java",
+      "purpose": "Reference generator implementation",
+      "importance": "High - shows basic generator pattern"
+    },
+    {
+      "path": "sample/src/main/java/com/regnosys/rosetta/generators/sample/GeneratorUtils.java",
+      "purpose": "Utility functions for code generation",
+      "importance": "High - shows type mapping and doc generation patterns"
+    },
+    {
+      "path": "checkstyle/checkstyle.xml",
+      "purpose": "Code quality rules and standards",
+      "importance": "Medium - shows quality expectations"
+    },
+    {
+      "path": "codefresh.yml",
+      "purpose": "CI/CD pipeline configuration",
+      "importance": "Medium - shows build/test/release workflow"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "purpose": "Contribution guidelines and development workflow",
+      "importance": "Medium - shows development practices"
+    },
+    {
+      "path": "README.md",
+      "purpose": "Project overview and getting started guide",
+      "importance": "High - primary documentation"
+    },
+    {
+      "path": "default-cdm-generators/pom.xml",
+      "purpose": "Example of orchestrating multiple generators",
+      "importance": "Medium - shows integration patterns"
+    }
+  ],
+  "notes": "This is a mature, well-architected code generation framework designed specifically for the Rosetta/Rune DSL ecosystem. The project demonstrates excellent software engineering practices including multi-module architecture, comprehensive testing infrastructure, code quality enforcement, and clear separation of concerns. \n\nKey strengths:\n1. Clean plugin architecture allowing independent generator development\n2. Proven model-to-text transformation approach using EMF/Ecore\n3. Support for 10+ target languages and formats\n4. Good documentation and sample code\n5. Active maintenance with regular dependency updates\n6. Permissive Apache 2.0 licensing\n\nKey weaknesses:\n1. Heavy dependency on Java/Eclipse ecosystem (Xtext, EMF, Xtend)\n2. Several known bugs especially in Python and JSON Schema generators\n3. Testing infrastructure acknowledged as needing simplification\n4. Developer setup documentation incomplete\n5. Some generators have limitations (duplicate typenames, missing operators)\n\nApplicability to UML code generation:\n- The architectural patterns are highly applicable and validated\n- The model-to-text transformation approach is exactly what we need\n- The plugin architecture for multiple language targets is ideal\n- The type mapping strategies are directly applicable\n- However, we should NOT adopt the Java/Xtext/EMF stack for a Python project\n- Instead, extract the patterns and implement with Python-native tools:\n  * Use XMI/XML parsers instead of ANTLR\n  * Use Pydantic models instead of EMF/Ecore\n  * Use Jinja2 templates instead of Xtend\n  * Use Poetry instead of Maven\n  * Use pytest instead of JUnit\n  * Use black/ruff/mypy instead of Checkstyle\n\nRecommendation: ADAPT\nStudy this codebase thoroughly to understand the patterns and architecture, then implement a Python-native version using modern Python tooling. The conceptual architecture is sound and proven, but the technology stack is not appropriate for our needs.\n\nKey learnings to apply:\n1. Plugin architecture with separate modules per language\n2. Template Method pattern for generator base class\n3. Model-to-text transformation with intermediate representation\n4. Type mapping strategies\n5. Separate generation from file I/O (return filename->content maps)\n6. Shared test infrastructure\n7. Comprehensive code quality enforcement\n8. Clear documentation and examples (sample generator)\n9. Handle cardinality/multiplicity explicitly\n10. Generate documentation alongside code"
+}

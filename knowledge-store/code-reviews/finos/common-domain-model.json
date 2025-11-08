@@ -1,0 +1,524 @@
+{
+  "version": 1,
+  "repository": "finos/common-domain-model",
+  "reviewed_date": "2025-11-08",
+  "last_updated": "2025-11-08T00:00:00Z",
+  "change_history": [],
+  "license": "Community Specification License 1.0 (specification) / Apache 2.0 (source code)",
+  "reuse_decision": "HYBRID",
+  "reuse_rationale": "The CDM represents a sophisticated approach to domain modeling using the Rosetta DSL that offers valuable patterns and architectural concepts highly relevant to UML-based metamodeling. The specification license (Community Specification License 1.0) permits implementation and derivative works with patent protections, while accompanying source code uses Apache 2.0. HYBRID is appropriate because: (1) The Rosetta DSL metamodeling patterns, type system, and validation approach can be STUDIED and ADAPTED for UML metamodel design; (2) The specific financial domain models should NOT be directly lifted but serve as reference examples; (3) The architectural patterns for organizing large domain models, handling lifecycle events, and maintaining referential integrity are universally applicable; (4) The code generation approach and DSL design philosophy align with model-driven architecture principles relevant to UML tools.",
+  "components": [
+    {
+      "name": "Rosetta DSL Core",
+      "purpose": "Domain-specific language for modeling financial operational processes in a technology-agnostic manner",
+      "type": "Language/Framework",
+      "location": "Implemented via REGnosys/rosetta-dsl (separate repository)",
+      "value_proposition": "Provides a human-readable, machine-executable syntax for domain modeling that bridges the gap between domain experts and technical implementations. Supports type extension, composition, validation constraints, and metadata annotations. Critical insight: DSL enables domain experts without programming backgrounds to write fully functional business logic.",
+      "key_features": [
+        "Type system with inheritance (extends keyword)",
+        "Compositional modeling with nested structures",
+        "Declarative validation through condition constraints",
+        "Metadata annotations for cross-referencing and external standard alignment",
+        "Choice constraints for mutually exclusive fields",
+        "Function definitions for business logic",
+        "Code generation to multiple target languages (Java default, community generators for others)",
+        "Eclipse Modeling Framework (EMF) based grammar"
+      ],
+      "recommendation": "ADAPT - Study the DSL design principles for creating domain-specific modeling languages. The approach of separating data structure definitions from validation logic and business rules is highly applicable to UML profile and metamodel design."
+    },
+    {
+      "name": "CDM Base Type System",
+      "purpose": "Foundational type definitions for dates, math, parties, and static data",
+      "type": "Model Layer",
+      "location": "rosetta-source/src/main/rosetta/base-*.rosetta files",
+      "value_proposition": "Demonstrates systematic decomposition of complex domain concepts into reusable, composable primitives. Shows how to build a coherent type system that balances precision with flexibility.",
+      "key_features": [
+        "DateTime types: AdjustableDate, RelativeDateOffset, Frequency, BusinessDayAdjustments, TimeZone, PeriodRange",
+        "Math types: Measure, MeasureBase, Quantity, QuantitySchedule, NonNegativeQuantity, Schedule, Rounding, NumberRange, AveragingCalculationMethod",
+        "Party types: Counterparty, AncillaryParty, BuyerSeller, PayerReceiver, Party, LegalEntity, NaturalPerson, ContactInformation, Account",
+        "All types include comprehensive metadata and validation rules",
+        "FpML compliance through validation rules (e.g., ird-57, ird-58)"
+      ],
+      "recommendation": "STUDY - The base type organization provides excellent patterns for structuring fundamental types in a domain model. The separation of concerns between temporal, quantitative, and party-related concepts is exemplary."
+    },
+    {
+      "name": "CDM Event Model",
+      "purpose": "Represents trade lifecycle events through state transitions",
+      "type": "Model Layer",
+      "location": "rosetta-source/src/main/rosetta/event-*.rosetta files",
+      "value_proposition": "Implements a sophisticated event sourcing pattern where business events are decomposed into primitive instructions. This architecture enables systematic capture of financial contract changes while maintaining referential integrity across complex multi-party scenarios.",
+      "key_features": [
+        "BusinessEvent as root type representing lifecycle transitions",
+        "Nine primitive instruction types: ContractFormation, Execution, Exercise, PartyChange, QuantityChange, Reset, Split, TermsChange, Transfer",
+        "Three state types: TradeState, CounterpartyPositionState, TransferState",
+        "Event qualification through eventQualifier attribute",
+        "Instruction pattern with constraint rules",
+        "Workflow support with lineage tracking",
+        "Action validation based on previous states"
+      ],
+      "recommendation": "ADOPT - The event model architecture is highly applicable to any system requiring lifecycle management and state transitions. The primitive instruction pattern is a powerful abstraction that could be adapted for UML-based behavioral modeling."
+    },
+    {
+      "name": "CDM Product Model",
+      "purpose": "Models financial products and their characteristics",
+      "type": "Model Layer",
+      "location": "rosetta-source/src/main/rosetta/product-*.rosetta files",
+      "value_proposition": "Demonstrates type hierarchy through extension and composition patterns. Shows how to balance inheritance for shared behavior with composition for flexible product structures.",
+      "key_features": [
+        "Payout hierarchy: CommodityPayout, CreditDefaultPayout, InterestRatePayout all extend PayoutBase",
+        "Compositional structure: nested related concepts (GeneralTerms, ProtectionTerms, TransactedPrice)",
+        "Product qualification functions based on ISDA Taxonomy v2",
+        "Asset class qualifications: InterestRate, Credit, ForeignExchange, Equity, Commodity",
+        "Observable qualification logic for underliers",
+        "Validation through complex business rule conditions"
+      ],
+      "recommendation": "ADAPT - The product modeling patterns demonstrate sophisticated use of inheritance and composition. The qualification function approach for classifying products based on structural characteristics is a valuable pattern for type inference and classification."
+    },
+    {
+      "name": "CDM Mapping & Integration",
+      "purpose": "Maps CDM to existing industry formats and standards",
+      "type": "Integration Layer",
+      "location": "rosetta-source/src/main/rosetta/mapping-*.rosetta and ingest-fpml-*.rosetta files",
+      "value_proposition": "Demonstrates how to bridge standardized domain models with legacy formats. Over 50 FpML ingestion files show systematic approach to format translation.",
+      "key_features": [
+        "FpML (Financial products Markup Language) ingestion support",
+        "Mapping files for: Config, CreateIQ, FIS, ORE",
+        "Synonym mapping for external standard alignment",
+        "Systematic translation between representations"
+      ],
+      "recommendation": "STUDY - The mapping architecture provides patterns for maintaining backward compatibility and integrating with existing standards. Relevant for UML model transformation and import/export scenarios."
+    },
+    {
+      "name": "CDM Legal Documentation Model",
+      "purpose": "Models legal agreements and documentation structures",
+      "type": "Model Layer",
+      "location": "rosetta-source/src/main/rosetta/legaldocumentation-*.rosetta files",
+      "value_proposition": "Shows how to model complex legal agreement structures including CSA (Credit Support Annex), ISDA, ICMA, and ISLA documentation.",
+      "key_features": [
+        "Agreement structure modeling",
+        "Election and clause representation",
+        "Term and condition modeling",
+        "Reference to regulatory frameworks"
+      ],
+      "recommendation": "STUDY - Demonstrates modeling of textual and legal concepts in structured form, which could inform approaches to modeling requirements, constraints, and documentation in UML."
+    },
+    {
+      "name": "Code Generation Infrastructure",
+      "purpose": "Generates executable code from Rosetta DSL models",
+      "type": "Tooling",
+      "location": "Implemented via rosetta-maven-plugin and separate code generator repositories",
+      "value_proposition": "Demonstrates model-driven architecture in practice. The ability to generate production-quality code in multiple languages from a single source of truth is a key enabler of the CDM's success.",
+      "key_features": [
+        "Java code generation (default)",
+        "Community-contributed generators for other languages",
+        "Python generation with standardized serialization format",
+        "Maven plugin integration (rosetta-maven-plugin v9.68.0)",
+        "Generated code includes validation logic and business rules"
+      ],
+      "recommendation": "ADOPT - The code generation approach is directly relevant to UML tools. Study the architecture for insights into generating code from models while maintaining human-readable source representations."
+    },
+    {
+      "name": "Validation & Business Logic Framework",
+      "purpose": "Enforces business rules and constraints on model instances",
+      "type": "Framework Component",
+      "location": "Embedded in .rosetta files through condition blocks and func definitions",
+      "value_proposition": "Shows how to separate validation logic from data structure definitions, making rules explicit and maintainable. Conditions are expressed declaratively and can be validated at model time.",
+      "key_features": [
+        "Condition blocks for validation rules",
+        "Choice constraints for mutual exclusivity",
+        "Function definitions for derived values and qualifications",
+        "Cardinality constraints (0..1, 1..1, 0..*, 1..*)",
+        "Cross-field validation",
+        "Temporal validation (action state transitions)"
+      ],
+      "recommendation": "ADOPT - The validation framework architecture is highly applicable to UML constraint modeling. The declarative approach to expressing business rules should inform OCL usage and constraint definition patterns."
+    },
+    {
+      "name": "Governance & Contribution Framework",
+      "purpose": "Manages collaborative specification development",
+      "type": "Process/Governance",
+      "location": "GOVERNANCE.md, CONTRIBUTING.md, LICENSE.md",
+      "value_proposition": "Demonstrates effective governance for large-scale collaborative modeling efforts involving multiple organizations. The consensus-based decision-making with clear roles (Maintainers, Editors, Participants) provides a template for managing complex standardization efforts.",
+      "key_features": [
+        "Four core roles: Maintainers, Editors, Participants, Discussion Groups",
+        "Consensus-based decision making with appeal rights",
+        "Issue management: Discussion, Proposal, Spec Change types",
+        "PR review standards with LGTM approval",
+        "CLA requirement (ICLA/CCLA via EasyCLA)",
+        "13 organizational representatives from major financial institutions",
+        "Multiple specialized working groups (Collateral, Tech Architecture, Physical Risk, etc.)"
+      ],
+      "recommendation": "STUDY - The governance model provides valuable lessons for managing open-source standardization efforts. The balance between openness and quality control is well-designed."
+    }
+  ],
+  "design_patterns": [
+    {
+      "pattern": "Type Extension Hierarchy",
+      "description": "Uses 'extends' keyword to create specialized types that inherit from base types. For example, CommodityPayout extends PayoutBase, InterestRatePayout extends PayoutBase. This enables shared validation rules and behavior while allowing asset-class-specific attributes.",
+      "applicability_to_uml": "Directly maps to UML generalization relationships. Demonstrates clean use of inheritance for domain specialization. Shows when to use inheritance vs composition.",
+      "examples": [
+        "PayoutBase hierarchy with specialized payout types",
+        "MeasureBase as abstract foundation for Quantity types"
+      ]
+    },
+    {
+      "pattern": "Composition Over Inheritance",
+      "description": "Complex types embed related concepts as nested structures rather than using deep inheritance hierarchies. For example, CreditDefaultPayout contains GeneralTerms, ProtectionTerms, and TransactedPrice as composed elements.",
+      "applicability_to_uml": "Aligns with UML composition and aggregation relationships. Demonstrates when composition is preferable to inheritance for flexibility and clarity.",
+      "examples": [
+        "Product types composing terms and conditions",
+        "Party types composing contact information and accounts"
+      ]
+    },
+    {
+      "pattern": "Primitive Instruction Decomposition",
+      "description": "Complex business events are decomposed into primitive instructions (ContractFormation, Execution, Exercise, PartyChange, QuantityChange, Reset, Split, TermsChange, Transfer). High-level BusinessEvents are composed of these primitives.",
+      "applicability_to_uml": "Relevant to UML behavioral modeling. Shows how to decompose complex actions into atomic operations. Could inform Activity and Interaction diagram patterns.",
+      "examples": [
+        "BusinessEvent composed of PrimitiveInstructions",
+        "Workflow steps with action state transitions"
+      ]
+    },
+    {
+      "pattern": "State Machine Pattern for Lifecycle Management",
+      "description": "Three state types (TradeState, CounterpartyPositionState, TransferState) track entity evolution through lifecycle. State transitions are validated through action enumerations and constraints.",
+      "applicability_to_uml": "Directly applicable to UML State Machine diagrams. The validation of state transitions through constraints is an excellent pattern for ensuring valid state machines.",
+      "examples": [
+        "Action validation: New→New, New→Correct, New→Cancel, Correct→Correct, Correct→Cancel",
+        "TradeState maintaining reset and transfer histories"
+      ]
+    },
+    {
+      "pattern": "Qualification Function Pattern",
+      "description": "Products and events are classified through qualification functions that examine structural characteristics rather than explicit type declarations. For example, Qualify_AssetClass_InterestRate determines if a product is an interest rate instrument by examining its payout structure.",
+      "applicability_to_uml": "Relevant to UML constraint-based classification and type inference. Shows how to implement duck typing in a strongly-typed system. Could inform stereotype application and profile validation.",
+      "examples": [
+        "Product qualification functions based on ISDA Taxonomy v2",
+        "Observable qualification logic examining underlier types",
+        "Event qualification through eventQualifier attribute"
+      ]
+    },
+    {
+      "pattern": "Metadata Annotation Pattern",
+      "description": "Attributes include metadata tags (@metadata scheme, @metadata reference, @metadata key) that enable cross-referencing to external standards, marking keys for object identity, and referencing other model elements.",
+      "applicability_to_uml": "Directly applicable to UML tagged values and stereotypes. Shows how to bridge domain models with external standards through metadata.",
+      "examples": [
+        "@metadata scheme annotations linking to FpML, ISDA definitions",
+        "@metadata key for object identity",
+        "@metadata reference for cross-model references"
+      ]
+    },
+    {
+      "pattern": "Choice Constraint Pattern",
+      "description": "Enforces mutual exclusivity where a type must have exactly one of several alternative fields populated. Expressed through 'one of' constraints. For example, GeneralTerms requires one of referenceInformation, indexReferenceInformation, or basketReferenceInformation.",
+      "applicability_to_uml": "Maps to UML XOR constraints and exclusive OR relationships. Shows how to model alternatives in a type system.",
+      "examples": [
+        "GeneralTerms choice between reference types",
+        "Instruction containing either primitive instruction OR before-state reference"
+      ]
+    },
+    {
+      "pattern": "Cardinality Constraint Pattern",
+      "description": "Explicit cardinality specifications (0..1, 1..1, 0..*, 1..*) on all attributes and relationships. Required fields use 1..1 or 1..*, optional fields use 0..1 or 0..*.",
+      "applicability_to_uml": "Directly maps to UML multiplicity specifications. The CDM is rigorous about specifying cardinality on all relationships.",
+      "examples": [
+        "Optional single values: 0..1",
+        "Required single values: 1..1",
+        "Optional lists: 0..*",
+        "Required non-empty lists: 1..*"
+      ]
+    },
+    {
+      "pattern": "Adjustable Reference Pattern",
+      "description": "Separates unadjusted values from adjusted values with explicit adjustment rules. For example, AdjustableDate includes unadjustedDate, dateAdjustments, and adjustedDate fields.",
+      "applicability_to_uml": "Shows how to model values that require contextual adjustment. Could inform patterns for modeling derived attributes and calculation specifications.",
+      "examples": [
+        "AdjustableDate with business day adjustments",
+        "Relative dates with offset calculations"
+      ]
+    },
+    {
+      "pattern": "Namespace Organization Pattern",
+      "description": "Model is organized into logical namespaces: cdm.base.datetime, cdm.base.math, cdm.base.staticdata, cdm.observable, cdm.product, cdm.event, cdm.legaldocumentation, cdm.mapping, etc. Clear separation of concerns across namespaces.",
+      "applicability_to_uml": "Maps to UML package structure. Demonstrates effective large-scale model organization. The namespace hierarchy reflects architectural layers.",
+      "examples": [
+        "Base layer: datetime, math, staticdata",
+        "Domain layer: observable, product, event, legaldocumentation",
+        "Integration layer: mapping, ingest"
+      ]
+    },
+    {
+      "pattern": "Synonym Mapping Pattern",
+      "description": "External standards and formats are mapped to CDM types through synonym annotations, enabling bidirectional translation while maintaining a canonical representation.",
+      "applicability_to_uml": "Relevant to model transformation and mapping specifications. Shows how to maintain traceability between different representations of the same concepts.",
+      "examples": [
+        "FpML ingestion mappings",
+        "Synonym mappings for CreateIQ, FIS, ORE"
+      ]
+    },
+    {
+      "pattern": "Validation Function Pattern",
+      "description": "Business rules are expressed as named functions with condition blocks. Functions return boolean values or qualified objects. Validation logic is separate from data structure definitions.",
+      "applicability_to_uml": "Applicable to OCL constraint definition and validation. Shows how to organize complex validation logic into reusable functions.",
+      "examples": [
+        "Qualification functions for product classification",
+        "Validation functions for business rule enforcement",
+        "Workflow creation functions with state transition validation"
+      ]
+    }
+  ],
+  "requirements_identified": [
+    {
+      "id": "REQ-CDM-001",
+      "category": "Metamodeling",
+      "description": "Support for type extension (inheritance) with single inheritance model",
+      "priority": "HIGH",
+      "rationale": "The CDM extensively uses type extension to create specialized types. A UML metamodel tool should support clean inheritance hierarchies with proper LSP (Liskov Substitution Principle) semantics."
+    },
+    {
+      "id": "REQ-CDM-002",
+      "category": "Metamodeling",
+      "description": "Support for composition and aggregation relationships with explicit cardinality",
+      "priority": "HIGH",
+      "rationale": "The CDM models complex relationships through composition with rigorous cardinality specifications (0..1, 1..1, 0..*, 1..*). UML tools must support these multiplicity constraints."
+    },
+    {
+      "id": "REQ-CDM-003",
+      "category": "Constraint Modeling",
+      "description": "Declarative constraint specification with validation logic separate from structure",
+      "priority": "HIGH",
+      "rationale": "The CDM uses condition blocks for validation rules, keeping business logic separate from data structure definitions. This separation of concerns is crucial for maintainability."
+    },
+    {
+      "id": "REQ-CDM-004",
+      "category": "Constraint Modeling",
+      "description": "Support for choice constraints (XOR relationships) between fields",
+      "priority": "MEDIUM",
+      "rationale": "The CDM uses 'one of' constraints to enforce mutual exclusivity. UML should support XOR constraints between attributes or associations."
+    },
+    {
+      "id": "REQ-CDM-005",
+      "category": "Metadata",
+      "description": "Rich metadata annotation system for cross-referencing, identity, and external standard alignment",
+      "priority": "HIGH",
+      "rationale": "The CDM uses @metadata annotations extensively for scheme references, keys, and references. UML tagged values and stereotypes should support similar capabilities."
+    },
+    {
+      "id": "REQ-CDM-006",
+      "category": "Code Generation",
+      "description": "Multi-language code generation from models with validation logic included",
+      "priority": "HIGH",
+      "rationale": "The CDM generates production-quality code in multiple languages from a single source. UML tools should support similar model-driven code generation."
+    },
+    {
+      "id": "REQ-CDM-007",
+      "category": "Type System",
+      "description": "Support for abstract base types that cannot be instantiated",
+      "priority": "MEDIUM",
+      "rationale": "The CDM uses abstract types like MeasureBase and PayoutBase. UML abstract classes should be properly supported with enforcement."
+    },
+    {
+      "id": "REQ-CDM-008",
+      "category": "Behavioral Modeling",
+      "description": "State machine patterns with validated transitions",
+      "priority": "MEDIUM",
+      "rationale": "The CDM's event model uses state transitions with validation rules. UML State Machine diagrams should support similar constraint-based transition validation."
+    },
+    {
+      "id": "REQ-CDM-009",
+      "category": "Functional Modeling",
+      "description": "Support for derived attributes and calculation specifications",
+      "priority": "MEDIUM",
+      "rationale": "The CDM includes qualification functions and calculation logic. UML should support derived attributes with specifications for how they are calculated."
+    },
+    {
+      "id": "REQ-CDM-010",
+      "category": "Model Organization",
+      "description": "Hierarchical namespace/package organization for large models",
+      "priority": "HIGH",
+      "rationale": "The CDM is organized into logical namespaces (base, observable, product, event, etc.). UML packages should support similar hierarchical organization."
+    },
+    {
+      "id": "REQ-CDM-011",
+      "category": "Model Transformation",
+      "description": "Support for model mappings and transformations to external formats",
+      "priority": "MEDIUM",
+      "rationale": "The CDM includes extensive mapping support for FpML and other formats. UML tools should support model transformation specifications."
+    },
+    {
+      "id": "REQ-CDM-012",
+      "category": "Versioning",
+      "description": "Model versioning and evolution support",
+      "priority": "MEDIUM",
+      "rationale": "The CDM has 641 releases with active version management. UML tools should support model versioning and migration."
+    },
+    {
+      "id": "REQ-CDM-013",
+      "category": "Documentation",
+      "description": "Rich documentation embedded in model elements with multi-format output",
+      "priority": "MEDIUM",
+      "rationale": "The CDM includes extensive documentation that generates to web formats. UML models should support embedded documentation with various output formats."
+    },
+    {
+      "id": "REQ-CDM-014",
+      "category": "Validation",
+      "description": "Cross-field validation and complex business rule enforcement",
+      "priority": "HIGH",
+      "rationale": "The CDM validates relationships between fields and enforces complex business rules. UML constraint mechanisms (OCL) should support similar capabilities."
+    },
+    {
+      "id": "REQ-CDM-015",
+      "category": "Domain-Specific Language",
+      "description": "Support for creating domain-specific modeling languages with custom syntax",
+      "priority": "LOW",
+      "rationale": "The Rosetta DSL demonstrates the value of domain-specific syntax. While not required for UML, the ability to define profiles with custom concrete syntax could be valuable."
+    },
+    {
+      "id": "REQ-CDM-016",
+      "category": "Event Sourcing",
+      "description": "Patterns for modeling lifecycle events and state transitions",
+      "priority": "MEDIUM",
+      "rationale": "The CDM's event model with primitive instructions is a sophisticated pattern for event sourcing. UML behavioral modeling should support similar patterns."
+    },
+    {
+      "id": "REQ-CDM-017",
+      "category": "Type Qualification",
+      "description": "Support for structural type classification (duck typing) through qualification functions",
+      "priority": "LOW",
+      "rationale": "The CDM classifies products based on structural characteristics. UML could benefit from similar constraint-based type inference and classification."
+    },
+    {
+      "id": "REQ-CDM-018",
+      "category": "Model Composition",
+      "description": "Support for composing models from multiple sources with clear boundaries",
+      "priority": "MEDIUM",
+      "rationale": "The CDM includes ingestion and mapping modules that compose external models. UML should support model composition and import mechanisms."
+    },
+    {
+      "id": "REQ-CDM-019",
+      "category": "Governance",
+      "description": "Support for collaborative modeling with version control and review processes",
+      "priority": "MEDIUM",
+      "rationale": "The CDM's governance framework manages contributions from 79 contributors across 13 organizations. UML tools should integrate with version control and support collaborative modeling workflows."
+    },
+    {
+      "id": "REQ-CDM-020",
+      "category": "Testing",
+      "description": "Model validation and testing framework",
+      "priority": "MEDIUM",
+      "rationale": "The CDM includes comprehensive test suites (JUnit 5, Mockito). UML tools should support model validation testing and test generation."
+    }
+  ],
+  "technical_debt": [
+    {
+      "category": "Legacy Migration",
+      "description": "Active effort to retire non-FpML legacy mappings and migrate CreateIQ synonym mappings to newer ingestion functions",
+      "severity": "LOW",
+      "impact": "Indicates healthy maintenance practices. Not applicable to UML adoption.",
+      "recommendation": "N/A - Internal CDM maintenance"
+    },
+    {
+      "category": "Infrastructure",
+      "description": "Migration from Codefresh to GitHub Actions proposed for build process",
+      "severity": "LOW",
+      "impact": "Modern CI/CD migration. Standard technical evolution.",
+      "recommendation": "N/A - Internal CDM infrastructure"
+    },
+    {
+      "category": "Python Compatibility",
+      "description": "Python generation update introduces incompatible serialization format with previous versions",
+      "severity": "MEDIUM",
+      "impact": "Breaking change in Python library requiring consumer updates. Shows challenges of maintaining multi-language code generation.",
+      "recommendation": "When building UML code generators, plan for versioning and backward compatibility from the start. Consider semantic versioning for generated code."
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "Rosetta DSL (Rune DSL)",
+      "version": "9.68.0",
+      "license": "Apache 2.0",
+      "purpose": "Core domain-specific language for model definition",
+      "criticality": "CRITICAL",
+      "repository": "REGnosys/rosetta-dsl"
+    },
+    {
+      "name": "Jackson",
+      "version": "2.17.1",
+      "license": "Apache 2.0",
+      "purpose": "JSON processing for serialization",
+      "criticality": "HIGH"
+    },
+    {
+      "name": "Guava",
+      "version": "33.3.1-jre",
+      "license": "Apache 2.0",
+      "purpose": "Google core libraries for Java",
+      "criticality": "MEDIUM"
+    },
+    {
+      "name": "Eclipse Modeling Framework (EMF)",
+      "version": "N/A (via Rosetta DSL)",
+      "license": "Eclipse Public License",
+      "purpose": "Foundation for DSL grammar and metamodeling",
+      "criticality": "CRITICAL"
+    },
+    {
+      "name": "OpenGamma Strata",
+      "version": "1.7.0",
+      "license": "Apache 2.0",
+      "purpose": "Financial calculations and market risk analytics",
+      "criticality": "MEDIUM"
+    },
+    {
+      "name": "SLF4J + Logback",
+      "version": "2.0.7 / 1.5.13",
+      "license": "MIT / EPL/LGPL",
+      "purpose": "Logging framework",
+      "criticality": "LOW"
+    },
+    {
+      "name": "JAXB",
+      "version": "2.3.1",
+      "license": "CDDL/GPL",
+      "purpose": "XML binding for FpML ingestion",
+      "criticality": "MEDIUM"
+    },
+    {
+      "name": "JUnit 5",
+      "version": "5.9.1",
+      "license": "Eclipse Public License 2.0",
+      "purpose": "Testing framework",
+      "criticality": "LOW"
+    },
+    {
+      "name": "Maven",
+      "version": "4.0.0 (Java 21 enforcement)",
+      "license": "Apache 2.0",
+      "purpose": "Build system",
+      "criticality": "MEDIUM"
+    }
+  ],
+  "key_metrics": {
+    "repository_stars": 198,
+    "repository_forks": 95,
+    "total_commits": 6260,
+    "contributors": 79,
+    "releases": 641,
+    "latest_release": "5.29.0",
+    "release_date": "2025-11-07",
+    "open_issues": 127,
+    "primary_language": "Java",
+    "language_breakdown": {
+      "Java": "91.6%",
+      "JavaScript": "2.8%",
+      "Python": "1.8%",
+      "Shell": "1.4%",
+      "CSS": "1.2%",
+      "MDX": "0.8%"
+    },
+    "rosetta_files": 141,
+    "organizations": 13,
+    "active_working_groups": 10
+  },
+  "notes": "## Executive Summary\n\nThe FINOS Common Domain Model (CDM) is a landmark project in financial services standardization that offers profound insights for UML-based domain modeling and metamodeling. Built on the Rosetta DSL (now called Rune DSL), the CDM demonstrates how to create large-scale, multi-organization domain models with executable semantics.\n\n## Critical Insights for UML Development\n\n### 1. Metamodeling Architecture\n\nThe Rosetta DSL provides a reference architecture for domain-specific modeling languages:\n\n- **Separation of Concerns**: Data structure definitions (types) are separate from validation logic (conditions) and business logic (functions). This clean separation is exemplary and should inform UML profile and metamodel design.\n\n- **Type System Design**: The combination of inheritance (extends), composition, cardinality constraints, and choice constraints creates a powerful yet understandable type system. UML Class diagrams should support similar expressiveness.\n\n- **Metadata System**: The @metadata annotation system enables cross-referencing, identity management, and alignment with external standards without cluttering the core model. This is more elegant than excessive use of stereotypes.\n\n### 2. Event-Driven Architecture\n\nThe CDM's event model with primitive instruction decomposition is a sophisticated pattern:\n\n- **Primitive Instructions**: Complex business events decompose into atomic operations (ContractFormation, Execution, Exercise, PartyChange, QuantityChange, Reset, Split, TermsChange, Transfer). This is analogous to UML's concept of atomic actions in Activity diagrams.\n\n- **State Management**: Three state types (TradeState, CounterpartyPositionState, TransferState) with validated transitions show how to model lifecycle management rigorously. Directly applicable to UML State Machine patterns.\n\n- **Event Qualification**: The eventQualifier attribute demonstrates structural classification—determining event type based on characteristics rather than explicit declaration. This is a form of duck typing in a strongly-typed system.\n\n### 3. Product Qualification Pattern\n\nThe qualification function approach is innovative:\n\n- **Structural Classification**: Products are classified by examining their structure (payout composition, observable types) rather than explicit type declarations. This enables flexible classification while maintaining strong typing.\n\n- **ISDA Taxonomy Compliance**: The qualification functions implement the ISDA Taxonomy v2, showing how to align domain models with external classification schemes. Relevant for UML stereotype application and profile validation.\n\n- **Hierarchical Qualification**: Asset class → Product type → Product subtype qualification demonstrates composable classification logic.\n\n### 4. Code Generation Insights\n\nThe multi-language code generation demonstrates model-driven architecture in practice:\n\n- **Default Java Generator**: Produces production-quality code with validation logic, builders, and proper encapsulation.\n\n- **Community Generators**: Separate repository (rosetta-code-generators) enables community to contribute generators for other languages without modifying core DSL.\n\n- **Python Compatibility**: Recent breaking change for standardized serialization shows challenges of maintaining generated code APIs. Plan for versioning from the start.\n\n### 5. Large-Scale Model Organization\n\nWith 141 Rosetta files organized into logical namespaces, the CDM shows how to structure large models:\n\n- **Layered Architecture**: Base layer (datetime, math, staticdata) → Domain layer (observable, product, event, legaldocumentation) → Integration layer (mapping, ingest)\n\n- **Namespace Hierarchy**: Clear separation of concerns with logical grouping. UML package structure should follow similar principles.\n\n- **Modularization**: Each namespace is self-contained with minimal coupling, enabling parallel development.\n\n### 6. Governance and Collaboration\n\nThe CDM's governance framework manages 79 contributors across 13 organizations:\n\n- **Consensus-Based Decision Making**: Maintainers determine consensus through good faith consideration of participant views. No unanimous agreement required.\n\n- **Role Clarity**: Maintainers, Editors, Participants, and Discussion Groups have clear responsibilities.\n\n- **Contribution Process**: Issue-driven development with three issue types (Discussion, Proposal, Spec Change). PR review with LGTM approval.\n\n- **Legal Framework**: Community Specification License 1.0 provides patent protections while enabling implementation and derivative works.\n\n## Applicability to UML Codex\n\n### ADOPT Recommendations\n\n1. **Event Model Architecture**: The primitive instruction pattern for decomposing complex events is universally applicable. Adapt for UML behavioral modeling.\n\n2. **Validation Framework**: Declarative constraint specification separate from structure definitions. Should inform OCL usage patterns.\n\n3. **Code Generation Approach**: Multi-language generation from single source with validation logic. Relevant for UML code generation tools.\n\n### ADAPT Recommendations\n\n1. **Type System Patterns**: Inheritance vs composition decisions, cardinality constraints, choice constraints. Study for UML Class diagram patterns.\n\n2. **Qualification Functions**: Structural classification approach could inform stereotype application and type inference in UML.\n\n3. **Metadata Annotations**: Cross-referencing and external standard alignment patterns applicable to UML tagged values.\n\n### STUDY Recommendations\n\n1. **Base Type Organization**: The systematic decomposition of temporal, quantitative, and party-related concepts provides patterns for fundamental type structuring.\n\n2. **Mapping Architecture**: The approach to bridging standardized models with legacy formats is relevant for UML model transformation.\n\n3. **Governance Framework**: The consensus-based collaborative modeling process offers lessons for open-source standardization.\n\n### AVOID Recommendations\n\nNone. The CDM represents best-in-class domain modeling practices. No anti-patterns identified.\n\n## Technical Considerations\n\n### Strengths\n\n1. **Clean Separation of Concerns**: Data, validation, and logic are cleanly separated.\n2. **Human-Readable Syntax**: Domain experts can read and write Rosetta DSL.\n3. **Machine-Executable**: Models generate production code with full semantics.\n4. **Multi-Language Support**: Code generation targets multiple languages.\n5. **Active Development**: 6,260 commits, 641 releases, active working groups.\n6. **Industry Backing**: 13 major financial institutions, 79 contributors.\n7. **Comprehensive Coverage**: 141 Rosetta files covering broad financial domain.\n8. **Standard Alignment**: FpML ingestion, ISDA Taxonomy compliance.\n\n### Limitations\n\n1. **Financial Domain Specific**: The CDM is highly specialized for financial services. Domain concepts are not directly reusable outside finance.\n2. **Rosetta DSL Learning Curve**: The DSL requires learning new syntax and concepts.\n3. **Breaking Changes**: Python serialization change shows challenges of maintaining generated code APIs.\n4. **Complex Governance**: Multi-organization governance adds process overhead.\n\n### Licensing Considerations\n\n**Community Specification License 1.0** (specification):\n- Permits implementation and derivative works\n- Requires attribution\n- Provides royalty-free patent licenses with 45-day exclusion period\n- Materials provided \"AS IS\" with warranty disclaimers\n\n**Apache 2.0** (source code):\n- Permissive open-source license\n- Allows commercial use, modification, distribution\n- Requires preservation of copyright and license notices\n- Provides patent grant\n\nBoth licenses are permissive and compatible with studying, adapting, and learning from the CDM for UML development purposes.\n\n## Recommendations for UML Codex\n\n### Immediate Actions\n\n1. **Study Rosetta DSL Design**: Examine the DSL syntax, type system, and constraint mechanisms. The REGnosys/rosetta-dsl repository and documentation at docs.rosetta-technology.io provide detailed specifications.\n\n2. **Analyze Event Model**: The primitive instruction pattern for event decomposition is immediately applicable to UML behavioral modeling patterns.\n\n3. **Review Code Generators**: Examine the rosetta-code-generators repository to understand how to generate clean, idiomatic code from models.\n\n### Medium-Term Actions\n\n1. **Adapt Qualification Pattern**: The structural classification approach could inform UML type inference and stereotype application mechanisms.\n\n2. **Implement Validation Patterns**: The declarative constraint approach should inform OCL constraint patterns and validation framework design.\n\n3. **Design Package Structure**: Use the CDM's layered namespace architecture as a reference for organizing large UML models.\n\n### Long-Term Actions\n\n1. **Develop DSL Capabilities**: Consider supporting domain-specific concrete syntax for UML profiles, inspired by Rosetta DSL's success in making models accessible to domain experts.\n\n2. **Build Governance Framework**: If UML Codex becomes a multi-organization effort, adapt the CDM's governance model for consensus-based decision making.\n\n3. **Create Industry Models**: Use CDM as inspiration for developing comprehensive domain models in other industries using UML.\n\n## Metamodeling Insights\n\nThe Rosetta DSL is itself a metamodel, making it particularly relevant:\n\n1. **Eclipse Modeling Framework**: The DSL is built on EMF, the same foundation as many UML tools. This creates direct technical applicability.\n\n2. **Type System Expressiveness**: The combination of inheritance, composition, cardinality, constraints, and metadata creates a metamodel with high expressiveness without excessive complexity.\n\n3. **Validation as First-Class Concept**: Conditions and functions are first-class modeling concepts, not afterthoughts. This elevates constraint modeling to the same level as structural modeling.\n\n4. **Code Generation as Core Feature**: The DSL is designed for code generation from inception, not bolted on later. This influences all design decisions positively.\n\n## Conclusion\n\nThe FINOS Common Domain Model and its underlying Rosetta DSL represent a sophisticated, mature approach to large-scale domain modeling that directly informs UML tool development and metamodeling practices. The project demonstrates that domain-specific modeling languages can achieve both human readability for domain experts and machine executability for production systems.\n\nFor the UML Codex project, the CDM provides:\n\n- **Architectural Patterns**: Event decomposition, state management, qualification functions\n- **Type System Design**: Inheritance, composition, constraints, metadata\n- **Validation Approach**: Declarative constraints separate from structure\n- **Code Generation**: Multi-language generation with validation semantics\n- **Model Organization**: Layered namespace architecture for large models\n- **Governance**: Collaborative multi-organization development process\n\nThe HYBRID reuse decision reflects that while the specific financial domain models should not be directly lifted, the metamodeling patterns, architectural decisions, and design philosophy are highly valuable and should be adapted for UML-based domain modeling tools.\n\n**Recommendation: Dedicate focused study time to the Rosetta DSL and CDM architecture. The lessons learned will directly improve UML Codex metamodel design and tooling capabilities.**\n\n## Additional Resources\n\n- **CDM Documentation**: https://cdm.finos.org\n- **Rosetta DSL Repository**: https://github.com/REGnosys/rosetta-dsl\n- **Rosetta Documentation**: https://docs.rosetta-technology.io\n- **Code Generators**: https://github.com/REGnosys/rosetta-code-generators\n- **Demo Model**: https://github.com/rosetta-models/demo\n- **FINOS CDM Repository**: https://github.com/finos/common-domain-model\n\n## Cross-References\n\nThis analysis complements:\n- **REGnosys Research**: See /home/user/uml-codex/knowledge-store/code-reviews/regnosys-research.json for background on Rosetta DSL philosophy\n- **Eclipse Modeling Framework**: The CDM's foundation in EMF creates synergies with UML tools built on similar technology\n- **OMG Specifications**: The CDM's approach to standardization parallels OMG's process for UML and related specifications"
+}

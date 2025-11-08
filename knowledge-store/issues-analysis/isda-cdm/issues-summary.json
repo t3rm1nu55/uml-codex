@@ -1,0 +1,1484 @@
+{
+  "version": 1,
+  "repository": "finos/common-domain-model",
+  "analysis_date": "2025-11-08",
+  "last_updated": "2025-11-08T00:00:00Z",
+  "change_history": [
+    {
+      "date": "2025-11-08",
+      "reviewer": "Claude Code Analysis",
+      "summary": "Comprehensive analysis of FINOS CDM repository covering 127 open issues and recent closed issues, with focus on domain modeling patterns, governance, and evolution"
+    }
+  ],
+  "total_issues": 127,
+  "issues_analyzed": 127,
+  "date_range": {
+    "from": "2023-03-14",
+    "to": "2025-11-07"
+  },
+  "categories": {
+    "bugs": [
+      {
+        "number": 4128,
+        "title": "Documentation link is broken in README",
+        "status": "OPEN",
+        "created": "2025-10-25",
+        "labels": ["bug"],
+        "priority": "LOW",
+        "summary": "README contains broken documentation link"
+      },
+      {
+        "number": 4076,
+        "title": "FpML synonym mapping of PrincipalPaymentSchedule incorrect",
+        "status": "OPEN",
+        "created": "2025-10-03",
+        "labels": ["bug", "technical"],
+        "priority": "MEDIUM",
+        "summary": "Single final payment mapping errors in FpML synonym processing"
+      },
+      {
+        "number": 4041,
+        "title": "Scoping/Placement of 'person' class creates fundamental issues in state management",
+        "status": "OPEN",
+        "created": "2025-09-19",
+        "labels": ["bug"],
+        "priority": "HIGH",
+        "summary": "Person class nested within party class causes parent party's global key to change when personnel assignments shift, undermining state management. Requires architectural split into counterparty persons vs role-holding persons.",
+        "discussion_points": [
+          "Global key stability violated when person assignments change",
+          "Regulatory roles misplaced in CDM vs DRR reportingRoles",
+          "Workaround via partyChangeInstruction impractical at scale",
+          "Proposed split: static counterparty persons vs workflow-level responsible persons",
+          "Related to issue #3319 on party-to-person relationships"
+        ]
+      },
+      {
+        "number": 3987,
+        "title": "Partial Termination Not Qualified properly",
+        "status": "OPEN",
+        "created": "2025-08-25",
+        "labels": ["bug", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "HIGH",
+        "summary": "Qualification logic fails to properly identify partial termination events"
+      },
+      {
+        "number": 3969,
+        "title": "Missing activityDate in closedState when creating Termination",
+        "status": "OPEN",
+        "created": "2025-08-08",
+        "labels": ["bug"],
+        "priority": "MEDIUM",
+        "summary": "Termination events lack activity date in closed state"
+      },
+      {
+        "number": 3798,
+        "title": "The qualification logic for Terminations doesn't align with expected changes",
+        "status": "OPEN",
+        "created": "2025-06-12",
+        "labels": ["bug", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "HIGH",
+        "summary": "Termination qualification logic misalignment with model changes"
+      },
+      {
+        "number": 3925,
+        "title": "Regularly Broken Builds: Pipeline could not be executed because codefresh.yaml file is missing",
+        "status": "OPEN",
+        "created": "2025-07-08",
+        "labels": ["bug", "technical"],
+        "priority": "MEDIUM",
+        "summary": "Build pipeline reliability issues during documentation updates"
+      },
+      {
+        "number": 3663,
+        "title": "The Type PartialExercise has an incorrectly labelled attribute",
+        "status": "CLOSED",
+        "created": "2025-04-26",
+        "closed": "2025-07-14",
+        "labels": ["bug", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Attribute naming error in PartialExercise type (resolved)"
+      },
+      {
+        "number": 4039,
+        "title": "FpML synonym mapping error for FX instruments",
+        "status": "CLOSED",
+        "created": "2025-09-19",
+        "closed": "2025-10-15",
+        "labels": ["bug", "technical"],
+        "milestone": "Minor Release 6.10",
+        "priority": "MEDIUM",
+        "summary": "FX payer/receiver mapping bug in FpML ingestion (resolved)"
+      },
+      {
+        "number": 4145,
+        "title": "Missing PostingObligationsElection class causing build failures",
+        "status": "CLOSED",
+        "created": "2025-11-02",
+        "closed": "2025-11-03",
+        "labels": ["bug"],
+        "priority": "HIGH",
+        "summary": "Master branch build failures due to missing class (resolved)"
+      }
+    ],
+    "features": [
+      {
+        "number": 4173,
+        "title": "LegalAgreement - Clause updates in relation to High Level CSA and CTA refactoring",
+        "status": "OPEN",
+        "created": "2025-11-07",
+        "labels": ["feature", "triage", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "HIGH",
+        "summary": "Comprehensive refactoring of legal agreement structures to streamline model and reduce validation errors. Includes 14 changes consolidating conditions, updating cardinality, relocating fields, and improving nomenclature.",
+        "discussion_points": [
+          "Approved by Legal Agreement Working Group",
+          "Reduces validation errors while improving data integrity",
+          "Consolidates SpecifiedCondition and AccessCondition structures",
+          "Adjusts cardinality for election types",
+          "Removes redundant CSA date fields"
+        ]
+      },
+      {
+        "number": 4172,
+        "title": "LegalAgreement - High level refactoring of CSA and CTA Elections",
+        "status": "OPEN",
+        "created": "2025-11-07",
+        "labels": ["feature", "triage"],
+        "priority": "HIGH",
+        "summary": "High-level architectural changes to Credit Support Annex and Credit Transfer Agreement elections"
+      },
+      {
+        "number": 4169,
+        "title": "Advanced Mathematical Functions for Option Pricing Models (Black-Scholes & Binomial)",
+        "status": "OPEN",
+        "created": "2025-11-07",
+        "labels": ["feature", "triage"],
+        "priority": "MEDIUM",
+        "summary": "Add support for sophisticated option pricing mathematical models"
+      },
+      {
+        "number": 4168,
+        "title": "CDM Smart Contract: Phase 1 – Collect Floating Rate Option",
+        "status": "OPEN",
+        "created": "2025-11-06",
+        "labels": ["feature", "triage"],
+        "priority": "HIGH",
+        "summary": "First step in smart contract framework - collecting floating rate options for automated execution",
+        "discussion_points": [
+          "Part of phased smart contract implementation",
+          "Focuses on floating rate option collection",
+          "Enables automated contract execution"
+        ]
+      },
+      {
+        "number": 4165,
+        "title": "CDM Smart Contract: Phase 1 – Smart Contract Framework",
+        "status": "OPEN",
+        "created": "2025-11-06",
+        "labels": ["feature", "triage"],
+        "priority": "HIGH",
+        "summary": "Development of foundational smart contract framework for CDM"
+      },
+      {
+        "number": 4148,
+        "title": "Move build from Codefresh to Github Actions",
+        "status": "OPEN",
+        "created": "2025-11-04",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "CI/CD migration to GitHub Actions for better integration"
+      },
+      {
+        "number": 4139,
+        "title": "Rosetta - Add securities lending visualisations",
+        "status": "OPEN",
+        "created": "2025-10-30",
+        "labels": ["feature", "triage"],
+        "priority": "MEDIUM",
+        "summary": "Enhanced visualization tools for securities lending in Rosetta DSL"
+      },
+      {
+        "number": 4130,
+        "title": "CDM Dataset Validation Cleanup and Model Update",
+        "status": "OPEN",
+        "created": "2025-10-27",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "Cleanup of dataset validation logic and model updates"
+      },
+      {
+        "number": 4122,
+        "title": "What is Qualify_SecuritySettlement actually qualifying?",
+        "status": "OPEN",
+        "created": "2025-10-20",
+        "labels": ["feature"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Clarification and potential refactoring of security settlement qualification scope"
+      },
+      {
+        "number": 4083,
+        "title": "Update Qualify_SecurityLending qualification function",
+        "status": "OPEN",
+        "created": "2025-10-07",
+        "labels": ["feature"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Enhancement of security lending qualification logic"
+      },
+      {
+        "number": 4021,
+        "title": "Apply for CDM Project Active Status",
+        "status": "OPEN",
+        "created": "2025-09-09",
+        "labels": ["feature"],
+        "priority": "LOW",
+        "summary": "Governance milestone for project status progression"
+      },
+      {
+        "number": 4017,
+        "title": "Contribution for the Intra-Day qualification of a Transfer",
+        "status": "OPEN",
+        "created": "2025-09-03",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "Add intra-day transfer qualification capabilities"
+      },
+      {
+        "number": 4016,
+        "title": "Intraday Timing - Contribution of the time in economic terms",
+        "status": "OPEN",
+        "created": "2025-09-03",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "Support for intraday timing in economic event modeling"
+      },
+      {
+        "number": 3995,
+        "title": "Add DTI and DLI to identify DLT-based financial instruments",
+        "status": "OPEN",
+        "created": "2025-08-28",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "Support for distributed ledger technology identifiers"
+      },
+      {
+        "number": 3974,
+        "title": "ISDA support documents cannot be listed without full CDM representation",
+        "status": "OPEN",
+        "created": "2025-08-14",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "Enable partial representation of ISDA documentation"
+      },
+      {
+        "number": 3967,
+        "title": "Further enhancement of Skeleton Work for GMSLA",
+        "status": "OPEN",
+        "created": "2025-08-06",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "Global Master Securities Lending Agreement representation improvements"
+      },
+      {
+        "number": 3950,
+        "title": "PartyContactInformation restructuring",
+        "status": "OPEN",
+        "created": "2025-07-23",
+        "labels": ["feature", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Architectural changes to party contact information model"
+      },
+      {
+        "number": 3906,
+        "title": "CSA Posting Obligations improvements",
+        "status": "OPEN",
+        "created": "2025-06-27",
+        "labels": ["feature", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Enhanced modeling of posting obligations in Credit Support Annexes"
+      },
+      {
+        "number": 3871,
+        "title": "Addition of new fee type options for lending fee and rebate rate",
+        "status": "OPEN",
+        "created": "2025-06-13",
+        "labels": ["feature", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Expanded fee structure options for securities lending"
+      },
+      {
+        "number": 3870,
+        "title": "Addition of new transferType to support transfer of securities",
+        "status": "OPEN",
+        "created": "2025-06-13",
+        "labels": ["feature", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "HIGH",
+        "summary": "New enum value for securities delivery in lending trades. Discussion evolved from 'SecurityDelivery' to simpler 'Delivery' option to maintain consistency.",
+        "discussion_points": [
+          "Initial proposal: add 'SecurityDelivery' to ScheduledTransferEnum",
+          "Concern: enum represents obligations not asset types",
+          "Alternative proposals: RepoSettlement, LendingBorrowingSettlement",
+          "Resolution: add 'Delivery' option, asset specified elsewhere",
+          "Maintains pattern consistency with cash 'PrincipalPayment'"
+        ]
+      },
+      {
+        "number": 3868,
+        "title": "Addition of wrapped/insured debt",
+        "status": "OPEN",
+        "created": "2025-06-12",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "Support for wrapped and insured debt instruments"
+      },
+      {
+        "number": 3865,
+        "title": "Restructuring of AssetType, Instrument, and Security",
+        "status": "OPEN",
+        "created": "2025-06-11",
+        "labels": ["feature"],
+        "priority": "HIGH",
+        "summary": "Major refactoring of core asset type hierarchy"
+      },
+      {
+        "number": 3816,
+        "title": "The QuantityChange primitive event needs to be revisited",
+        "status": "OPEN",
+        "created": "2025-06-19",
+        "labels": ["feature", "complex"],
+        "priority": "HIGH",
+        "summary": "Holistic review of QuantityChange component with multiple associated issues. Three-step investigation: assess current implementation, identify adjustments, or develop alternatives.",
+        "discussion_points": [
+          "Multiple outstanding issues warrant comprehensive review",
+          "Handles business requirements: increasing, decreasing, or terminating transactions",
+          "Suggestion to separate price and quantity updates into distinct functions",
+          "Current function handles both ambiguously",
+          "Convert from Java implementation to Rune language",
+          "Insufficient granularity in price/quantity attributes within payouts",
+          "Six related sub-issues tracked (1 complete, 5 open)",
+          "Deep-dive session scheduled"
+        ]
+      },
+      {
+        "number": 3749,
+        "title": "FRAGMOS - enrich Observable with priceObservation",
+        "status": "OPEN",
+        "created": "2025-05-14",
+        "labels": ["feature"],
+        "priority": "MEDIUM",
+        "summary": "FRAGMOS initiative to enhance Observable type with price observation"
+      },
+      {
+        "number": 3748,
+        "title": "FRAGMOS - Improving Observation",
+        "status": "OPEN",
+        "created": "2025-05-14",
+        "labels": ["feature", "backward-incompatible", "complex"],
+        "milestone": "Major Release 7.0",
+        "priority": "HIGH",
+        "summary": "Major refactoring of Observation concept addressing structural deficiencies. Proposes moving ObservationTerms/ValuationTerms to PayoutBase, creating new PriceObservation type, and standalone observation events.",
+        "discussion_points": [
+          "ObservationTerms and ValuationTerms restricted to particular payouts vs generic application",
+          "Misalignment with ISDA Definitions standards",
+          "Event model gaps: inconsistency in reset components, missing resolving method, forced into Reset/Transfer events",
+          "Product model refactoring: move terms to PayoutBase for generic applicability",
+          "Event model refactoring: new PriceObservation with ObservationPriceValue and PriceResolvingMethod",
+          "CRWG: requires dedicated governance separate from standing committees",
+          "Steering WG: complex, consequential, needs adequate resourcing and task force",
+          "Currently parked at CRWG pending prioritization"
+        ]
+      },
+      {
+        "number": 3739,
+        "title": "FRAGMOS - new type BaseQuantity",
+        "status": "OPEN",
+        "created": "2025-05-08",
+        "labels": ["feature", "triage"],
+        "priority": "MEDIUM",
+        "summary": "FRAGMOS proposal for new BaseQuantity type"
+      },
+      {
+        "number": 3706,
+        "title": "FRAGMOS - CorePayoutTerms types",
+        "status": "OPEN",
+        "created": "2025-04-30",
+        "labels": ["feature", "triage"],
+        "priority": "MEDIUM",
+        "summary": "FRAGMOS initiative for payout terms types"
+      },
+      {
+        "number": 3705,
+        "title": "FRAGMOS - MultiplierDivisor type",
+        "status": "OPEN",
+        "created": "2025-04-30",
+        "labels": ["feature", "triage"],
+        "priority": "MEDIUM",
+        "summary": "FRAGMOS proposal for multiplier/divisor type"
+      },
+      {
+        "number": 3685,
+        "title": "Inclusion of Depositary Receipts (ADR, GDR, IDR) in InstrumentTypeEnum",
+        "status": "CLOSED",
+        "created": "2025-05-02",
+        "closed": "2025-07-15",
+        "labels": ["feature", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Added support for depositary receipt instruments (resolved)"
+      },
+      {
+        "number": 3582,
+        "title": "Add ability to record collateral and trade valuations derived from Mark To Market",
+        "status": "CLOSED",
+        "created": "2025-03-28",
+        "closed": "2025-06-19",
+        "labels": ["feature", "backward-incompatible"],
+        "priority": "MEDIUM",
+        "summary": "Support for MTM-derived valuations (resolved)"
+      },
+      {
+        "number": 3333,
+        "title": "Proposed CDM Model for Tokenised Assets",
+        "status": "CLOSED",
+        "created": "2025-01-15",
+        "closed": "2025-03-18",
+        "labels": ["feature", "complex"],
+        "priority": "HIGH",
+        "summary": "Modular TokenisationDetails component for blockchain-based assets. Composition-based approach for flexibility, scalability, and clarity. Addresses off-chain/on-chain alignment.",
+        "discussion_points": [
+          "Market gap: tokenised assets need consistent data standards",
+          "Challenge: misalignment between legal ownership and token representation",
+          "Solution: modular TokenisationDetails composition",
+          "Advantages: flexibility, scalability, clarity",
+          "Can apply to any asset type (Cash, Security, Commodity)",
+          "Use cases: trade settlement, collateral management, lifecycle events",
+          "Requires Steering WG approval (complex label)"
+        ]
+      },
+      {
+        "number": 3432,
+        "title": "Extending the Common Domain Model for Property and Physical Risk",
+        "status": "CLOSED",
+        "created": "2025-02-19",
+        "closed": "2025-03-18",
+        "labels": ["feature", "complex"],
+        "priority": "HIGH",
+        "summary": "Extension for physical risk management in banking. Property as fundamental asset class with hazard attributes (flood, fire, wind). Debate over core integration vs external extension.",
+        "discussion_points": [
+          "BIP Group proposal: foundation data model for banks managing physical risks",
+          "Benefits: reduced reporting costs, enhanced analytics, scenario testing",
+          "Enable Physical Risk Swaps as hedging instruments",
+          "Debate: CDM core vs external extension first",
+          "Supporter position: Property is fundamental asset class like collateral",
+          "Cautious position: concern about model bloat, reference data removal initiatives",
+          "Property as asset type with risk attribute specifications",
+          "Can serve as underlying collateral to Loan instruments",
+          "Approved by Steering WG March 18, 2025"
+        ]
+      }
+    ],
+    "enhancements": [
+      {
+        "number": 4143,
+        "title": "Addition of Redemption to debtType",
+        "status": "OPEN",
+        "created": "2025-10-31",
+        "labels": ["task"],
+        "priority": "MEDIUM",
+        "summary": "Enhancement to debt type modeling with redemption support"
+      },
+      {
+        "number": 4032,
+        "title": "Add DSL features to support more concise and readable mapping functions",
+        "status": "OPEN",
+        "created": "2025-09-11",
+        "labels": ["task", "technical"],
+        "priority": "MEDIUM",
+        "summary": "DSL language improvements for better mapping function readability"
+      },
+      {
+        "number": 4031,
+        "title": "Contribute FpML Confirmation Ingest functions for CDM 6",
+        "status": "OPEN",
+        "created": "2025-09-11",
+        "labels": ["task", "technical"],
+        "priority": "MEDIUM",
+        "summary": "Expand FpML confirmation ingestion capabilities for version 6"
+      },
+      {
+        "number": 4116,
+        "title": "Retire or migrate remaining non-FpML legacy mappings",
+        "status": "OPEN",
+        "created": "2025-10-16",
+        "labels": ["task", "technical"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Legacy mapping cleanup using synonyms and associated tests"
+      },
+      {
+        "number": 4115,
+        "title": "Migrate legacy CreateIQ synonym mappings to Ingest functions",
+        "status": "OPEN",
+        "created": "2025-10-16",
+        "labels": ["task", "technical"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Convert legacy CreateIQ mappings to modern ingest architecture"
+      },
+      {
+        "number": 3904,
+        "title": "Non-Java CDM build and distribution requirements to support FpML CDM Reference Data Code lists",
+        "status": "OPEN",
+        "created": "2025-06-26",
+        "labels": ["feature", "technical"],
+        "priority": "MEDIUM",
+        "summary": "Extend non-Java tooling support for reference data"
+      },
+      {
+        "number": 4072,
+        "title": "Updating IM/VM & Legacy Credit Support clauses in Legal Documentation",
+        "status": "CLOSED",
+        "created": "2025-10-01",
+        "closed": "2025-10-31",
+        "labels": ["feature", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "HIGH",
+        "summary": "Updates to Initial Margin/Variation Margin and legacy credit support clauses (resolved)"
+      },
+      {
+        "number": 4053,
+        "title": "Remaining IM/VM Clauses - Updates to clause structure and definitions",
+        "status": "CLOSED",
+        "created": "2025-09-26",
+        "closed": "2025-10-31",
+        "labels": ["task", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "HIGH",
+        "summary": "Structural and definitional improvements to IM/VM clauses (resolved)"
+      },
+      {
+        "number": 4051,
+        "title": "Merging Valuation/Calculation Agent types & Collateral & Legacy Valuation Agent",
+        "status": "CLOSED",
+        "created": "2025-09-26",
+        "closed": "2025-10-31",
+        "labels": ["task", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Consolidation of valuation agent types (resolved)"
+      },
+      {
+        "number": 4049,
+        "title": "Merging Legacy Threshold & MTA types with Threshold/MTA",
+        "status": "CLOSED",
+        "created": "2025-09-26",
+        "closed": "2025-10-30",
+        "labels": ["task", "backward-incompatible"],
+        "milestone": "Major Release 7.0",
+        "priority": "MEDIUM",
+        "summary": "Consolidation of threshold and MTA types (resolved)"
+      },
+      {
+        "number": 4033,
+        "title": "Support for FpML Record-keeping schema",
+        "status": "CLOSED",
+        "created": "2025-09-13",
+        "closed": "2025-10-29",
+        "labels": ["feature", "technical"],
+        "priority": "MEDIUM",
+        "summary": "Added FpML record-keeping schema support (resolved)"
+      },
+      {
+        "number": 4030,
+        "title": "Retire legacy FpML mappings using synonyms and associated ingestion tests",
+        "status": "CLOSED",
+        "created": "2025-09-13",
+        "closed": "2025-10-29",
+        "labels": ["task", "technical"],
+        "priority": "MEDIUM",
+        "summary": "Legacy FpML mapping retirement (resolved)"
+      },
+      {
+        "number": 4025,
+        "title": "CFTC taxonomy enum addition for underlying taxonomy support",
+        "status": "CLOSED",
+        "created": "2025-09-10",
+        "closed": "2025-10-20",
+        "labels": ["feature"],
+        "milestone": "Minor Release 5.28",
+        "priority": "MEDIUM",
+        "summary": "Added CFTC taxonomy support to TaxonomySourceEnum (resolved)"
+      },
+      {
+        "number": 3949,
+        "title": "Consolidation of enums and replacing of attributes in legacy CSA clauses",
+        "status": "CLOSED",
+        "created": "2025-07-23",
+        "closed": "2025-08-26",
+        "labels": ["task", "backward-incompatible"],
+        "priority": "MEDIUM",
+        "summary": "Enum consolidation in legacy Credit Support Annex clauses (resolved)"
+      },
+      {
+        "number": 3945,
+        "title": "Addition of clause EligibilityToHoldPostedCollateral added to CSA",
+        "status": "CLOSED",
+        "created": "2025-07-22",
+        "closed": "2025-08-26",
+        "labels": ["task", "backward-incompatible"],
+        "priority": "MEDIUM",
+        "summary": "New clause for collateral holding eligibility (resolved)"
+      },
+      {
+        "number": 3874,
+        "title": "Legacy CSA Contributions 2025",
+        "status": "CLOSED",
+        "created": "2025-06-16",
+        "closed": "2025-08-26",
+        "labels": ["feature", "backward-incompatible"],
+        "priority": "HIGH",
+        "summary": "Major legacy CSA contributions package (resolved)"
+      }
+    ],
+    "questions": [
+      {
+        "number": 3319,
+        "title": "Entity Identifier Type",
+        "status": "OPEN",
+        "created": "2025-01-13",
+        "labels": ["feature", "backward-incompatible"],
+        "priority": "HIGH",
+        "summary": "Most-discussed issue - entity identification and party-to-person relationship rationalization. Related to person class state management issue.",
+        "discussion_points": [
+          "Fundamental question about entity identification in CDM",
+          "Related to party-to-person relationships",
+          "Potential use of RelatedParty concept",
+          "Requires Steering WG roadmap placement",
+          "High community engagement (top comments)"
+        ]
+      }
+    ],
+    "documentation": [
+      {
+        "number": 4057,
+        "title": "OpenSSF Best Practices Badge requirements",
+        "status": "CLOSED",
+        "created": "2025-09-29",
+        "closed": "2025-10-08",
+        "labels": ["documentation"],
+        "priority": "MEDIUM",
+        "summary": "Compliance checklist completion for OpenSSF badge (resolved)"
+      },
+      {
+        "number": 3988,
+        "title": "CDM Website Updates",
+        "status": "OPEN",
+        "created": "2025-08-26",
+        "labels": ["feature", "documentation"],
+        "priority": "MEDIUM",
+        "summary": "Website content enhancements"
+      },
+      {
+        "number": 3936,
+        "title": "CDM Documentation - Versioning",
+        "status": "OPEN",
+        "created": "2025-07-17",
+        "labels": ["documentation"],
+        "priority": "MEDIUM",
+        "summary": "Structure, files, and Docusaurus navigation for versioning"
+      },
+      {
+        "number": 3935,
+        "title": "CDM Documentation - Home.mdx and navigation",
+        "status": "OPEN",
+        "created": "2025-07-17",
+        "labels": ["documentation"],
+        "priority": "MEDIUM",
+        "summary": "Review and update homepage and navigation structure"
+      },
+      {
+        "number": 3934,
+        "title": "CDM Documentation - Roadmap",
+        "status": "OPEN",
+        "created": "2025-07-17",
+        "labels": ["documentation"],
+        "priority": "MEDIUM",
+        "summary": "Review and plan roadmap updates"
+      },
+      {
+        "number": 3933,
+        "title": "CDM Documentation - Governance",
+        "status": "CLOSED",
+        "created": "2025-07-17",
+        "closed": "2025-08-01",
+        "labels": ["documentation"],
+        "priority": "MEDIUM",
+        "summary": "Review governance-related website materials (resolved)"
+      },
+      {
+        "number": 3930,
+        "title": "CDM Documentation Website Updates following BL/IGZ review",
+        "status": "OPEN",
+        "created": "2025-07-16",
+        "labels": ["documentation"],
+        "priority": "MEDIUM",
+        "summary": "Address feedback from BL/IGZ review"
+      },
+      {
+        "number": 3783,
+        "title": "Missing link to ANSI's Essential Requirements for Due Process",
+        "status": "CLOSED",
+        "created": "2025-06-05",
+        "closed": "2025-06-10",
+        "labels": ["documentation"],
+        "priority": "LOW",
+        "summary": "Add missing reference link (resolved)"
+      },
+      {
+        "number": 3781,
+        "title": "Remove reference to ISDA Foundations",
+        "status": "CLOSED",
+        "created": "2025-06-04",
+        "closed": "2025-06-10",
+        "labels": ["documentation"],
+        "priority": "LOW",
+        "summary": "Remove outdated foundation references (resolved)"
+      },
+      {
+        "number": 3780,
+        "title": "CDM Documentation Website Updates",
+        "status": "CLOSED",
+        "created": "2025-06-04",
+        "closed": "2025-07-01",
+        "labels": ["documentation"],
+        "priority": "MEDIUM",
+        "summary": "General website updates (resolved)"
+      },
+      {
+        "number": 3731,
+        "title": "CDM GitHub & Documentation updates",
+        "status": "OPEN",
+        "created": "2025-05-08",
+        "labels": ["bug", "documentation"],
+        "priority": "MEDIUM",
+        "summary": "Repository and documentation improvements"
+      },
+      {
+        "number": 3723,
+        "title": "CDM Needs Defined Process for Rune Changes",
+        "status": "OPEN",
+        "created": "2025-05-03",
+        "labels": ["feature", "documentation"],
+        "priority": "HIGH",
+        "summary": "Establish formal review process for Rune DSL changes. Proposes governance procedures for CDM's dependency on Rune to manage innovation pace while maintaining controlled DSL version management.",
+        "discussion_points": [
+          "CDM depends entirely on Rune DSL",
+          "Need to leverage Rune innovation while maintaining control",
+          "TAWG should develop governance procedures for SWG approval",
+          "Critical questions: Which Rune changes need CDM review?",
+          "Should breaking vs non-breaking follow distinct approval pathways?",
+          "Version numbers don't always identify breaking changes",
+          "What vetting for new modeling syntax before adoption?",
+          "Is TAWG appropriate for all reviews including urgent changes?",
+          "How to manage decisions to reject proposed Rune changes?",
+          "Discussed at TAWG meeting September 11, 2025"
+        ]
+      },
+      {
+        "number": 3572,
+        "title": "Contribution Guidelines missing",
+        "status": "OPEN",
+        "created": "2025-03-15",
+        "labels": ["documentation"],
+        "priority": "MEDIUM",
+        "summary": "Add contribution guidelines documentation"
+      }
+    ]
+  },
+  "key_insights": [
+    {
+      "id": "CDM-INSIGHT-001",
+      "insight": "Domain models evolve through careful governance balancing innovation with backward compatibility - Major Release 7.0 consolidates 23 backward-incompatible changes",
+      "source_issues": [4173, 4172, 3870, 3748, 3798, 3987, 4072, 4053, 4051, 4049],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should support versioning strategy with major/minor releases",
+        "Implement backward-compatibility tracking and analysis",
+        "Build tooling to identify breaking changes in domain models",
+        "Support migration path generation for major version upgrades",
+        "Enable grouping of related breaking changes into coordinated releases"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-002",
+      "insight": "State management in domain models requires careful scoping - nested objects can break global key stability when they represent mutable relationships vs immutable identity",
+      "source_issues": [4041, 3319],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should distinguish between identity attributes vs relationship attributes",
+        "Implement global key stability analysis",
+        "Support separation of static identity from dynamic workflow roles",
+        "Provide warnings when nested objects could affect parent identity",
+        "Enable modeling patterns: composition for identity, association for roles"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-003",
+      "insight": "Complex domain model changes require dedicated governance and resourcing - FRAGMOS observation improvements parked pending task force formation",
+      "source_issues": [3748, 3816],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should flag 'complex' changes requiring special review",
+        "Support breaking complex issues into smaller units",
+        "Enable linking sub-issues to parent epic issues",
+        "Provide impact analysis tools for cross-cutting changes",
+        "Support working group coordination and resource planning"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-004",
+      "insight": "Domain-specific languages evolve independently from domain models - need explicit governance for DSL version management and change acceptance",
+      "source_issues": [3723, 4032],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should separate modeling language from domain models",
+        "Track DSL version dependencies for each model version",
+        "Implement review process for language feature adoption",
+        "Distinguish breaking vs non-breaking DSL changes",
+        "Support syntax evolution without forcing model updates"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-005",
+      "insight": "FpML integration reveals the challenge of mapping legacy standards to modern domain models - requires synonym mappings, ingestion functions, and validation",
+      "source_issues": [4116, 4115, 4076, 4039, 4033, 4030, 4031],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should support synonym mapping for legacy standard integration",
+        "Implement ingestion function framework for data transformation",
+        "Enable migration from legacy synonym mappings to modern functions",
+        "Provide validation for mapping correctness",
+        "Support multiple standard versions simultaneously"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-006",
+      "insight": "Qualification functions are critical for event and product classification - but logic easily becomes misaligned with model evolution",
+      "source_issues": [4122, 4083, 4017, 4016, 3987, 3798],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should track qualification functions alongside domain model",
+        "Detect when model changes might break qualification logic",
+        "Support test cases for qualification function correctness",
+        "Enable qualification function versioning with model versions",
+        "Provide visualization of what qualifications apply to what types"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-007",
+      "insight": "Securities lending requires extensive domain-specific extensions - collateral management, fee structures, rate changes, transfer types, settlement states",
+      "source_issues": [4139, 4083, 4071, 3871, 3870, 3640, 3967],
+      "source_documentation": [],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Study securities lending as exemplar of domain extension patterns",
+        "UML-Codex should support domain-specific terminology and extensions",
+        "Enable visualization of complex lending workflows",
+        "Support modeling of fee structures and rate mechanisms",
+        "Provide patterns for settlement state management"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-008",
+      "insight": "FRAGMOS demonstrates systematic domain model improvement methodology - contributor submits 17+ related issues addressing interconnected structural deficiencies",
+      "source_issues": [3748, 3749, 3739, 3706, 3705],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should support systematic improvement campaigns",
+        "Enable tagging issues by contributor/initiative",
+        "Provide dependency tracking across related improvements",
+        "Support phased rollout of coordinated changes",
+        "Track approval status across working groups"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-009",
+      "insight": "Domain model extension for new asset classes requires careful debate - tokenized assets and property/physical risk approved through composition vs core integration discussion",
+      "source_issues": [3333, 3432, 3995, 3685, 3868],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should support modular composition patterns for extensions",
+        "Enable debate between core integration vs external extension",
+        "Provide impact analysis for model bloat concerns",
+        "Support reference data vs structural modeling decisions",
+        "Track extension approval through governance workflow"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-010",
+      "insight": "QuantityChange primitive event demonstrates the challenge of insufficient granularity - handling both price and quantity ambiguously leads to multiple downstream issues",
+      "source_issues": [3816],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should detect ambiguous multi-purpose components",
+        "Recommend separation of concerns when single component handles multiple dimensions",
+        "Track downstream issues caused by granularity problems",
+        "Support refactoring from Java implementation to DSL",
+        "Enable holistic review of primitive events and functions"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-011",
+      "insight": "Legal agreement refactoring focuses on reducing validation errors and improving data integrity - 14 coordinated changes streamline CSA and CTA structures",
+      "source_issues": [4173, 4172, 4072, 4053, 4051, 4049, 3949, 3945, 3874],
+      "source_documentation": [],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Study legal agreement modeling patterns for complex contractual terms",
+        "UML-Codex should support clause structures and elections",
+        "Enable consolidation of redundant fields across versions",
+        "Provide cardinality validation and adjustment tools",
+        "Support nomenclature improvements and field relocations"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-012",
+      "insight": "Smart contract support emerging as new use case - Phase 1 focuses on floating rate option collection and execution framework",
+      "source_issues": [4168, 4165],
+      "source_documentation": [],
+      "relevance": "MEDIUM",
+      "confidence": "MEDIUM",
+      "actionable": true,
+      "action_items": [
+        "Monitor smart contract integration patterns in domain models",
+        "Consider how UML-Codex models map to executable contracts",
+        "Study data collection requirements for contract execution",
+        "Understand phased implementation approach",
+        "Track blockchain-related identifier support (DTI, DLI)"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-013",
+      "insight": "Rosetta DSL generates multi-language code artifacts - Python, Java, JavaScript generators with Maven publishing for distribution",
+      "source_issues": [4139, 4130, 3878, 3848, 3844, 3829],
+      "source_documentation": [],
+      "relevance": "HIGH",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "Study Rosetta code generation architecture",
+        "UML-Codex should support multi-language code generation",
+        "Implement artifact publishing mechanisms",
+        "Support visualization of domain models",
+        "Enable dataset validation from model definitions"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-014",
+      "insight": "Build and CI/CD issues reveal operational challenges - Codefresh pipeline problems driving migration to GitHub Actions",
+      "source_issues": [4148, 3925, 4145],
+      "source_documentation": [],
+      "relevance": "LOW",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should integrate with modern CI/CD platforms",
+        "Ensure build reliability for code generation outputs",
+        "Support GitHub Actions for automated workflows",
+        "Provide clear error messages for missing dependencies",
+        "Enable validation before committing model changes"
+      ],
+      "refined_count": 0
+    },
+    {
+      "id": "CDM-INSIGHT-015",
+      "insight": "Documentation and governance processes require significant attention - contribution guidelines, versioning, roadmap, and process definitions for changes",
+      "source_issues": [3723, 3572, 3988, 3936, 3935, 3934, 3930],
+      "source_documentation": [],
+      "relevance": "MEDIUM",
+      "confidence": "HIGH",
+      "actionable": true,
+      "action_items": [
+        "UML-Codex should generate documentation from models",
+        "Support versioning documentation with model versions",
+        "Enable contribution workflow automation",
+        "Provide templates for governance processes",
+        "Track change approval through defined pathways"
+      ],
+      "refined_count": 0
+    }
+  ],
+  "pain_points": [
+    {
+      "pain_point": "State management fragility due to nested object design",
+      "severity": "HIGH",
+      "frequency": "RECURRING",
+      "evidence": ["Issue #4041: person class nesting breaks party global keys", "Issue #3319: entity identifier relationships"],
+      "impact": "Undermines before/after state comparison in workflows"
+    },
+    {
+      "pain_point": "Qualification function logic becomes misaligned with model changes",
+      "severity": "HIGH",
+      "frequency": "COMMON",
+      "evidence": ["Issue #3798: termination qualification misalignment", "Issue #3987: partial termination not qualified properly", "Issue #4122: unclear qualification scope"],
+      "impact": "Events and products incorrectly classified after model updates"
+    },
+    {
+      "pain_point": "Insufficient granularity in primitive events and functions",
+      "severity": "HIGH",
+      "frequency": "RECURRING",
+      "evidence": ["Issue #3816: QuantityChange handles price and quantity ambiguously", "Six related sub-issues tracked"],
+      "impact": "Single component tries to handle multiple concerns, causing downstream problems"
+    },
+    {
+      "pain_point": "FpML legacy mapping maintenance burden",
+      "severity": "MEDIUM",
+      "frequency": "ONGOING",
+      "evidence": ["Issue #4116: retire non-FpML mappings", "Issue #4115: migrate CreateIQ mappings", "Issue #4076: synonym mapping errors"],
+      "impact": "Technical debt and mapping correctness issues"
+    },
+    {
+      "pain_point": "Complex changes stall without dedicated resourcing",
+      "severity": "MEDIUM",
+      "frequency": "COMMON",
+      "evidence": ["Issue #3748: FRAGMOS observation improvements parked", "Requires task force formation", "Steering WG notes adequate resourcing needed"],
+      "impact": "Important structural improvements delayed indefinitely"
+    },
+    {
+      "pain_point": "Unclear governance process for DSL changes",
+      "severity": "MEDIUM",
+      "frequency": "STRUCTURAL",
+      "evidence": ["Issue #3723: CDM needs defined process for Rune changes", "Multiple critical questions about review scope and authority"],
+      "impact": "No clear path for adopting or rejecting language evolution"
+    },
+    {
+      "pain_point": "Build pipeline reliability issues",
+      "severity": "MEDIUM",
+      "frequency": "RECURRING",
+      "evidence": ["Issue #3925: regularly broken builds", "Issue #4145: missing class causing failures", "Issue #4148: migration to GitHub Actions"],
+      "impact": "Development velocity reduced by CI/CD problems"
+    },
+    {
+      "pain_point": "Model bloat concerns when adding new asset classes",
+      "severity": "MEDIUM",
+      "frequency": "STRATEGIC",
+      "evidence": ["Issue #3432: debate over property asset integration", "Concern about reference data in core model", "Core vs external extension tension"],
+      "impact": "Difficulty deciding what belongs in core vs extensions"
+    },
+    {
+      "pain_point": "Observation and valuation terms restricted to specific payouts",
+      "severity": "HIGH",
+      "frequency": "ARCHITECTURAL",
+      "evidence": ["Issue #3748: ObservationTerms not generic", "Misalignment with ISDA Definitions", "Event model gaps in observation handling"],
+      "impact": "Cannot apply standard observation patterns across all payout types"
+    },
+    {
+      "pain_point": "Documentation and contribution guidelines lag behind code",
+      "severity": "LOW",
+      "frequency": "CHRONIC",
+      "evidence": ["Issue #3572: missing contribution guidelines", "Multiple documentation update issues", "Issue #4128: broken documentation links"],
+      "impact": "Barrier to new contributors and community growth"
+    }
+  ],
+  "feature_requests": [
+    {
+      "category": "Smart Contracts",
+      "requests": [
+        {
+          "issue": 4168,
+          "title": "Floating rate option collection for smart contracts",
+          "priority": "HIGH",
+          "status": "OPEN"
+        },
+        {
+          "issue": 4165,
+          "title": "Smart contract framework for CDM",
+          "priority": "HIGH",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "category": "Advanced Mathematics",
+      "requests": [
+        {
+          "issue": 4169,
+          "title": "Black-Scholes and Binomial option pricing models",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "category": "Securities Lending",
+      "requests": [
+        {
+          "issue": 4139,
+          "title": "Securities lending visualizations",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 4083,
+          "title": "Enhanced security lending qualification",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 4071,
+          "title": "Settled position state for lending",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 3871,
+          "title": "New fee type options for lending",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 3870,
+          "title": "Securities transfer type support",
+          "priority": "HIGH",
+          "status": "OPEN"
+        },
+        {
+          "issue": 3640,
+          "title": "Rate changes on lending trades",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "category": "Blockchain/DLT",
+      "requests": [
+        {
+          "issue": 3995,
+          "title": "DTI and DLI identifiers for DLT instruments",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 3333,
+          "title": "Tokenized assets model",
+          "priority": "HIGH",
+          "status": "CLOSED"
+        }
+      ]
+    },
+    {
+      "category": "New Asset Classes",
+      "requests": [
+        {
+          "issue": 3432,
+          "title": "Property and physical risk support",
+          "priority": "HIGH",
+          "status": "CLOSED"
+        },
+        {
+          "issue": 3868,
+          "title": "Wrapped/insured debt",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 3685,
+          "title": "Depositary receipts (ADR, GDR, IDR)",
+          "priority": "MEDIUM",
+          "status": "CLOSED"
+        }
+      ]
+    },
+    {
+      "category": "Intraday Operations",
+      "requests": [
+        {
+          "issue": 4017,
+          "title": "Intra-day transfer qualification",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 4016,
+          "title": "Intraday timing in economic terms",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "category": "Legal Agreements",
+      "requests": [
+        {
+          "issue": 3974,
+          "title": "Partial ISDA document representation",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 3967,
+          "title": "Enhanced GMSLA support",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "category": "DSL Improvements",
+      "requests": [
+        {
+          "issue": 4032,
+          "title": "More concise and readable mapping functions",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "category": "Non-Java Tooling",
+      "requests": [
+        {
+          "issue": 3904,
+          "title": "Non-Java build and distribution for reference data",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        },
+        {
+          "issue": 3878,
+          "title": "Python generator for CDM 5.x and 6.x",
+          "priority": "MEDIUM",
+          "status": "OPEN"
+        }
+      ]
+    }
+  ],
+  "architectural_decisions": [
+    {
+      "decision": "Major Release 7.0 to consolidate backward-incompatible changes",
+      "rationale": "Coordinate 23+ breaking changes into single major version rather than fragmenting across minor releases",
+      "impact": "Provides clear migration path for adopters, reduces upgrade complexity",
+      "date": "2025-06-12",
+      "status": "IN_PROGRESS",
+      "milestone": "Major Release 7.0 due 2026-02-28"
+    },
+    {
+      "decision": "Composition-based approach for tokenized assets",
+      "rationale": "Modular TokenisationDetails component provides flexibility, scalability, and clarity without modifying core asset structures",
+      "impact": "Enables tokenization for any asset type (Cash, Security, Commodity) without architectural upheaval",
+      "date": "2025-03-18",
+      "status": "APPROVED"
+    },
+    {
+      "decision": "Property asset class in core model",
+      "rationale": "Property is fundamental asset class like collateral; risk attributes attach as contained specifications",
+      "impact": "Enables physical risk management in banking, supports Physical Risk Swaps, can serve as loan collateral",
+      "date": "2025-03-18",
+      "status": "APPROVED"
+    },
+    {
+      "decision": "Migrate from Codefresh to GitHub Actions",
+      "rationale": "Resolve regularly broken builds and improve CI/CD integration",
+      "impact": "Better reliability, tighter GitHub integration, modern workflow capabilities",
+      "date": "2025-11-04",
+      "status": "PROPOSED"
+    },
+    {
+      "decision": "Retire legacy FpML synonym mappings in favor of Ingest functions",
+      "rationale": "Modern ingestion architecture more maintainable than synonym-based approach",
+      "impact": "Cleaner codebase, better separation of concerns, easier testing",
+      "date": "2025-09-13",
+      "status": "IN_PROGRESS",
+      "milestone": "Major Release 7.0"
+    },
+    {
+      "decision": "Separate governance for FRAGMOS observation improvements",
+      "rationale": "Complex, consequential changes require dedicated task force with adequate resourcing",
+      "impact": "Proper attention to structural deficiencies, but progress currently parked",
+      "date": "2025-06-10",
+      "status": "PARKED"
+    },
+    {
+      "decision": "Establish formal process for Rune DSL change review",
+      "rationale": "CDM depends entirely on Rune; need to manage innovation pace while maintaining controlled DSL version management",
+      "impact": "Clear governance for adopting or rejecting language evolution",
+      "date": "2025-09-11",
+      "status": "IN_DISCUSSION"
+    },
+    {
+      "decision": "Simplify securities transfer enum to 'Delivery'",
+      "rationale": "Maintain consistency where enum represents obligations and asset type specified elsewhere",
+      "impact": "Cleaner pattern matching cash 'PrincipalPayment' approach",
+      "date": "2025-06-13",
+      "status": "IN_PROGRESS",
+      "milestone": "Major Release 7.0"
+    },
+    {
+      "decision": "Consolidate legacy threshold, MTA, and valuation agent types",
+      "rationale": "Reduce duplication and simplify model structure",
+      "impact": "Cleaner model, fewer validation issues, but backward-incompatible",
+      "date": "2025-10-31",
+      "status": "COMPLETED"
+    },
+    {
+      "decision": "Split person concept into counterparty persons vs role-holding persons",
+      "rationale": "Prevent global key instability when personnel assignments change across workflow steps",
+      "impact": "Maintains party identity stability, supports proper state management",
+      "date": "2025-11-04",
+      "status": "IN_REVIEW"
+    }
+  ],
+  "common_patterns": [
+    {
+      "pattern": "Backward-incompatible changes coordinated into major releases",
+      "description": "Breaking changes grouped together with explicit milestone targeting (Major Release 7.0 has 23 issues)",
+      "frequency": "SYSTEMATIC",
+      "examples": ["Major Release 7.0: 47 closed, 23 open backward-incompatible issues", "Clear labeling requires 2 maintainers approval and Steering WG roadmap placement"]
+    },
+    {
+      "pattern": "Working group review for complex changes",
+      "description": "Complex issues require steering committee approval, potential task force formation, and resource allocation",
+      "frequency": "CONSISTENT",
+      "examples": ["Issue #3748 parked pending task force", "Issue #3723 discussed at TAWG", "Issue #4173 approved by Legal Agreement WG"]
+    },
+    {
+      "pattern": "Triage label for incoming issues",
+      "description": "New issues marked for triage by Release Management team before work begins",
+      "frequency": "STANDARD",
+      "examples": ["17+ FRAGMOS issues in triage", "Recent smart contract issues marked triage", "Systematic intake process"]
+    },
+    {
+      "pattern": "Systematic contributor initiatives",
+      "description": "Contributors like FRAGMOS submit coordinated sets of related improvements addressing structural deficiencies",
+      "frequency": "EMERGING",
+      "examples": ["FRAGMOS: 17+ issues covering observation, barriers, quantities, payouts", "Coherent improvement campaign spanning multiple model areas"]
+    },
+    {
+      "pattern": "Legacy code consolidation and cleanup",
+      "description": "Ongoing effort to merge legacy types, retire old mappings, and simplify model structure",
+      "frequency": "CONTINUOUS",
+      "examples": ["CSA clause consolidation", "FpML mapping retirement", "Threshold/MTA type merging", "Valuation agent type consolidation"]
+    },
+    {
+      "pattern": "FpML integration challenges",
+      "description": "Recurring issues with synonym mappings, ingestion functions, and schema support for FpML standard",
+      "frequency": "COMMON",
+      "examples": ["Issue #4076: mapping errors", "Issue #4039: FX mapping bug", "Issue #4031: confirmation ingest functions", "Issue #4033: record-keeping schema"]
+    },
+    {
+      "pattern": "Qualification function misalignment",
+      "description": "Qualification logic fails to keep pace with model evolution, causing incorrect classification",
+      "frequency": "RECURRING",
+      "examples": ["Issue #3798: termination logic misalignment", "Issue #3987: partial termination not qualified", "Issue #4122: unclear qualification scope"]
+    },
+    {
+      "pattern": "Composition over inheritance for extensions",
+      "description": "New capabilities added through modular composition rather than core model modification",
+      "frequency": "ARCHITECTURAL",
+      "examples": ["Tokenization via TokenisationDetails component", "Property risk as attached specifications", "Maintains flexibility and avoids model bloat"]
+    },
+    {
+      "pattern": "Multi-language code generation",
+      "description": "Rosetta DSL generates Python, Java, JavaScript artifacts with Maven publishing",
+      "frequency": "FOUNDATIONAL",
+      "examples": ["Issue #3829: Python enum generator", "Issue #3848: Maven publishing", "Issue #3878: Python generator for older versions"]
+    },
+    {
+      "pattern": "Documentation maintenance challenges",
+      "description": "Documentation updates lag behind code, contribution guidelines missing, broken links",
+      "frequency": "CHRONIC",
+      "examples": ["Issue #3572: no contribution guidelines", "Issue #4128: broken README link", "Multiple documentation update issues"]
+    },
+    {
+      "pattern": "Securities lending domain extension",
+      "description": "Systematic expansion of CDM for securities lending use cases across multiple dimensions",
+      "frequency": "THEMATIC",
+      "examples": ["Collateral management", "Fee structures", "Rate changes", "Transfer types", "Settlement states", "Qualification functions"]
+    },
+    {
+      "pattern": "Meeting minutes as GitHub issues",
+      "description": "Working group meetings documented as closed issues for transparency and traceability",
+      "frequency": "GOVERNANCE",
+      "examples": ["Issue #2011: inaugural meeting minutes", "Multiple collateral WG meeting issues", "High comment counts on meeting issues"]
+    }
+  ],
+  "suggested_future_issues": [],
+  "repository_context": {
+    "created_date": "2023-03-14",
+    "open_issues": 127,
+    "closed_issues": "Many (exact count not available)",
+    "primary_language": "Rosetta DSL",
+    "organization": "FINOS (Fintech Open Source Foundation)",
+    "related_projects": ["ISDA CDM", "Rosetta DSL", "REGnosys tools"],
+    "status": "ACTIVE_DEVELOPMENT",
+    "maturity": "PRODUCTION",
+    "governance": "Multi-working-group structure with Steering WG, Technical Architecture WG, Contribution Review WG, Legal Agreement WG, Collateral WG",
+    "release_strategy": "Parallel major and minor releases with milestone-based planning",
+    "current_milestone": "Major Release 7.0 (due 2026-02-28, 67% complete)"
+  },
+  "next_steps": [
+    "Complete Major Release 7.0 with remaining 23 backward-incompatible issues",
+    "Establish formal governance process for Rune DSL changes",
+    "Form task force for FRAGMOS observation improvements",
+    "Resolve person class state management architectural issue",
+    "Complete migration from Codefresh to GitHub Actions",
+    "Finish legacy FpML mapping retirement and CreateIQ migration",
+    "Implement contribution guidelines and documentation improvements",
+    "Advance smart contract framework development",
+    "Continue systematic securities lending expansion",
+    "Review and update qualification functions for alignment"
+  ],
+  "analysis_notes": "FINOS CDM repository demonstrates mature governance with structured working groups, milestone-based planning, and careful backward compatibility management. The project coordinates major releases consolidating breaking changes while maintaining parallel minor releases. Key challenges include state management fragility from nested objects, qualification function misalignment, insufficient component granularity, and FpML integration maintenance burden. The FRAGMOS initiative exemplifies systematic domain improvement methodology. Smart contracts and blockchain identifiers emerging as new use cases. Rosetta DSL multi-language code generation is foundational capability. Strong community engagement evidenced by high-comment issues and working group meetings."
+}
